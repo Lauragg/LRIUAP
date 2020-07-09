@@ -22,3 +22,25 @@ Una primera idea, sería utilizar utilizar \emph{$k$-Nearest Neighbor Classifier
 De esta sencilla propuesta, surgen diversos problemas. Al darle mayor importancia al valor concreto de los píxeles, en lugar de a las formas que de las que está compuesta la figura, nos encontramos con que valores como los colores de fondo pueden influir más en la clasificación que los propios píxeles de la figura que queremos clasificar. En el ejemplo de la imagen del chiguagua, si considerásemos las etiquetas verde y perro, tendríamos que por lo general como respuesta el color verde, pese a que estamos más interesados por la mascota en sí. Otro gran problema, sería la baja escalabilidad que nos proporciona esta solución, al incrementarse enormemente el costo computacional de clasificación conforme aumenta el número de etiquetas.\\
 
 El siguiente paso, es buscar una forma de ``memorizar'' los datos de entrenamiento de forma que no tengamos que estar comparándolos con todos ellos cuando queramos clasificar una imagen. Lo que buscamos es poder valorar de alguna forma la imagen completa y a partir de esta ``puntuación'' conocer qué etiqueta le corresponde mejor a nuestra imagen. De esta forma, veríamos drásticamente reducido el tiempo de clasificación, sacrificando para ello el tiempo de entrenamiento, y podríamos ampliar en varias unidades la cantidad de datos de entrenamiento utilizados, aumentando así la precisión de nuestro clasificador.
+
+\section{Clasificadores Lineales}
+
+Antes de nada, vamos a comenzar contextualizando matemáticamente el entorno en el que nos encontramos. Una vez realizado esto podremos hablar correctamente de los clasificadores lineales y así poder extenderlos naturalmente a los conceptos de Red Neuronal y de Red Neuronal Convolucionada.\\
+
+Sea $D \in \N$ la dimensión de nuestras imágenes, por lo general el número de píxeles que estas poseen, y $K \in \N$ la cantidad de etiquetas o categorías bajo las cuales pueden ser clasificadas. Siendo $N \in \N$ el número de ejemplos que utilizaremos para entrenar nuestro clasificador, tendremos que para cada dato de entrenamiento $x_i \in \R^D \; i=1,...,N$ le corresponde una etiqueta $y_i \in 1,...,K$ tal que juntos conforman el par $(x_i,y_i)$ de imagen y categoría a la que pertenece.\\
+
+Para que no sea más fácil de entender este contexto, tomaremos como ejemplo el conjunto de datos CIFAR-10 que consiste en 60000 imágenes RGB de dimensión 32x32 y 10 categorías. De esta forma, tendríamos que $D=32\cdot 32 \cdot 3 = 3072$, $K=10$ y $N=60000$.
+
+\begin{definicion}\label{def:ScoreFunction}
+Definiremos la \emph{función de puntuación} o \emph{score function} como una función $f:\R^D \to \R^K$ que asigna los píxeles de la imagen sin procesar una serie de puntuaciones para cada etiqueta.
+\end{definicion}
+
+La función de puntuación nos revela la probabilidad que tiene cada imagen de pertenecer a cada una de la distintas etiquetas de las que disponemos. Dicho esto, podemos definir un \emph{clasificador lineal} o \emph{lineal classifier} \label{def:LinealClassifier} como aquel que utiliza una función de puntuación lineal, es decir, de la forma:
+
+$$f(x)=W\cdot x+ b\; \; \; W\in M_{K,D}(\R) \;\; b \in \R^K \;\; \forall x\in \R^D$$
+
+Dicho esto, existen diferentes tipos de clasificadores lineales y la principal diferencia entre ellos reside en la función de pérdida que utilicen a la hora de entrenar la red.
+
+\begin{definicion}\label{LossFunction}
+Una \emph{función de pérdida} o \emph{loss function} es aquella que durante el entrenamiento de un clasificador se encarga de penalizar las etiquetas incorrectas.
+\end{definicion}
