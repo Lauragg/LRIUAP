@@ -35,12 +35,74 @@ Para que no sea más fácil de entender este contexto, tomaremos como ejemplo el
 Definiremos la \emph{función de puntuación} o \emph{score function} como una función $f:\R^D \to \R^K$ que asigna los píxeles de la imagen sin procesar una serie de puntuaciones para cada etiqueta.
 \end{definicion}
 
-La función de puntuación nos revela la probabilidad que tiene cada imagen de pertenecer a cada una de la distintas etiquetas de las que disponemos. Dicho esto, podemos definir un \emph{clasificador lineal} o \emph{lineal classifier} \label{def:LinealClassifier} como aquel que utiliza una función de puntuación lineal, es decir, de la forma:
+La función de puntuación nos revela la probabilidad que tiene cada imagen de pertenecer a cada una de la distintas etiquetas de las que disponemos. Dicho esto, podemos definir un \emph{clasificador lineal} o \emph{linear classifier} \label{def:LinearClassifier} como aquel que utiliza una función de puntuación lineal, es decir, de la forma:
 
 $$f(x)=W\cdot x+ b\; \; \; W\in M_{K,D}(\R) \;\; b \in \R^K \;\; \forall x\in \R^D$$
 
 Dicho esto, existen diferentes tipos de clasificadores lineales y la principal diferencia entre ellos reside en la función de pérdida que utilicen a la hora de entrenar la red.
 
-\begin{definicion}\label{LossFunction}
+\begin{definicion}\label{def:LossFunction}
 Una \emph{función de pérdida} o \emph{loss function} es aquella que durante el entrenamiento de un clasificador se encarga de penalizar las etiquetas incorrectas.
 \end{definicion}
+
+FIXME: ¿Hablar de SVM, SoftMax y Cross-Entropy?\\
+
+Llegados a este punto, debemos de explicar cómo funcionan los clasificadores lineales, es decir, cómo estos son entrenados y para qué se emplean las funciones de puntuación y de pérdida. Dado poseemos un conjunto de ejemplos con su correspondiente etiqueta pero desconocemos el valor de los parámetros $W$ y $b$, nuestro objetivo es utilizar dichos datos de entrenamiento para estimar estos valores. \\
+
+Para ello, comenzamos haciendo una conjetura sobre un posible valor para nuestros parámetros, evaluamos nuestra función de puntuación con todos nuestros datos de entrenamiento y seguidamente utilizamos la función de pérdida para estimar cómo de bien funciona nuestra conjetura. Analizamos los resultados y hacemos una nueva conjetura que los mejore, repitiendo el proceso un número lo suficientemente grande de veces.\\
+
+Llegados a este punto, podemos preguntarnos cómo realizamos la nueva conjetura de forma que nos aseguremos tener unos resultados mejores. Hacerlo de forma totalmente aleatoria, repitiéndolo hasta obtener una pérdida lo suficientemente pequeña, no parece una buena idea puesto que es difícil saber cuándo encontraremos una buena respuesta. Entre las distintas técnicas, nos encontramos con las basadas en la \emph{búsqueda aleatoria local} y las que se basan en el \emph{Gradiente Descendiente}, entre otras muchas. Como ejemplo, tomaremos el algoritmo del gradiente descendiente y minimizaremos la función de pérdida para llegar a aquellos pesos que menor error nos den.\\
+
+FIXME: Enlazar pdfs que expliquen bien cómo funciona el gradiente descendiente y la búsqueda aleatoria local \\
+\lstset{language=Python}
+\begin{lstlisting}[frame=single]
+while condicion_de_parada :
+  weight_grad=evaluate_grad(loss_fun,x,y)
+  weight = -step_size*weight_grad
+
+\end{lstlisting}
+
+El código mostrado más arriba se trata de una versión muy simplificada de cómo funcionaría de cómo podríamos implementar el algoritmo, teniendo en cuenta que nosotros mismos podremos modificar la condición de parada de acuerdo a nuestras necesidades y que el valor \emph{step\_size} es algo que podremos fijar de la misma forma, sabiendo que este nos indica cuánto queremos avanzar en la dirección que nos indica el gradiente. FIXME: Enlazar pdfs que expliquen la importancia de estos valores y cómo fijarlos.\\
+
+FIXME: Añadir implementación en Tensorflow de un clasificador lineal.
+
+\begin{ejemplo}\label{SoftMaxBinary}
+Fijemos una etiqueta, $y=0$ por lo que $K=1$. Tendríamos que nuestra función de puntuación sería $f:\R^D \to \R$ donde $W=(w_1,...w_D)\in \R^D$ y $b\in \R$ luego $$f(x)=W\cdot x + b = \sum_{j=1}^D w_j x_j+b.$$ Así mismo, tomamos como función de pérdida $$L(x,f)=-\ln \frac{1}{\sum_{j=1}^D e^{f_j}}=-\ln \frac{1}{\sum_{j=1}^D e^{w_j x_j +b}}=\sum_{j=1}^D e^{w_j x_j +b}$$ que es un caso particular de \emph{Entropía Cruzada} o \emph{Cross-entropy}.\\
+
+Este clasificador recibe el nombre de \emph{Binary Softmax classifier} o \emph{Binary Logistic Regression classifier}. De esta forma, si consideramos la función probabilística \emph{sigmoide} tendríamos que el minimizar la función de pérdida estaríamos aumentando la probabilidad clasificar correctamente nuestros datos puesto que: $$P(y=0 | x; W)=\sigma (f(x)) = \frac{1}{1+e^{-f(x)}}.$$
+
+\begin{observacion}
+Estamos calculando la probabilidad de coincidir o no con una determinada etiqueta, recibe el nombre de binario porque también podríamos considerar que tenemos dos etiquetas y que si no perteneces a una forzosamente perteneces a la otra. Este modelo puede por tanto construirse también utilizando ambas etiquetas y con mejores resultados a la hora de clasificar puesto que durante el entrenamiento la función de pérdida es ligeramente modificada para tener en cuenta la otra etiqueta. En cualquier caso, ambas construcciones siguen la misma interpretación probabilística y, además, tenemos que $P(y=1 | x; W)=1-P(y=0 | x; W)$.
+\end{observacion}
+\end{ejemplo}
+
+\begin{ejemplo}\label{SVM}
+Tomamos como función de pérdida $L(x,f)=\frac{1}{N} \sum_{i=1}^N \sum_{j \neq y_i} \max(0,f_j-f_y_i + \Delta)$ donde $\Delta \in \R$ es un parámetro que se suele ajustar utilizando una técnica llamada \emph{validación cruzada} o \emph{cross validation}. Esta función suele recibir el nombre de \emph{hinge loss} y el clasificador lineal es conocido como \emph{Multiclass Suport Vector Machine (SVM)}. Este clasificador "quiere" que la etiqueta correcta para cada imagen tenga una puntuación mayor que las incorrectas por un margen fijo $\Delta$.
+\end{ejemplo}
+\section{El modelo de una neurona}
+
+Cuando comenzamos planteando nuestro problema buscábamos conseguir clasificar una imagen con una probabilidad de acertar similar o superior a cómo lo haríamos nosotros mismos. Teníamos el problema de que un ordenador no era capaz de pensar o razonar de la misma forma que un ser humano y buscábamos una forma de clasificar esta información a pesar de ello. Es aquí donde nacen los modelos de redes neuronales, en un intento por ser capaces de simular cómo funciona nuestro propio cerebro en nuestros clasificadores y que estos sean capaces de aprender cómo reconocer los distintos elementos de la misma forma que nosotros lo hemos ido haciendo a lo largo de nuestra vida.\\
+
+\begin{figure}[htpb]
+  \centering
+  \includegraphics[width=0.45\textwidth]{neuron}
+  \vrule
+  \includegraphics[width=0.45\textwidth]{neuron_model}
+  \caption{Comparación entre una neurona biológica (izquierda) y el modelo matemático (derecha) }
+  \label{fig:neurona}
+\end{figure}
+
+Nuestro cerebro está formado por múltiples neuronas interconectadas entre sí que están constantemente transmitiéndose información y aprendiendo a través de todos los datos que reciben. Si nos fijamos en \ref{fig:neurona} podemos ver que una neurona real esta formada por dentritas que son quienes, a través del proceso de sinapsis, reciben la entrada de información, que es asimilada y transformada por su núcleo antes de ser transmitida a la siguientes neuronas a través de las divisiones de su axón en caso de que supere un cierto umbral y se active.\\
+
+De esta forma, si consideramos que tenemos $D$ dentritas y que por la $i$-dentrita recibimos el la información $x_i$ con un peso o fuerza de sinapsis $w_i$, tendríamos que nuestro núcleo trabaja con el vector de información $(w_1 x_1,...,w_D x_D)$ que podemos condensar utilizando la norma $||\cdot ||_1$ como $\sum_i w_i x_i $ y sumarle una determinada constante $b$ propia de la neurona. El umbral de activación y la señal enviada al resto de neuronas la representaremos con la \emph{función de activación}\label{def:ActivationFunction} que será una función $f: \R \to \R$. \\
+
+A continuación, mencionaremos los ejemplos más representativos utilizados como funciones de activación, enlazándolos con lo ya visto anteriormente:
+
+\begin{itemize}
+\item \emph{Función sigmoide} $\sigma: \R \to [0,1]$ definida como $\sigma(x)=\frac{1}{1+e^{-x}} $. En este caso, nos encontramos con el ejemplo \ref{SoftMaxBinary} transformado en una neurona cuya función de pérdida utilizada durante el entrenamiento suele ser la misma que en el ejemplo mencionado. Se suele utilizar en la última capa de nuestra red, cuando nuestras imágenes pueden pertenecer a varias clases o etiquetas al mismo tiempo.
+\item \emph{Función Softmax} utilizada normalmente en la última capa donde hay tantas neuronas como etiquetas y en el problema de clasificación donde una imagen puede pertenecer únicamente a una sola etiqueta o caso. Se trata de una modificación de función la sigmoide que regulariza la salida para obtener la probabilidad de pertenecer a cada clase como sucesos independientes obteniendo así que la suma de todas las salidas de esta capa sería 1. Aquí, la $i$-neurona tendría función de activación $\sigma_i(x)=\frac{e^{x_i}}{\sum_{j=1}^K e^{x_j}}$ y utilizaría $L(x)=\frac{1}{N}\sum_{i=1}^N -\ln \frac{e^{f_y_i}}{\sum_{j=1}^D e^{f_j}}=\frac{1}{N}\sum_{i=1}^N (-{f_y_i}+\ln \sum_{j=1}^D e^f_j)$ como función de pérdida para el entrenamiento.
+\item \emph{Función ReLU}, cuyo nombre completo sería \emph{Rectified Lineal Unit}. Se suele utilizar en las capas intermedias de nuestra red y utiliza como función de activación $f(x)=\max(0,x)$ que nos recuerda al ejemplo \ref{SVM}.
+\item \emph{Función Tanh} se trata de de una centralización de la función sigmoide. $Tanh(x)=2\sigma(x)-1$.
+\end{itemize}
+
+\section{La red completa}
