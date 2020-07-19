@@ -106,3 +106,57 @@ A continuación, mencionaremos los ejemplos más representativos utilizados como
 \end{itemize}
 
 \section{La red completa}
+
+Una red red neuronal es un conjunto de neuronas dividas en varias \emph{capas} de forma que las neuronas de una capa pueden estar unidas o no con las neuronas de la capa anterior y de la siguiente formando así un grafo acíclico.
+
+\begin{figure}[htpb]
+  \centering
+  \includegraphics[width=0.4\textwidth]{neural_net}
+  \vrule
+  \includegraphics[width=0.5\textwidth]{neural_net2}
+  \caption{Ejemplos de redes totalmente conectadas (\emph{fully-connected}) }
+  \label{fig:fully-connected}
+\end{figure}
+
+La primera capa recibe el nombre de \emph{capa de entrada} que posee $D$ neuronas, es decir, tantas como la dimensión de nuestros datos. Por otro lado tenemos la \emph{capa de salida} con $K$ neuronas, tantas como etiquetas o clases de clasificación tengamos. El resto de neuronas se distribuyen dentro las \emph{capas ocultas} cuya distribución y conexiones dependen del modelo en concreto que queramos desarrollar, quedando a nuestro criterio.\\
+
+A continuación toca hablar del entrenamiento de la red completa, a los conceptos que ya conocíamos del clasificador lineal \ref{LinearClassifier} se añade el concepto de \emph{Backpropagation} o \emph{Propagación hacia atrás de errores} que hace uso de la \emph{regla de la cadena} para, a través de los cálculos locales realizados por cada neurona, obtener la función completa de clasificación. Así, buscamos que las neuronas se auto organicen para ser capaces de localizar patrones similares de forman que sepan cómo reaccionar ante la presencia de ruido o datos incompletos. Esto hace a través de la comunicación de sus valores locales y gradientes entre las distintas neuronas, comenzando por la capa de salida y avanzando hacia atrás. FIXME: Mencionar importancia del Subgradiente para el cálculo del gradiente, al no estar definido para cualquier función. \\
+
+FIXME: Definir epoch y la validación cruzada
+
+\chapter{Redes Neuronales Convolucionadas (CNN)}
+
+Hasta ahora, todo lo que hemos hablado es válido para casi cualquier contexto puesto que no hemos hecho ninguna presunción en cuanto a la estructura de los datos o sobre las peculiaridades que estos presentan, para nosotros todos los datos eran un vector con $D$ componentes a los que les correspondía una etiqueta y no le dábamos importancia a la estructura interna que estos pudieran llegar presentar. Esto cambia con el uso de las \emph{Redes Neuronales Convolucionadas} al ser un tipo de red exclusivo para imágenes en las cuáles no sólo podremos utilizar todos lo válido en el caso general sino que también utilizaremos una serie de bondades conocidas por el simple hecho de estar tratando con imágenes.\\
+
+Anteriormente, comentábamos el ejemplo del conjunto de datos CIFAR-10 donde teníamos que $D=3072$ y mostrábamos cómo obteníamos ese valor. Para ello, utilizábamos la dimensión de la imagen de $ancho \times alto $ y la dimensión del \emph{espacio de color} que estábamos utilizando. De esta forma, si en lugar de trasladar estos valores a $\R^D$ como vectores nos quedamos en $\R^{ancho}\times \R^{alto} \times \R^{\dim color}$ estaremos trabajando un espacio de matrices tridimensionales. De esta forma, siendo $a$ el ancho, $h$ la altura y $c$ la dimensión del espacio de color, para cada matriz $m \in M_{a, h,c}(\R)$ tendremos que dado un píxel conocemos de forma inmediata sus píxeles más próximos sin necesidad de hacer ningún cálculo complejo. Nos aprovecharemos de esto para definir las \emph{capas convolucionadas} o \emph{convolutionals} y las \emph{capas de agrupación} o \emph{pooling}.\\
+
+\section{Filtros}
+
+FIXME: Definición de filtro y ejemplos de cómo estos pueden resaltar diferentes características de las imágenes. Mención de los filtros más utilizados y enlace para más info.
+
+\section{Capas Convolucionadas o Convolutionals}
+
+FIXME: ¿Qué es una convolución? Utilidad de las convoluciones
+
+\section{Capas de Agrupación o Pooling}
+
+FIXME: Same convoluciones
+
+\section{Ejemplos}
+
+FIXME: ¿Apéndices o distribuido en el pdf? Cosas a mencionar:
+
+\begin{itemize}
+\item Cómo se ven tras cada neurona y/o capa (cómo pooling y convolution modifican la imagen)
+\item Cómo los filtros modifican una imagen visualmente
+\end{itemize}
+
+\chapter{Localización de interés en imágenes}
+
+\section{Window Sliding}
+
+\section{Dos pasos o basadas en RCNN}
+
+\section{Un paso o basado en YOLO}
+
+\section{Modelo elegido}
