@@ -23,3 +23,30 @@
 
     \theoremstyle{remark}
   \newtheorem{observacion}{Observación}[chapter]
+
+
+% FIGURAS TIKZ
+
+\newcommand{\cubo}{
+\coordinate (P1) at (0,0,0);
+\coordinate (P2) at (0,0,1);
+\coordinate (P3) at (0,1,0);
+\coordinate (P4) at (0,1,1);
+\coordinate (P5) at (1,0,0);
+\coordinate (P6) at (1,0,1);
+\coordinate (P7) at (1,1,0);
+\coordinate (P8) at (1,1,1);
+
+\draw[dashed] (P1) -- (P2);
+\draw[dashed] (P1) -- (P3);
+\draw[dashed] (P1) -- (P5);
+\draw (P2) -- (P4);
+\draw (P2) -- (P6);
+\draw (P3) -- (P4);
+\draw (P3) -- (P7);
+\draw (P4) -- (P8);
+\draw (P5) -- (P7);
+\draw (P5) -- (P6);
+\draw (P6) -- (P8);
+\draw (P7) -- (P8);
+}

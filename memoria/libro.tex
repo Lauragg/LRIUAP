@@ -104,6 +104,8 @@
 \usepackage{booktabs}
 % \renewcommand{\arraystretch}{1.5} % Aumenta el espacio vertical entre las filas de un entorno tabular
 
+\usepackage{tikz}
+\usetikzlibrary{arrows,scopes,calc}
 \usepackage{xcolor, graphicx}
 % Carpeta donde buscar los archivos de imagen por defecto
 \graphicspath{{img/}}
@@ -250,10 +252,11 @@
 
 % BIBLIOGRAFÍA
 %-------------------------------------------------------------------
- 
+
 \setbibpreamble{Las referencias se listan por orden alfabético. Aquellas referencias con más de un autor están ordenadas de acuerdo con el primer autor.\par\bigskip}
 \bibliographystyle{alpha}
 \begin{small} % Normalmente la bibliografía se imprime en un tamaño de letra más pequeño.
+\nocite{*} % FIXME cambiar conforme se vayan poniendo las referencias
 \bibliography{library.bib}
 \end{small}
 
