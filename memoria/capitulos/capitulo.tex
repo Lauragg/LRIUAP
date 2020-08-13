@@ -180,6 +180,8 @@ FIXME: ¿Apéndices o distribuido en el pdf? Cosas a mencionar:
 \chapter{Paradigmas de detección}
 Hasta este momento, hemos tratado un problema de clasificación global. Se suponía que la imagen tenía un único elemento que se quisiera clasificar e idealmente este estaría centrado con respecto el centro de la imagen. En adelante, querremos clasificar múltiples elementos pertenecientes a múltiples etiquetas distintas y querremos saber cuántos elementos hay, sus posiciones relativas a la imagen y la categoría a la que pertenecen cada una de ellas.\\
 
+La gran mayoría de los paradigmas de detección utilizan una red neuronal pre-entrenada como clasificador dentro de sus estructuras. Suele recibir modificaciones en sus últimas capas ya sea sustituyéndolas, pasando por un proceso de \emph{fine-tunning}, o eliminándolas antes de ser añadidas como un elemento invariante durante el entrenamiento del modelo. Estas redes suelen recibir el nombre de \emph{backbone} y algunos modelos permiten la libre elección de estos clasificadores dependiendo del problema concreto que se desee abordar.\\
+
 Para indicar las posiciones de los elementos, por lo general se utilizarán \emph{bounding-box} o \emph{bbox} que serán rectángulos que contendrán cada uno de los elementos o \emph{pixel level} que colorea cada uno de los píxeles pertenecientes a determinada categoría, ambos con la mayor precisión posible.
 
 \begin{figure}[htpb]
@@ -188,6 +190,9 @@ Para indicar las posiciones de los elementos, por lo general se utilizarán \emp
   \caption{Detección, clasificación y segmentación. \cite{2019arXiv190803673W}}
   \label{fig:object-detection}
 \end{figure}
+
+
+
 \section{Dos pasos o basados en RCNN}
 El problema de detección se divide en dos etapas: una generación de propuestas y la realización de predicciones sobre estas propuestas. Como paradigmas de detección, destacan la familia \emph{R-CNN} y los que se encuentran basados en esta.\\
 
@@ -195,10 +200,22 @@ Esta familia surge en noviembre de 2013 con \emph{R-CNN} \cite{2013arXiv1311.252
 
 La principal diferencia con \emph{Fast R-CNN} \cite{2015arXiv150408083G} reside en que, en lugar de pasar por la CNN todas las propuestas de Selective Search, nuestra CNN recibe como entrada la imagen completa reduciendo el coste computacional al analizar una única vez las zonas de solapamiento entre propuestas. FIXME: Con lo apuntado en la pizarrita. \\
 
+\begin{figure}[htpb]
+  \centering
+  \includegraphics[width=1\textwidth]{rcnn}
+  \caption{Comparativa de algunos modelos de la familia R-CNN. \cite{2019arXiv190803673W}}
+  \label{fig:r-cnn}
+\end{figure}
+
 En \emph{Faster R-CNN} \cite{2015arXiv150601497R} se sustituye Selective Search por una red neuronal de generación propuestas que no sólo reduce el tiempo de cómputo de la generación de propuestas sino que aporta un menor número de propuestas con mayor calidad y precisión. Un buen apunte de la red de generación de propuestas, es que esta no es pre-entrenado antes de ser añadido al modelo sino que aprende de forma conjunta con toda la red.\\
 
-La última mejora de esta familia viene representada por \emph{Mask R-CNN} \cite{2017arXiv170306870H} que ... FIXME.
- 
+La última mejora de esta familia viene representada por \emph{Mask R-CNN} \cite{2017arXiv170306870H} que sustituye la capa RoI pooling introducida en el modelo R-CNN por una RoI alignment que retiene más información de las características obtenidas por la CNN. Mask R-CNN aprovecha esto para realizar predicciones del tipo pixel level con mayor precisión a través de una interpolación bilineal que se ejecuta paralelamente con las capas totalmente conectadas de los modelos anteriores.\\
+
+Mencionar Mesh R-CNN
+https://arxiv.org/abs/1906.02739
 \section{Un paso o basado en YOLO}
+
+\section{Feature Pyramid Networks }
+https://arxiv.org/pdf/1612.03144.pdf
 
 \section{Modelo elegido}
