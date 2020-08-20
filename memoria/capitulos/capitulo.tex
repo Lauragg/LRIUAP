@@ -198,7 +198,7 @@ El problema de detección se divide en dos etapas: una generación de propuestas
 
 Esta familia surge en noviembre de 2013 con \emph{R-CNN} \cite{2013arXiv1311.2524G} que utiliza Selective Search \cite{Selective Search for object recognition} para generar 2000 bbox de propuestas que son redimensionadas para coincidir con las dimensiones de entrada una CNN pre-entrenada. Esta CNN debe volver a entrenarse, extrayéndole la última capa y añadiéndole una \emph{máquina de vectores de soporte(SVM)} con las categorías originales más una nueva clase llamada "fondo" que engloba a todas las propuestas que no pertenecen a ninguna categoría. Finalmente, las propuestas clasificadas son combinadas a través de un modelo de regresión lineal para así obtener una bbox con mejor ajuste y precisión.\\
 
-La principal diferencia con \emph{Fast R-CNN} \cite{2015arXiv150408083G} reside en que, en lugar de pasar por la CNN todas las propuestas de Selective Search, nuestra CNN recibe como entrada la imagen completa reduciendo el coste computacional al analizar una única vez las zonas de solapamiento entre propuestas. FIXME: Con lo apuntado en la pizarrita. \\
+La principal diferencia que introduce \emph{Fast R-CNN} \cite{2015arXiv150408083G} reside en que, en lugar de pasar por la CNN todas las propuestas de Selective Search, nuestra CNN recibe como entrada la imagen completa reduciendo el coste computacional al analizar una única vez las zonas de solapamiento entre propuestas. Además, las propuestas dejan de ser escaladas para coincidir con una determinada dimensión y se introduce en una capa especial llamada \emph{Region of Interest Pooling Layer (RoI pooling)} que extrae un vector de longitud fija que será la entrada de las siguientes ramas. A continuación, el modelo se divide en dos ramas: un clasificador SoftMax y un modelo de regresión que calcula las bbox. \\
 
 \begin{figure}[htpb]
   \centering
@@ -207,15 +207,29 @@ La principal diferencia con \emph{Fast R-CNN} \cite{2015arXiv150408083G} reside 
   \label{fig:r-cnn}
 \end{figure}
 
-En \emph{Faster R-CNN} \cite{2015arXiv150601497R} se sustituye Selective Search por una red neuronal de generación propuestas que no sólo reduce el tiempo de cómputo de la generación de propuestas sino que aporta un menor número de propuestas con mayor calidad y precisión. Un buen apunte de la red de generación de propuestas, es que esta no es pre-entrenado antes de ser añadido al modelo sino que aprende de forma conjunta con toda la red.\\
+En \emph{Faster R-CNN} \cite{2015arXiv150601497R} se sustituye Selective Search por una red neuronal de generación propuestas, conocida como \emph{anchor boxes}, que no sólo reduce el tiempo de cómputo de la generación de propuestas sino que aporta un menor número de propuestas con mayor calidad y precisión. Un buen apunte de la red de generación de propuestas, es que esta no es pre-entrenada antes de ser añadido al modelo sino que aprende de forma conjunta con toda la red.\\
 
-La última mejora de esta familia viene representada por \emph{Mask R-CNN} \cite{2017arXiv170306870H} que sustituye la capa RoI pooling introducida en el modelo R-CNN por una RoI alignment que retiene más información de las características obtenidas por la CNN. Mask R-CNN aprovecha esto para realizar predicciones del tipo pixel level con mayor precisión a través de una interpolación bilineal que se ejecuta paralelamente con las capas totalmente conectadas de los modelos anteriores.\\
+La última mejora de esta familia viene representada por \emph{Mask R-CNN} \cite{2017arXiv170306870H} que sustituye la capa RoI pooling introducida en el modelo Fast R-CNN por una RoI alignment que retiene más información de las características obtenidas por la CNN compartiendo la misma estructura de entrada y salida de datos con la RoI pooling. Mask R-CNN aprovecha esto para realizar predicciones del tipo pixel level con mayor precisión a través de una interpolación bilineal que se ejecuta paralelamente con las capas totalmente conectadas de los modelos anteriores. Así, en el mismo punto que sus predecesores eran divididos en tres ramas independientes, Mask R-CNN se divide en tres ramas: un clasificador SoftMax, un regresor de bbox y un otro regresor de pixel level.\\
 
 Mencionar Mesh R-CNN
-https://arxiv.org/abs/1906.02739
-\section{Un paso o basado en YOLO}
+https://arxiv.org/abs/1906.02739\\
+Mencionar R-FCN
+https://arxiv.org/pdf/1605.06409.pdf\\
+Libra R-CNN
+https://arxiv.org/pdf/1904.02701.pdf
+\section{Un paso o basados en YOLO}
+Estos modelos destacan por no hacer una separación directa de la generación de propuestas y la predicción de estas. Destaca \emph{YOLO} y sus sucesivas mejoras, así como los múltiples algoritmos basados en ellas, pero existen muchos más modelos que pueden ser identificados con esta estructura.\\
 
-\section{Feature Pyramid Networks }
+En junio de 2015 aparece \emph{You Only Look Once (YOLO)} \cite{2015arXiv150602640R}, un nuevo algoritmo que pretende realizar al mismo tiempo la generación de propuestas y la clasificación de estas, buscando así una mayor eficiencia computacional. Para ello, tras redimensionar la imagen en 448x448 píxeles, el algoritmo divide la imagen en una cuadrícula cuyas celdas se encargan de realizar un número fijo de propuestas indicando en cada una de ellas la probabilidad que tiene de ser un objeto, la bbox en la que se encuentra y la probabilidad de pertenecer a cada una de las clases de objetos de las que disponemos. Finalmente, descarta aquellas propuestas con baja probabilidad de ser un objeto y utiliza un algoritmo de \emph{non-max supression} \cite{2017arXiv170404503B} que unifica y combina las bbox con las máximas áreas compartidas.\\
+
+Buscando una mejora de la predicción pero sin perder el enfoque de la velocidad, surge \emph{YOLO9000} o \emph{YOLOv2} \cite{2016arXiv161208242R} que sigue la misma estructura que su predecesor pero sustituyendo algunos fragmentos por otros con mayor rendimiento. YOLOv2 redimensiona la imagen original a 416x416 píxeles y sustituye las capas totalmente conectadas que utilizaba para la generación de propuestas por un modelo de \emph{anchor boxes} \cite{2015arXiv150601497R} junto con otros cambios menores.\\
+
+La siguiente versión \emph{YOLOv3} \cite{2018arXiv180402767R} decide  no darle tanta importancia a la velocidad y centrarse en solucionar los problemas de detección presentados por sus antecesores. Mientras que YOLOv2 utiliza una arquitectura con 30 capas, YOLOv3 utiliza 106 capas totalmente convolucionadas e introduce la utilización de \emph{residual blocks}, \emph{skip connections} y \emph{upsampling}. Esta nueva arquitectura, realiza la detección de objetos en tres escalas distintas en diferentes profundidades de la red Darknet-53 y utilizando una estructura piramidal \cite{2016arXiv161203144L} para comunicar la detección entre las diferentes escalas.\\
+
+Mencionar YOLOv4
+https://arxiv.org/pdf/2004.10934.pdf\\
+
+Feature Pyramid Networks
 https://arxiv.org/pdf/1612.03144.pdf
 
 \section{Modelo elegido}
