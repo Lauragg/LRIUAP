@@ -232,4 +232,16 @@ https://arxiv.org/pdf/2004.10934.pdf\\
 Feature Pyramid Networks
 https://arxiv.org/pdf/1612.03144.pdf
 
-\section{Modelo elegido}
+\section{Non-local Neural Networks}
+
+En \cite{DBLP:journals/corr/abs-1711-07971} se introduce el concepto de \emph{Non-local Neural Networks} que plantea un modelo de \emph{Feature Pyramid Network} para extraer las características de un clasificador a distintos niveles de profundidad y utilizarlas para segmentar semánticamente la imagen. \ref{fig:object_detection}\\
+
+FIXME: Insertar imagen del modelo genérico
+
+Podemos distinguir tres tipos de componentes principales: clasificador, bloque no local o \emph{non-local block} y bloque de fusión o \emph{fuse up block}. A continuación, nos centraremos en los non-local block, definiendo las clase de funciones que los forman y demostrando algunas de sus propiedades que garantizarán su correcto funcionamiento. Seguidamente, mostraremos algunos ejemplos y cómo podemos configurar nuestra propia red según nuestras necesidades.\\
+
+\subsection{Non-local operator}
+
+\begin{definicion}
+Sea $X$ un espacio topológico, $Y$ un conjunto, $F(X)$ un espacio de funciones que contiene a todas las funciones cuyo dominio sea $X$ y $G(Y)$ otro espacio de funciones que contiene todas las funciones con dominio $Y$. Un operador $A:F(X)\to G(Y)$ se dice que es local si para todo $y\in Y$ existe un $x\in X$ tal que $Au(y)=Av(y)$ para todas las funciones $u,v\in F(X)$ que son equivalentes a $x$.
+\end{definicion}
