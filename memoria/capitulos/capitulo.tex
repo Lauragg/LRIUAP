@@ -242,13 +242,13 @@ Podemos distinguir tres tipos de componentes principales: clasificador, bloque n
 
 A continuación, nos centraremos en los non-local block, definiendo las clase de funciones que los forman y demostrando algunas de sus propiedades que garantizarán su correcto funcionamiento. Seguidamente, mostraremos algunos ejemplos y cómo podemos configurar nuestra propia red según nuestras necesidades.\\
 
-\subsection{Non-local operator}
+\subsection{Non-local operation}
 
 %\begin{definicion}
 %Sea $X$ un espacio topológico, $Y$ un conjunto, $F(X)$ un espacio de funciones que contiene a todas las funciones cuyo dominio sea $X$ y $G(Y)$ otro espacio de funciones que contiene todas las funciones con dominio $Y$. Un operador $A:F(X)\to G(Y)$ se dice que es local si para todo $y\in Y$ existe un $x\in X$ tal que $Au(y)=Av(y)$ para todas las funciones $u,v\in F(X)$ que son equivalentes a $x$.
 %\end{definicion}
 \begin{definicion}
- Sea $x=(x_1,...,x_D)\in \R^D$ una señal de entrada, $u:\R \times \R \to \R$ un producto escalar, $v:\R \to \R$ y $C_x\in R$ una constante.  Se define una operación no local genérica o \emph{generic non-local operation) en una red neuronal profunda $f:\R^D \to \R^D$ con $f(x)=(f(x_1),...,f(x_D))$ donde:
+ Sea $x=(x_1,...,x_D)\in \R^D$ una señal de entrada, $u:\R \times \R \to \R$ un producto escalar, $v:\R \to \R$ y $C_x\in R$ una constante.  Se define una operación no local genérica o \emph{generic non-local operation} en una red neuronal profunda $f:\R^D \to \R^D$ con $f(x)=(f(x_1),...,f(x_D))$ donde:
 
  $$f(x_i)=\frac{1}{C_x}\sum_{\j=1}^{D} u(x_i,x_j)v(x_j) \; \;  \forall i=1,...,D$$
 \end{definicion}
@@ -264,3 +264,19 @@ Proseguiremos enunciando varios ejemplos de funciones que pertenezcan a dicha de
 \item \emph{Non-local means} \cite{}
 % ¿Concatenacion?
 \end{enumerate}
+
+FIXME: Insertar definiciones básicas utilizadas en el enunciado
+
+Sea $V$ un campo aleatorio (random field) y los datos de entrada $v$ una realización de $V$. Sea $Z$ una secuencia de variables aleatorias con $Z_i={X_i,Y_i}$ con $Y_i=V(i)$ es real valuada y $X_i=V(I\{i}) \R^p$ valuada donde $I$ representa el conjunto de posiciones. Una operación no local genérica será un estimador de la esperanza condicionada $E[Y_i|X_i=v(I\{i})]$.
+
+\begin{teorema}
+Sea $Z={V(N_i\{i},V(i)}_{i\gr 1}$ un proceso estocástico estrictamente estacionario y mezclado \emph{strictly stationary and mixing process}. Sea $f^n$ una operación no local genérica aplicada a la secuencia $Z_n={V(N_i\{i},V(i)}_{i=1}^n$. Entonces, $$ |f^n(j)-[Y_j|X_j=v(I\{j})]| \to 0 \; a.s \;  \forall j \in{1,...,n}$$.
+\end{teorema}
+
+En un contexto más general, la demostración se puede encontrar en \cite{A non local algorithm for image denoising}
+
+
+\subsection{Non-local block}
+Finalmente, el bloque non-local es de la forma: $$z_i=W_z f(x_i) + x_i$$, donde multiplicamos la función no local por un peso que será entrenado por la red y le añadimos una conexión residual para evitar perder las características del modelo pre-entrenado en caso de que $W_z$ comience siendo inicializado como $0$.
+
+FIXME: Añadir más ventajas de la conexión residual.
