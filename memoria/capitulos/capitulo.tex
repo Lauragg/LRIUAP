@@ -238,10 +238,29 @@ En \cite{DBLP:journals/corr/abs-1711-07971} se introduce el concepto de \emph{No
 
 FIXME: Insertar imagen del modelo genérico
 
-Podemos distinguir tres tipos de componentes principales: clasificador, bloque no local o \emph{non-local block} y bloque de fusión o \emph{fuse up block}. A continuación, nos centraremos en los non-local block, definiendo las clase de funciones que los forman y demostrando algunas de sus propiedades que garantizarán su correcto funcionamiento. Seguidamente, mostraremos algunos ejemplos y cómo podemos configurar nuestra propia red según nuestras necesidades.\\
+Podemos distinguir tres tipos de componentes principales: clasificador, bloque no local o \emph{non-local block} y bloque de fusión o \emph{fuse up block}. Lo que más destaca de estas estructuras son los non-local block utilizados para extraer las características puesto que, en lugar obtenerlas utilizando de forma recurrente convoluciones en pequeñas áreas, comprueban las relaciones entre los datos con una única operación que, además, comprueba la afinidad con los datos más distantes.\\
+
+A continuación, nos centraremos en los non-local block, definiendo las clase de funciones que los forman y demostrando algunas de sus propiedades que garantizarán su correcto funcionamiento. Seguidamente, mostraremos algunos ejemplos y cómo podemos configurar nuestra propia red según nuestras necesidades.\\
 
 \subsection{Non-local operator}
 
+%\begin{definicion}
+%Sea $X$ un espacio topológico, $Y$ un conjunto, $F(X)$ un espacio de funciones que contiene a todas las funciones cuyo dominio sea $X$ y $G(Y)$ otro espacio de funciones que contiene todas las funciones con dominio $Y$. Un operador $A:F(X)\to G(Y)$ se dice que es local si para todo $y\in Y$ existe un $x\in X$ tal que $Au(y)=Av(y)$ para todas las funciones $u,v\in F(X)$ que son equivalentes a $x$.
+%\end{definicion}
 \begin{definicion}
-Sea $X$ un espacio topológico, $Y$ un conjunto, $F(X)$ un espacio de funciones que contiene a todas las funciones cuyo dominio sea $X$ y $G(Y)$ otro espacio de funciones que contiene todas las funciones con dominio $Y$. Un operador $A:F(X)\to G(Y)$ se dice que es local si para todo $y\in Y$ existe un $x\in X$ tal que $Au(y)=Av(y)$ para todas las funciones $u,v\in F(X)$ que son equivalentes a $x$.
+ Sea $x=(x_1,...,x_D)\in \R^D$ una señal de entrada, $u:\R \times \R \to \R$ un producto escalar, $v:\R \to \R$ y $C_x\in R$ una constante.  Se define una operación no local genérica o \emph{generic non-local operation) en una red neuronal profunda $f:\R^D \to \R^D$ con $f(x)=(f(x_1),...,f(x_D))$ donde:
+
+ $$f(x_i)=\frac{1}{C_x}\sum_{\j=1}^{D} u(x_i,x_j)v(x_j) \; \;  \forall i=1,...,D$$
 \end{definicion}
+ 
+ En este contexto, $v$ será una representación de la señal de entrada en la posición $j$, $u$ representará una relación, por ejemplo la afinidad, entre los $i$ y $j$. La operación recibe este nombre debido a que considera todas las posiciones de la imagen para calcular el valor del filtro en la posición $i$ distinguiéndose así de una operación convolucional que se centraría en un rango \emph{local} de posiciones.% ($i-1\leq j \leq i+1$ en el caso de tener una convolución de núcleo de tamaño $3$). 
+ 
+Proseguiremos enunciando varios ejemplos de funciones que pertenezcan a dicha definición para mostrar la diversidad que podemos elegir a la hora de implementar un modelo que siga esta estructura. Por simplicidad, consideraremos que $v(x_j)=W_v x_j$ donde $W_v$ es una matriz de pesos que tiene que ser aprendida, siendo esta fácilmente implementable como una convolución de núcleo de tamaño $1$. 
+
+\begin{enumerate}
+\item \emph{Gaussiana} $u(x_i,x_j)=e^{x_i^T x_j}$ y $C(x)= \sum_{j=1}^D u(x_i,x_j)$.
+\item \emph{Embedded Gaussian} $u(x_i,x_j)=e^{\phi(x_i)^T,\theta(x_j)}$ donde $\phi(x_i)=W_\phi x_i$ y $\theta(x_j)=W_\theta x_j$ son dos inmersiones y  $C(x)= \sum_{j=1}^D u(x_i,x_j)$. Nótese que el módulo \emph{self-attention} es un caso particular de este ejemplo.
+\item \emph{Dot-product similarity} $u(x_i,x_j)=\phi(x_i)^T \theta(x_j)$ donde $\phi(x_i)=W_\phi x_i$ y $\theta(x_j)=W_\theta x_j$ son dos inmersiones y $C(x)=D$.
+\item \emph{Non-local means} \cite{}
+% ¿Concatenacion?
+\end{enumerate}
