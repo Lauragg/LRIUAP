@@ -4,7 +4,7 @@
 \chapter{Red Neuronal}
 \section{El problema de clasificar una imagen.}
 
-Cuando observamos una imagen, podemos localizar varios elementos a partir de los cuáles esta se encuentra compuesta con tan sólo un vistazo. Sin embargo, para un ordenador no se trata de algo tan sencillo puesto que sólo es capaz de ver un gran conjunto de números que no tienen por qué tener relación alguna entre sí.\newline
+Cuando observamos una imagen, podemos localizar varios elementos, a partir de los cuáles, esta se encuentra compuesta con tan sólo un vistazo. Sin embargo, para un ordenador no se trata de algo tan sencillo puesto que sólo es capaz de ver un gran conjunto de números que no tienen por qué tener relación alguna entre sí.\newline
 
 \begin{figure}[htpb]
   \centering
@@ -13,72 +13,95 @@ Cuando observamos una imagen, podemos localizar varios elementos a partir de los
   \label{fig:blanquita}
 \end{figure}
 
-Idealmente, en esta imagen desearíamos que fuera capaz de identificar que se trata de un perro, en concreto de un chiguagua, de pelaje blanco y manchas color café que se encuentra sobre un césped. Estos poquitos datos que para nosotros parecen tan triviales necesitan de horas y horas de computación para ser obtenidos a partir de una imagen cualquiera.\newline
+Idealmente, en esta imagen desearíamos que fuera capaz de identificar que se trata de un perro, en concreto de un chiguagua, de pelaje blanco y manchas color café que se encuentra sobre un césped. Estos poquitos datos, que para nosotros parecen tan triviales, necesitan de horas y horas de computación para ser obtenidos a partir de una imagen cualquiera.\newline
 
 Dejamos todos estos detalles, a los cuales esperamos poder llegar en un futuro no muy lejano, y simplificamos el problema a tener un conjunto de etiquetas y buscar con cuál de todas ellas tiene mayor relación nuestra imagen.\newline
 
-Una primera idea, sería utilizar utilizar \emph{$k$-Nearest Neighbor Classifier}, en adelante $k$-NN. Este clasificador consiste en que para cada etiqueta se correspondan $k$ imágenes y consideraremos como etiqueta idónea para nuestra clasificación aquella cuya distancia, siendo Manhattan y Euclídea las más comunes, entre los píxeles con nuestra imagen sea menor. Nos encontramos con que el tiempo de entrenamiento de nuestro clasificador sería ínfimo en comparación con el tiempo de clasificación, si bien se pueden hacer diversas mejoras que cambien estos hechos. \newline
+Una primera idea, sería utilizar utilizar \emph{$k$-Nearest Neighbor Classifier}, en adelante $k$-NN. Este clasificador consiste en que, para cada etiqueta, se correspondan $k$ imágenes y consideraremos como etiqueta idónea para nuestra clasificación aquella cuya distancia, siendo Manhattan y Euclídea las más comunes, entre los píxeles con nuestra imagen sea menor. Nos encontramos con que el tiempo de entrenamiento de nuestro clasificador sería ínfimo en comparación con el tiempo de clasificación, si bien se pueden hacer diversas mejoras que cambien estos hechos. \newline
+
+\begin{figure}[htpb]
+  \centering
+  \includegraphics[width=0.8\textwidth]{knn}
+  \caption{Un ejemplo de la diferencia entre un \emph{Nearest Neighbor classifier} y un \emph{5-Nearest Neighbor classifier} con puntos bidimensionales y tres clases.}
+  \label{fig:knn}
+\end{figure}
 
 De esta sencilla propuesta, surgen diversos problemas. Al darle mayor importancia al valor concreto de los píxeles, en lugar de a las formas que de las que está compuesta la figura, nos encontramos con que valores como los colores de fondo pueden influir más en la clasificación que los propios píxeles de la figura que queremos clasificar. En el ejemplo de la imagen del chiguagua, si considerásemos las etiquetas verde y perro, tendríamos que por lo general como respuesta el color verde, pese a que estamos más interesados por la mascota en sí. Otro gran problema, sería la baja escalabilidad que nos proporciona esta solución, al incrementarse enormemente el costo computacional de clasificación conforme aumenta el número de etiquetas.\newline
 
-El siguiente paso, es buscar una forma de ``memorizar'' los datos de entrenamiento de forma que no tengamos que estar comparándolos con todos ellos cuando queramos clasificar una imagen. Lo que buscamos es poder valorar de alguna forma la imagen completa y a partir de esta ``puntuación'' conocer qué etiqueta le corresponde mejor a nuestra imagen. De esta forma, veríamos drásticamente reducido el tiempo de clasificación, sacrificando para ello el tiempo de entrenamiento, y podríamos ampliar en varias unidades la cantidad de datos de entrenamiento utilizados, aumentando así la precisión de nuestro clasificador.
+%El siguiente paso, es buscar una forma de ``memorizar'' los datos de entrenamiento de forma que no tengamos que estar comparándolos con todos ellos cuando queramos clasificar una imagen. Lo que buscamos es poder valorar de alguna forma la imagen completa y a partir de esta ``puntuación'' conocer qué etiqueta le corresponde mejor a nuestra imagen. De esta forma, veríamos drásticamente reducido el tiempo de clasificación, sacrificando para ello el tiempo de entrenamiento, y podríamos ampliar en varias unidades la cantidad de datos de entrenamiento utilizados, aumentando así la precisión de nuestro clasificador.
 
-\section{Clasificadores Lineales}
+Los $k$-NN presentan más problemas que ventajas y muchos son los autores que niegan que se pueda considerar que estos clasificadores aprendan en alguna parte de su proceso. Realmente, lo que se busca es un método que sea más fácilmente escalable y que pueda considerar muchos datos de entrenamiento, para así refinar lo máximo posible su predicción ante entradas nunca antes vistas. Un primer ejemplo de la búsqueda de esta finalidad, podrían ser los clasificadores lineales.\\
 
-Antes de nada, vamos a comenzar contextualizando matemáticamente el entorno en el que nos encontramos. Una vez realizado esto podremos hablar correctamente de los clasificadores lineales y así poder extenderlos naturalmente a los conceptos de Red Neuronal y de Red Neuronal Convolucionada.\newline
+\begin{figure}[htpb]
+  \centering
+  \includegraphics[width=0.8\textwidth]{pixelspace}
+  \caption{Ejemplo de representación de un clasificador lineal con tres etiquetas.}
+  \label{fig:pixelspace}
+\end{figure}
 
-Sea $D \in \N$ la dimensión de nuestras imágenes, por lo general el número de píxeles que estas poseen, y $K \in \N$ la cantidad de etiquetas o categorías bajo las cuales pueden ser clasificadas. Siendo $N \in \N$ el número de ejemplos que utilizaremos para entrenar nuestro clasificador, tendremos que para cada dato de entrenamiento $x_i \in \R^D \; i=1,...,N$ le corresponde una etiqueta $y_i \in 1,...,K$ tal que juntos conforman el par $(x_i,y_i)$ de imagen y categoría a la que pertenece.\newline
+Si consideramos $D \in \N$ la dimensión de nuestras imágenes o datos de entrada y $K \in \N$ la cantidad de etiquetas o categorías bajo las cuales pueden ser clasificadas. Siendo $N \in \N$ el número de ejemplos que utilizaremos para entrenar nuestro clasificador, tendremos que para cada dato de entrenamiento $x_i \in \R^D \; i=1,...,N$ le corresponde una etiqueta $y_i \in 1,...,K$ tal que juntos conforman el par $(x_i,y_i)$ de imagen y categoría a la que pertenece. Utilizando estos datos, podremos entrenar el clasificador lineal que será una función del tipo
 
-Para que no sea más fácil de entender este contexto, tomaremos como ejemplo el conjunto de datos CIFAR-10 que consiste en 60000 imágenes RGB de dimensión 32x32 y 10 categorías. De esta forma, tendríamos que $D=32\cdot 32 \cdot 3 = 3072$, $K=10$ y $N=60000$.
+$$f(x)=W\cdot x+ b\; \; \; W\in M_{K,D}(\R) \;\; b \in \R^K \;\; \forall x\in \R^D,$$
 
-\begin{definicion}\label{def:ScoreFunction}
-Definiremos \emph{función de puntuación} o \emph{score function} como una función $f:\R^D \to \R^K$ que asigna los píxeles de la imagen sin procesar una serie de puntuaciones para cada etiqueta.
-\end{definicion}
+con la cual estaremos dividiendo el espacio de resultados utilizando hiperplanos. Existen múltiples tipos de clasificadores lineales, como por ejemplo una \emph{Máquina de vectores de soporte multiclase (Multiclass SVM)} o un clasificador SoftMax que tienen como principal diferencia la función de pérdida que utilizan para penalizar las etiquetas incorrectas.
 
-Una función de puntuación nos revela la probabilidad que tiene cada imagen de pertenecer a cada una de la distintas etiquetas de las que disponemos. Podemos definir un \emph{clasificador lineal} o \emph{linear classifier} \label{def:LinearClassifier} como aquel que utiliza una función de puntuación lineal, es decir, de la forma:
 
-$$f(x)=W\cdot x+ b\; \; \; W\in M_{K,D}(\R) \;\; b \in \R^K \;\; \forall x\in \R^D$$
+%\section{Clasificadores Lineales}
 
-Dicho esto, existen diferentes tipos de clasificadores lineales y la principal diferencia entre ellos reside en la función de pérdida que utilicen a la hora de entrenar la red.
+%Antes de nada, vamos a comenzar contextualizando matemáticamente el entorno en el que nos encontramos. Una vez realizado esto podremos hablar correctamente de los clasificadores lineales y así poder extenderlos naturalmente a los conceptos de Red Neuronal y de Red Neuronal Convolucionada.\newline
 
-\begin{definicion}\label{def:LossFunction}
-Una \emph{función de pérdida} o \emph{loss function} es aquella que durante el entrenamiento de un clasificador se encarga de penalizar las etiquetas incorrectas.
-\end{definicion}
+%Sea $D \in \N$ la dimensión de nuestras imágenes o datos de entrada, por lo general el número de píxeles que estas poseen, y $K \in \N$ la cantidad de etiquetas o categorías bajo las cuales pueden ser clasificadas. Siendo $N \in \N$ el número de ejemplos que utilizaremos para entrenar nuestro clasificador, tendremos que para cada dato de entrenamiento $x_i \in \R^D \; i=1,...,N$ le corresponde una etiqueta $y_i \in 1,...,K$ tal que juntos conforman el par $(x_i,y_i)$ de imagen y categoría a la que pertenece.\newline
 
-FIXME: ¿Hablar de SVM, SoftMax y Cross-Entropy?\newline
+%Para que no sea más fácil de entender este contexto, tomaremos como ejemplo el conjunto de datos CIFAR-10 que consiste en 60000 imágenes RGB de dimensión 32x32 y 10 categorías. De esta forma, tendríamos que $D=32\cdot 32 \cdot 3 = 3072$, $K=10$ y $N=60000$.
 
-Llegados a este punto, debemos de explicar cómo funcionan los clasificadores lineales, es decir, cómo estos son entrenados y para qué se emplean las funciones de puntuación y de pérdida. Dado poseemos un conjunto de ejemplos con su correspondiente etiqueta pero desconocemos el valor de los parámetros $W$ y $b$, nuestro objetivo es utilizar dichos datos de entrenamiento para estimar estos valores. \newline
+%\begin{definicion}\label{def:ScoreFunction}
+%Definiremos \emph{función de puntuación} o \emph{score function} como una función $f:\R^D \to \R^K$ que asigna los píxeles de la imagen sin procesar una serie de puntuaciones para cada etiqueta.
+%\end{definicion}
 
-Para ello, comenzamos haciendo una conjetura sobre un posible valor para nuestros parámetros, evaluamos nuestra función de puntuación con todos nuestros datos de entrenamiento y seguidamente utilizamos la función de pérdida para estimar cómo de bien funciona nuestra conjetura. Analizamos los resultados y hacemos una nueva conjetura que los mejore, repitiendo el proceso un número lo suficientemente grande de veces.\newline
+%Una función de puntuación nos revela la probabilidad que tiene cada imagen de pertenecer a cada una de la distintas etiquetas de las que disponemos. Podemos definir un \emph{clasificador lineal} o \emph{linear classifier} \label{def:LinearClassifier} como aquel que utiliza una función de puntuación lineal, es decir, de la forma:
 
-Seguidamente, debemos preguntarnos cómo realizamos la nueva conjetura de forma que nos aseguremos tener unos resultados mejores. Hacerlo de forma totalmente aleatoria, repitiéndolo hasta obtener una pérdida lo suficientemente pequeña, no parece una buena idea puesto que es difícil saber cuándo encontraremos una buena respuesta. Entre las distintas técnicas, nos encontramos con las basadas en la \emph{búsqueda aleatoria local} y las que se basan en el \emph{Gradiente Descendiente}, entre otras muchas. Como ejemplo, tomaremos el algoritmo del gradiente descendiente y minimizaremos la función de pérdida para llegar a aquellos pesos que menor error nos den.\newline
+%$$f(x)=W\cdot x+ b\; \; \; W\in M_{K,D}(\R) \;\; b \in \R^K \;\; \forall x\in \R^D$$
 
-FIXME: Enlazar pdfs que expliquen bien cómo funciona el gradiente descendiente y la búsqueda aleatoria local \newline
-\lstset{language=Python}
-\begin{lstlisting}[frame=single]
-while condicion_de_parada :
-  weight_grad=evaluate_grad(loss_fun,x,y)
-  weight = -step_size*weight_grad
+%Dicho esto, existen diferentes tipos de clasificadores lineales y la principal diferencia entre ellos reside en la función de pérdida que utilicen a la hora de entrenar la red.
 
-\end{lstlisting}
+%\begin{definicion}\label{def:LossFunction}
+%Una \emph{función de pérdida} o \emph{loss function} es aquella que durante el entrenamiento de un clasificador se encarga de penalizar las etiquetas incorrectas.
+%\end{definicion}
 
-El código mostrado más arriba se trata de una versión muy simplificada de cómo funcionaría de cómo podríamos implementar el algoritmo, teniendo en cuenta que nosotros mismos podremos modificar la condición de parada de acuerdo a nuestras necesidades y que el valor \emph{step\_size} es algo que podremos fijar de la misma forma, sabiendo que este nos indica cuánto queremos avanzar en la dirección que nos indica el gradiente. FIXME: Enlazar pdfs que expliquen la importancia de estos valores y cómo fijarlos.\newline
+%FIXME: ¿Hablar de SVM, SoftMax y Cross-Entropy?\newline
 
-FIXME: Añadir implementación en Tensorflow de un clasificador lineal.
+%Llegados a este punto, debemos de explicar cómo funcionan los clasificadores lineales, es decir, cómo estos son entrenados y para qué se emplean las funciones de puntuación y de pérdida. Dado poseemos un conjunto de ejemplos con su correspondiente etiqueta pero desconocemos el valor de los parámetros $W$ y $b$, nuestro objetivo es utilizar dichos datos de entrenamiento para estimar estos valores. \newline
 
-\begin{ejemplo}\label{SoftMaxBinary}
-Fijemos una etiqueta, $y=0$ por lo que $K=1$. Tendríamos que nuestra función de puntuación sería $f:\R^D \to \R$ donde $W=(w_1,...w_D)\in \R^D$ y $b\in \R$ luego $$f(x)=W\cdot x + b = \sum_{j=1}^D w_j x_j+b.$$ Así mismo, tomamos como función de pérdida $$L(x,f)=-\ln \frac{1}{\sum_{j=1}^D e^{f_j}}=-\ln \frac{1}{\sum_{j=1}^D e^{w_j x_j +b}}=\ln\sum_{j=1}^D e^{w_j x_j +b}$$ que es un caso particular de \emph{Entropía Cruzada} o \emph{Cross-entropy}.\newline
+%Para ello, comenzamos haciendo una conjetura sobre un posible valor para nuestros parámetros, evaluamos nuestra función de puntuación con todos nuestros datos de entrenamiento y seguidamente utilizamos la función de pérdida para estimar cómo de bien funciona nuestra conjetura. Analizamos los resultados y hacemos una nueva conjetura que los mejore, repitiendo el proceso un número lo suficientemente grande de veces.\newline
 
-Este clasificador recibe el nombre de \emph{Binary Softmax classifier} o \emph{Binary Logistic Regression classifier}. De esta forma, si consideramos la función probabilística \emph{sigmoide} tendríamos que el minimizar la función de pérdida estaríamos aumentando la probabilidad clasificar correctamente nuestros datos puesto que: $$P(y=0 | x; W)=\sigma (f(x)) = \frac{1}{1+e^{-f(x)}}.$$
+%Seguidamente, debemos preguntarnos cómo realizamos la nueva conjetura de forma que nos aseguremos tener unos resultados mejores. Hacerlo de forma totalmente aleatoria, repitiéndolo hasta obtener una pérdida lo suficientemente pequeña, no parece una buena idea puesto que es difícil saber cuándo encontraremos una buena respuesta. Entre las distintas técnicas, nos encontramos con las basadas en la \emph{búsqueda aleatoria local} y las que se basan en el \emph{Gradiente Descendiente}, entre otras muchas. Como ejemplo, tomaremos el algoritmo del gradiente descendiente y minimizaremos la función de pérdida para llegar a aquellos pesos que menor error nos den.\newline
 
-\begin{observacion}
-Estamos calculando la probabilidad de coincidir o no con una determinada etiqueta, recibe el nombre de binario porque también podríamos considerar que tenemos dos etiquetas y que si no perteneces a una forzosamente perteneces a la otra. Este modelo puede por tanto construirse también utilizando ambas etiquetas y con mejores resultados a la hora de clasificar puesto que durante el entrenamiento la función de pérdida es ligeramente modificada para tener en cuenta la otra etiqueta. En cualquier caso, ambas construcciones siguen la misma interpretación probabilística y, además, tenemos que $P(y=1 | x; W)=1-P(y=0 | x; W)$.
-\end{observacion}
-\end{ejemplo}
+%FIXME: Enlazar pdfs que expliquen bien cómo funciona el gradiente descendiente y la búsqueda aleatoria local \newline
+%\lstset{language=Python}
+%\begin{lstlisting}[frame=single]
+%while condicion_de_parada :
+%  weight_grad=evaluate_grad(loss_fun,x,y)
+%  weight = -step_size*weight_grad
 
-\begin{ejemplo}\label{SVM}
-Tomamos como función de pérdida $L(x,f)=\frac{1}{N} \sum_{i=1}^N \sum_{j \neq y_i} \max(0,f_j-f_{y_i} + \Delta)$ donde $\Delta \in \R$ es un parámetro que se suele ajustar utilizando una técnica llamada \emph{validación cruzada} o \emph{cross validation}. Esta función suele recibir el nombre de \emph{hinge loss} y el clasificador lineal es conocido como \emph{Multiclass Suport Vector Machine (SVM)}. Este clasificador "quiere" que la etiqueta correcta para cada imagen tenga una puntuación mayor que las incorrectas por un margen fijo $\Delta$.
-\end{ejemplo}
+%\end{lstlisting}
+
+%El código mostrado más arriba se trata de una versión muy simplificada de cómo funcionaría de cómo podríamos implementar el algoritmo, teniendo en cuenta que nosotros mismos podremos modificar la condición de parada de acuerdo a nuestras necesidades y que el valor \emph{step\_size} es algo que podremos fijar de la misma forma, sabiendo que este nos indica cuánto queremos avanzar en la dirección que nos indica el gradiente. FIXME: Enlazar pdfs que expliquen la importancia de estos valores y cómo fijarlos.\newline
+
+%FIXME: Añadir implementación en Tensorflow de un clasificador lineal.
+
+%\begin{ejemplo}\label{SoftMaxBinary}
+%Fijemos una etiqueta, $y=0$ por lo que $K=1$. Tendríamos que nuestra función de puntuación sería $f:\R^D \to \R$ donde $W=(w_1,...w_D)\in \R^D$ y $b\in \R$ luego $$f(x)=W\cdot x + b = \sum_{j=1}^D w_j x_j+b.$$ Así mismo, tomamos como función de pérdida $$L(x,f)=-\ln \frac{1}{\sum_{j=1}^D e^{f_j}}=-\ln \frac{1}{\sum_{j=1}^D e^{w_j x_j +b}}=\ln\sum_{j=1}^D e^{w_j x_j +b}$$ que es un caso particular de \emph{Entropía Cruzada} o \emph{Cross-entropy}.\newline
+
+%Este clasificador recibe el nombre de \emph{Binary Softmax classifier} o \emph{Binary Logistic Regression classifier}. De esta forma, si consideramos la función probabilística \emph{sigmoide} tendríamos que el minimizar la función de pérdida estaríamos aumentando la probabilidad clasificar correctamente nuestros datos puesto que: $$P(y=0 | x; W)=\sigma (f(x)) = \frac{1}{1+e^{-f(x)}}.$$
+
+%\begin{observacion}
+%Estamos calculando la probabilidad de coincidir o no con una determinada etiqueta, recibe el nombre de binario porque también podríamos considerar que tenemos dos etiquetas y que si no perteneces a una forzosamente perteneces a la otra. Este modelo puede por tanto construirse también utilizando ambas etiquetas y con mejores resultados a la hora de clasificar puesto que durante el entrenamiento la función de pérdida es ligeramente modificada para tener en cuenta la otra etiqueta. En cualquier %caso, ambas construcciones siguen la misma interpretación probabilística y, además, tenemos que $P(y=1 | x; W)=1-P(y=0 | x; W)$.
+%\end{observacion}
+%\end{ejemplo}
+
+%\begin{ejemplo}\label{SVM}
+%Tomamos como función de pérdida $L(x,f)=\frac{1}{N} \sum_{i=1}^N \sum_{j \neq y_i} \max(0,f_j-f_{y_i} + \Delta)$ donde $\Delta \in \R$ es un parámetro que se suele ajustar utilizando una técnica llamada \emph{validación cruzada} o \emph{cross validation}. Esta función suele recibir el nombre de \emph{hinge loss} y el clasificador lineal es conocido como \emph{Multiclass Suport Vector Machine (SVM)}. Este clasificador "quiere" que la etiqueta correcta para cada imagen tenga una puntuación mayor %que las incorrectas por un margen fijo $\Delta$.
+%\end{ejemplo}
 \section{El modelo de una neurona}
 
 Cuando comenzamos planteando nuestro problema buscábamos conseguir clasificar una imagen con una probabilidad de acertar similar o superior a cómo lo haríamos nosotros mismos. Teníamos el problema de que un ordenador no era capaz de pensar o razonar de la misma forma que un ser humano y buscábamos una forma de clasificar esta información a pesar de ello. Es aquí donde nacen los modelos de redes neuronales, en un intento por ser capaces de simular cómo funciona nuestro propio cerebro en nuestros clasificadores y que estos sean capaces de aprender cómo reconocer los distintos elementos de la misma forma que nosotros lo hemos ido haciendo a lo largo de nuestra vida.\newline
@@ -94,14 +117,14 @@ Cuando comenzamos planteando nuestro problema buscábamos conseguir clasificar u
 
 Nuestro cerebro está formado por múltiples neuronas interconectadas entre sí que están constantemente transmitiéndose información y aprendiendo a través de todos los datos que reciben. Si nos fijamos en \ref{fig:neurona} podemos ver que una neurona real esta formada por dentritas que son quienes, a través del proceso de sinapsis, reciben la entrada de información, que es asimilada y transformada por su núcleo antes de ser transmitida a la siguientes neuronas a través de las divisiones de su axón en caso de que supere un cierto umbral y se active.\newline
 
-De esta forma, si consideramos que tenemos $D$ dentritas y que por la $i$-dentrita recibimos el la información $x_i$ con un peso o fuerza de sinapsis $w_i$, tendríamos que nuestro núcleo trabaja con el vector de información $(w_1 x_1,...,w_D x_D)$ que podemos condensar utilizando la norma $||\cdot ||_1$ como $\sum_i w_i x_i $ y sumarle una determinada constante $b$ propia de la neurona. El umbral de activación y la señal enviada al resto de neuronas la representaremos con la \emph{función de activación}\label{def:ActivationFunction} que será una función $f: \R \to \R$. \newline
+Si consideramos que tenemos $D$ dentritas y que por la $i$-dentrita recibimos el la información $x_i$ con un peso o fuerza de sinapsis $w_i$, tendríamos que nuestro núcleo trabaja con el vector de información $(w_1 x_1,...,w_D x_D)$ que podemos condensar utilizando la norma $||\cdot ||_1$ como $\sum_i w_i x_i $ y sumarle una determinada constante $b$ propia de la neurona. El umbral de activación y la señal enviada al resto de neuronas la representaremos con la \emph{función de activación}\label{def:ActivationFunction} que será una función $f: \R \to \R$. Cabe destacar la similitud existente entre el modelo de una neurona y un clasificador lineal.\newline
 
-A continuación, mencionaremos los ejemplos más representativos utilizados como funciones de activación, enlazándolos con lo ya visto anteriormente:
+A continuación, mencionaremos los ejemplos más representativos utilizados como funciones de activación:
 
 \begin{itemize}
-\item \emph{Función sigmoide} $\sigma: \R \to [0,1]$ definida como $\sigma(x)=\frac{1}{1+e^{-x}} $. En este caso, nos encontramos con el ejemplo \ref{SoftMaxBinary} transformado en una neurona cuya función de pérdida utilizada durante el entrenamiento suele ser la misma que en el ejemplo mencionado. Se suele utilizar en la última capa de nuestra red, cuando nuestras imágenes pueden pertenecer a varias clases o etiquetas al mismo tiempo.
-\item \emph{Función Softmax} utilizada normalmente en la última capa donde hay tantas neuronas como etiquetas y en el problema de clasificación donde una imagen puede pertenecer únicamente a una sola etiqueta o caso. Se trata de una modificación de función la sigmoide que regulariza la salida para obtener la probabilidad de pertenecer a cada clase como sucesos independientes obteniendo así que la suma de todas las salidas de esta capa sería 1. Aquí, la $i$-neurona tendría función de activación $\sigma_i(x)=\frac{e^{x_i}}{\sum_{j=1}^K e^{x_j}}$ y utilizaría $L(x)=\frac{1}{N}\sum_{i=1}^N -\ln \frac{e^{f_{y_i}}}{\sum_{j=1}^D e^{f_j}}=\frac{1}{N}\sum_{i=1}^N (-{f_{y_i}}+\ln \sum_{j=1}^D e^f_j)$ como función de pérdida para el entrenamiento.
-\item \emph{Función ReLU}, cuyo nombre completo sería \emph{Rectified Lineal Unit}. Se suele utilizar en las capas intermedias de nuestra red y utiliza como función de activación $f(x)=\max(0,x)$ que nos recuerda al ejemplo \ref{SVM}.
+\item \emph{Función sigmoide} $\sigma: \R \to [0,1]$ definida como $\sigma(x)=\frac{1}{1+e^{-x}} $. Se suele utilizar en la última capa de nuestra red, cuando nuestras imágenes pueden pertenecer a varias clases o etiquetas al mismo tiempo.
+\item \emph{Función Softmax} utilizada normalmente en la última capa donde hay tantas neuronas como etiquetas y en el problema de clasificación donde una imagen puede pertenecer únicamente a una sola etiqueta o caso. Se trata de una modificación de función la sigmoide que regulariza la salida para obtener la probabilidad de pertenecer a cada clase como sucesos independientes obteniendo así que la suma de todas las salidas de esta capa sería $1$. Aquí, la $i$-neurona tendría función de activación $\sigma_i(x)=\frac{e^{x_i}}{\sum_{j=1}^K e^{x_j}}$ y utilizaría $L(x)=\frac{1}{N}\sum_{i=1}^N -\ln \frac{e^{f_{y_i}}}{\sum_{j=1}^D e^{f_j}}=\frac{1}{N}\sum_{i=1}^N (-{f_{y_i}}+\ln \sum_{j=1}^D e^f_j)$ como función de pérdida para el entrenamiento.
+\item \emph{Función ReLU}, cuyo nombre completo sería \emph{Rectified Lineal Unit}. Se suele utilizar en las capas intermedias de nuestra red y utiliza como función de activación $f(x)=\max(0,x)$.
 \item \emph{Función Tanh} se trata de de una centralización de la función sigmoide. $Tanh(x)=2\sigma(x)-1$.
 \end{itemize}
 
@@ -121,11 +144,13 @@ Una red red neuronal es un conjunto de neuronas dividas en varias \emph{capas} d
 La primera capa recibe el nombre de \emph{capa de entrada} que posee $D$ neuronas, es decir, tantas como la dimensión de nuestros datos. Por otro lado tenemos la \emph{capa de salida} con $K$ neuronas, tantas como etiquetas o clases de clasificación tengamos. El resto de neuronas se distribuyen dentro las \emph{capas ocultas} cuya distribución y conexiones dependen del modelo en concreto que queramos desarrollar, quedando a nuestro criterio.\newline
 
 
-De esta forma, podemos afirmar que una red neuronal es la aplicación sucesiva de funciones de la forma
+Así, podemos afirmar que una red neuronal es la aplicación sucesiva de funciones de la forma
 
-$$F(x)=\sum_{i=1}^n \alpha_i \sigma(w_i^Tx+b_i) \;\;\; \forall x \in \R^n,$$
+$$F(x)=\sum_{j=1}^n \alpha_j \sigma(w_j^Tx+b_j) \;\;\; \forall x \in \R^n,$$
 
-donde $w_i\in\R^n,\;\; \alpha_i,b_i\in\R$ serán fijas una vez entrenada la red y $\sigma : \R \to \R$ la función de activación elegida en cada capa.\\
+donde $w_j\in\R^n,\;\; \alpha_j,b_j\in\R$ serán fijas una vez entrenada la red y $\sigma : \R \to \R$ la función de activación elegida en cada capa.\\
+
+FIXME el siguiente párrafo desaparece y en su lugar aparecerá los algoritmos escritos. Así no es tan sacado de la manga
 
 A continuación toca hablar del entrenamiento de la red completa, a los conceptos que ya conocíamos del clasificador lineal \ref{def:LinearClassifier} se añade el concepto de \emph{Backpropagation} o \emph{Propagación hacia atrás de errores} que hace uso de la \emph{regla de la cadena} para, a través de los cálculos locales realizados por cada neurona, obtener la función completa de clasificación. Así, buscamos que las neuronas se auto organicen para ser capaces de localizar patrones similares de forman que sepan cómo reaccionar ante la presencia de ruido o datos incompletos. Esto hace a través de la comunicación de sus valores locales y gradientes entre las distintas neuronas, comenzando por la capa de salida y avanzando hacia atrás. FIXME: Mencionar importancia del Subgradiente para el cálculo del gradiente, al no estar definido para cualquier función. \newline
 
