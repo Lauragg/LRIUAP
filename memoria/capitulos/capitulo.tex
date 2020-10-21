@@ -1,7 +1,7 @@
 % !TeX root = ../libro.tex
 % !TeX encoding = utf8
 
-\chapter{Red Neuronal}
+\chapter{Red neuronal}
 \section{El problema de clasificar una imagen.}
 
 Cuando observamos una imagen, podemos localizar varios elementos, a partir de los cuáles, esta se encuentra compuesta con tan sólo un vistazo. Sin embargo, para un ordenador no se trata de algo tan sencillo puesto que sólo es capaz de ver un gran conjunto de números que no tienen por qué tener relación alguna entre sí.\newline
@@ -13,37 +13,35 @@ Cuando observamos una imagen, podemos localizar varios elementos, a partir de lo
   \label{fig:blanquita}
 \end{figure}
 
-Idealmente, en esta imagen desearíamos que fuera capaz de identificar que se trata de un perro, en concreto de un chiguagua, de pelaje blanco y manchas color café que se encuentra sobre un césped. Estos poquitos datos, que para nosotros parecen tan triviales, necesitan de horas y horas de computación para ser obtenidos a partir de una imagen cualquiera.\newline
+Idealmente, en esta imagen desearíamos que fuera capaz de identificar que se trata de un perro, en concreto de un chiguagua, de pelaje blanco y manchas color café que se encuentra sobre un césped. Estos pocos datos, que para nosotros parecen tan triviales, necesitan de horas y horas de computación para ser obtenidos a partir de una imagen cualquiera.\newline
 
-Dejamos todos estos detalles, a los cuales esperamos poder llegar en un futuro no muy lejano, y simplificamos el problema a tener un conjunto de etiquetas y buscar con cuál de todas ellas tiene mayor relación nuestra imagen.\newline
+Dejamos todos estos detalles, a los cuales esperamos poder llegar en secciones futuras, y simplificamos el problema a tener un conjunto de etiquetas y buscar con cuál de todas ellas tiene mayor relación nuestra imagen.\newline
 
-Una primera idea, sería utilizar utilizar \emph{$k$-Nearest Neighbor Classifier}, en adelante $k$-NN. Este clasificador consiste en que, para cada etiqueta, se correspondan $k$ imágenes y consideraremos como etiqueta idónea para nuestra clasificación aquella cuya distancia, siendo Manhattan y Euclídea las más comunes, entre los píxeles con nuestra imagen sea menor. Nos encontramos con que el tiempo de entrenamiento de nuestro clasificador sería ínfimo en comparación con el tiempo de clasificación, si bien se pueden hacer diversas mejoras que cambien estos hechos. \newline
+Una primera idea sería utilizar utilizar \emph{$k$-nearest neighbor classifier}, en adelante $k$-NN. Este clasificador consiste en, para cada etiqueta, determinar las $k$ imágenes cuya distancia, siendo Manhattan y Euclídea las más comunes, entre los píxeles de nuestra imagen sea menor. La etiqueta idónea será aquella cuya dicha distancia sea menor considerando las $k$ imágenes.\\
+
+%Este clasificador consiste en que, para cada etiqueta, se correspondan $k$ imágenes y consideraremos como etiqueta idónea para nuestra clasificación aquella cuya distancia, siendo Manhattan y Euclídea las más comunes, entre los píxeles con nuestra imagen sea menor. Nos encontramos con que el tiempo de entrenamiento de nuestro clasificador sería ínfimo en comparación con el tiempo de clasificación, si bien se pueden hacer diversas mejoras que cambien estos hechos. \newline
 
 \begin{figure}[htpb]
   \centering
   \includegraphics[width=0.8\textwidth]{knn}
-  \caption{Un ejemplo de la diferencia entre un \emph{Nearest Neighbor classifier} y un \emph{5-Nearest Neighbor classifier} con puntos bidimensionales y tres clases.}
+  \caption{Un ejemplo de la diferencia entre un \emph{Nearest Neighbor classifier} y un \emph{5-Nearest Neighbor classifier} con puntos bidimensionales y tres clases.\cite{stanford}}
   \label{fig:knn}
 \end{figure}
 
-De esta sencilla propuesta, surgen diversos problemas. Al darle mayor importancia al valor concreto de los píxeles, en lugar de a las formas que de las que está compuesta la figura, nos encontramos con que valores como los colores de fondo pueden influir más en la clasificación que los propios píxeles de la figura que queremos clasificar. En el ejemplo de la imagen del chiguagua, si considerásemos las etiquetas verde y perro, tendríamos que por lo general como respuesta el color verde, pese a que estamos más interesados por la mascota en sí. Otro gran problema, sería la baja escalabilidad que nos proporciona esta solución, al incrementarse enormemente el costo computacional de clasificación conforme aumenta el número de etiquetas.\newline
+De esta sencilla propuesta surgen diversos problemas. Las métricas más comunes de este clasificador suelen darle mayor importancia al valor concreto de los píxeles, en lugar de a las formas que de las que está compuesta la figura, provocando que valores como los colores de fondo pueden influir más en la clasificación que los propios píxeles de la figura que queremos clasificar. En el ejemplo de la imagen del chiguagua, si considerásemos las etiquetas verde y perro, tendríamos que por lo general como respuesta el color verde, pese a que estamos más interesados por la mascota en sí. Otro gran problema sería la baja escalabilidad que nos proporciona esta solución, al incrementarse enormemente el costo computacional de clasificación conforme aumenta el número de imágenes a comparar, ya sea por aumentar el número de etiquetas o nutrir de más datos las ya existentes.\newline
 
 %El siguiente paso, es buscar una forma de ``memorizar'' los datos de entrenamiento de forma que no tengamos que estar comparándolos con todos ellos cuando queramos clasificar una imagen. Lo que buscamos es poder valorar de alguna forma la imagen completa y a partir de esta ``puntuación'' conocer qué etiqueta le corresponde mejor a nuestra imagen. De esta forma, veríamos drásticamente reducido el tiempo de clasificación, sacrificando para ello el tiempo de entrenamiento, y podríamos ampliar en varias unidades la cantidad de datos de entrenamiento utilizados, aumentando así la precisión de nuestro clasificador.
 
-Los $k$-NN presentan más problemas que ventajas y muchos son los autores que niegan que se pueda considerar que estos clasificadores aprendan en alguna parte de su proceso. Realmente, lo que se busca es un método que sea más fácilmente escalable y que pueda considerar muchos datos de entrenamiento, para así refinar lo máximo posible su predicción ante entradas nunca antes vistas. Un primer ejemplo de la búsqueda de esta finalidad, podrían ser los clasificadores lineales.\\
+Debido a la falta de escalabilidad de este método de clasificación no paramétrico, existe un gran problema ante el incremento de los datos de entrenamiento. Un primer ejemplo de la búsqueda de aumentar la escalabilidad del algoritmo sin un aumento de los tiempos de clasificación, podrían ser los clasificadores lineales.\\
 
 \begin{figure}[htpb]
   \centering
   \includegraphics[width=0.8\textwidth]{pixelspace}
-  \caption{Ejemplo de representación de un clasificador lineal con tres etiquetas.}
+  \caption{Ejemplo de representación de un clasificador lineal con tres etiquetas.\cite{stanford}}
   \label{fig:pixelspace}
 \end{figure}
 
-Si consideramos $D \in \N$ la dimensión de nuestras imágenes o datos de entrada y $K \in \N$ la cantidad de etiquetas o categorías bajo las cuales pueden ser clasificadas. Siendo $N \in \N$ el número de ejemplos que utilizaremos para entrenar nuestro clasificador, tendremos que para cada dato de entrenamiento $x_i \in \R^D \; i=1,...,N$ le corresponde una etiqueta $y_i \in 1,...,K$ tal que juntos conforman el par $(x_i,y_i)$ de imagen y categoría a la que pertenece. Utilizando estos datos, podremos entrenar el clasificador lineal que será una función del tipo
-
-$$f(x)=W\cdot x+ b\; \; \; W\in M_{K,D}(\R) \;\; b \in \R^K \;\; \forall x\in \R^D,$$
-
-con la cual estaremos dividiendo el espacio de resultados utilizando hiperplanos. Existen múltiples tipos de clasificadores lineales, como por ejemplo una \emph{Máquina de vectores de soporte multiclase (Multiclass SVM)} o un clasificador SoftMax que tienen como principal diferencia la función de pérdida que utilizan para penalizar las etiquetas incorrectas.
+Consideremos $D \in \N$ la dimensión de nuestras imágenes o datos de entrada y $K \in \N$ la cantidad de etiquetas o categorías bajo las cuales pueden ser clasificadas. Siendo $N \in \N$ el número de ejemplos que utilizaremos para entrenar nuestro clasificador, tendremos que para cada dato de entrenamiento $x_i \in \R^D \; i=1,...,N$ le corresponde una etiqueta $y_i \in \{1,...,K\}$ tal que juntos conforman el par $(x_i,y_i)$ de imagen y categoría a la que pertenece. Utilizando estos datos, podremos entrenar el clasificador lineal que será una función del tipo $$f(x)=W\cdot x+ b\; \; \; W\in M_{K,D}(\R) \;\; b \in \R^K \;\; \forall x\in \R^D,$$ con la cual estaremos dividiendo el espacio de resultados utilizando hiperplanos. Existen múltiples tipos de clasificadores lineales, como por ejemplo una \emph{máquina de vectores de soporte multiclase (Multiclass SVM)} o un clasificador SoftMax que tienen como principal diferencia la función de pérdida que utilizan para penalizar las etiquetas incorrectas.
 
 
 %\section{Clasificadores Lineales}
@@ -104,44 +102,49 @@ con la cual estaremos dividiendo el espacio de resultados utilizando hiperplanos
 %\end{ejemplo}
 \section{El modelo de una neurona}
 
-Cuando comenzamos planteando nuestro problema buscábamos conseguir clasificar una imagen con una probabilidad de acertar similar o superior a cómo lo haríamos nosotros mismos. Teníamos el problema de que un ordenador no era capaz de pensar o razonar de la misma forma que un ser humano y buscábamos una forma de clasificar esta información a pesar de ello. Es aquí donde nacen los modelos de redes neuronales, en un intento por ser capaces de simular cómo funciona nuestro propio cerebro en nuestros clasificadores y que estos sean capaces de aprender cómo reconocer los distintos elementos de la misma forma que nosotros lo hemos ido haciendo a lo largo de nuestra vida.\newline
+Cuando comenzamos planteando nuestro problema buscábamos conseguir clasificar una imagen con una probabilidad de acertar similar o superior a la humana. Teníamos el problema de que un ordenador no era capaz de pensar o razonar de la misma forma que un ser humano y buscábamos una forma de clasificar esta información a pesar de ello. Es aquí donde consideraremos los modelos de redes neuronales, que buscan ser capaces de simular cómo funciona un cerebro humano para aprender cómo reconocer distintos elementos de la misma forma que nosotros lo hemos ido haciendo a lo largo de nuestra vida. %Es aquí donde nacen los modelos de redes neuronales, en un intento por ser capaces de simular cómo funciona nuestro propio cerebro en nuestros clasificadores y que estos sean capaces de aprender cómo reconocer los distintos elementos de la misma forma que nosotros lo hemos ido haciendo a lo largo de nuestra vida.\newline
 
 \begin{figure}[htpb]
   \centering
   \includegraphics[width=0.45\textwidth]{neuron}
   \vrule
   \includegraphics[width=0.45\textwidth]{neuron_model}
-  \caption{Comparación entre una neurona biológica (izquierda) y el modelo matemático (derecha) }
+  \caption{Comparación entre una neurona biológica (izquierda) y el modelo matemático (derecha) \cite{stanford} }
   \label{fig:neurona}
 \end{figure}
 
 Nuestro cerebro está formado por múltiples neuronas interconectadas entre sí que están constantemente transmitiéndose información y aprendiendo a través de todos los datos que reciben. Si nos fijamos en \ref{fig:neurona} podemos ver que una neurona real esta formada por dentritas que son quienes, a través del proceso de sinapsis, reciben la entrada de información, que es asimilada y transformada por su núcleo antes de ser transmitida a la siguientes neuronas a través de las divisiones de su axón en caso de que supere un cierto umbral y se active.\newline
 
-Si consideramos que tenemos $D$ dentritas y que por la $i$-dentrita recibimos el la información $x_i$ con un peso o fuerza de sinapsis $w_i$, tendríamos que nuestro núcleo trabaja con el vector de información $(w_1 x_1,...,w_D x_D)$ que podemos condensar utilizando la norma $||\cdot ||_1$ como $\sum_i w_i x_i $ y sumarle una determinada constante $b$ propia de la neurona. El umbral de activación y la señal enviada al resto de neuronas la representaremos con la \emph{función de activación}\label{def:ActivationFunction} que será una función $f: \R \to \R$. Cabe destacar la similitud existente entre el modelo de una neurona y un clasificador lineal.\newline
+Si consideramos que tenemos $D$ dentritas y que por la $i$-ésima dentrita recibimos la información $x_i$ con un peso o fuerza de sinapsis $w_i$, tendríamos que nuestro núcleo trabaja con el vector de información $(w_1 x_1,...,w_D x_D)$ que podemos estimar como $\sum_i w_i x_i $ y sumarle una determinada constante $b$ propia de la neurona. El umbral de activación y la señal enviada al resto de neuronas será la evaluación a través de una \emph{función de activación} \autoref{def:ActivationFunction}. Cabe destacar la similitud existente entre el modelo de una neurona y un clasificador lineal.\newline
+
+\begin{definicion}\label{def:ActivationFunction}
+Una \emph{función de activación} es una función $f: \R^n \to \R^n$ siendo $n\in\N$ el número de neuronas de la capa a evaluar.
+\end{definicion}
 
 A continuación, mencionaremos los ejemplos más representativos utilizados como funciones de activación:
 
+FIXME: Sugerencia: Añadir una gráfica para cada función de activación
 \begin{itemize}
-\item \emph{Función sigmoide} $\sigma: \R \to [0,1]$ definida como $\sigma(x)=\frac{1}{1+e^{-x}} $. Se suele utilizar en la última capa de nuestra red, cuando nuestras imágenes pueden pertenecer a varias clases o etiquetas al mismo tiempo.
-\item \emph{Función Softmax} utilizada normalmente en la última capa donde hay tantas neuronas como etiquetas y en el problema de clasificación donde una imagen puede pertenecer únicamente a una sola etiqueta o caso. Se trata de una modificación de función la sigmoide que regulariza la salida para obtener la probabilidad de pertenecer a cada clase como sucesos independientes obteniendo así que la suma de todas las salidas de esta capa sería $1$. Aquí, la $i$-neurona tendría función de activación $\sigma_i(x)=\frac{e^{x_i}}{\sum_{j=1}^K e^{x_j}}$ y utilizaría $L(x)=\frac{1}{N}\sum_{i=1}^N -\ln \frac{e^{f_{y_i}}}{\sum_{j=1}^D e^{f_j}}=\frac{1}{N}\sum_{i=1}^N (-{f_{y_i}}+\ln \sum_{j=1}^D e^f_j)$ como función de pérdida para el entrenamiento.
-\item \emph{Función ReLU}, cuyo nombre completo sería \emph{Rectified Lineal Unit}. Se suele utilizar en las capas intermedias de nuestra red y utiliza como función de activación $f(x)=\max(0,x)$.
-\item \emph{Función Tanh} se trata de de una centralización de la función sigmoide. $Tanh(x)=2\sigma(x)-1$.
+\item \emph{Función sigmoide} o \emph{logística} $\sigma: \R^n \to [0,1]^n$ definida como $\sigma_i(x_i)=\frac{1}{1+e^{-x_i}} $. Se suele utilizar en la última capa de nuestra red, cuando nuestras imágenes pueden pertenecer a varias clases o etiquetas al mismo tiempo al ser el resultado para cada componente independiente del resto.
+\item \emph{Función softmax} utilizada normalmente en la última capa donde hay tantas neuronas como etiquetas y en el problema de clasificación donde una imagen puede pertenecer únicamente a una sola etiqueta o caso. Se trata de una modificación de función logística que normaliza la salida para obtener la probabilidad de pertenecer a cada clase obteniendo así que la suma de todas las salidas de esta capa sería $1$. Aquí, la $i$-ésima neurona tendría función de activación $\sigma_i(x)=\frac{e^{x_i}}{\sum_{j=1}^K e^{x_j}}$ y utilizaría $L(x)=\frac{1}{N}\sum_{i=1}^N -\ln \frac{e^{\sigma_{y_i}(x)}}{\sum_{j=1}^D e^{\sigma_j}(x)}=\frac{1}{N}\sum_{i=1}^N (-{\sigma_{y_i}(x)}+\ln \sum_{j=1}^D e^{\sigma_j(x)})$ como función de pérdida para el entrenamiento.
+\item \emph{Función ReLU}, cuyo nombre completo sería \emph{Rectified Linear Unit}. Se suele utilizar en las capas intermedias de nuestra red y es de la forma $f(x)=\max(0,x)$.
+\item \emph{Función tanh} se trata de de una centralización de la función sigmoide. $Tanh(x)=2\sigma(x)-1$.
 \end{itemize}
 
 \section{La red completa}
 
-Una red red neuronal es un conjunto de neuronas dividas en varias \emph{capas} de forma que las neuronas de una capa pueden estar unidas o no con las neuronas de la capa anterior y de la siguiente formando así un grafo acíclico.\newline
+Una red red neuronal es un conjunto de neuronas dividas en varias \emph{capas} de forma que las neuronas de una capa pueden estar unidas o no con las neuronas de la capa anterior y de la siguiente formando así un grafo acíclico dirigido.\newline
 
 \begin{figure}[htpb]
   \centering
   \includegraphics[width=0.4\textwidth]{neural_net}
   \vrule
   \includegraphics[width=0.5\textwidth]{neural_net2}
-  \caption{Ejemplos de redes totalmente conectadas (\emph{fully-connected}) }
+  \caption{Ejemplos de redes totalmente conectadas (\emph{fully-connected}) \stanford }
   \label{fig:fully-connected}
 \end{figure}
 
-La primera capa recibe el nombre de \emph{capa de entrada} que posee $D$ neuronas, es decir, tantas como la dimensión de nuestros datos. Por otro lado tenemos la \emph{capa de salida} con $K$ neuronas, tantas como etiquetas o clases de clasificación tengamos. El resto de neuronas se distribuyen dentro las \emph{capas ocultas} cuya distribución y conexiones dependen del modelo en concreto que queramos desarrollar, quedando a nuestro criterio.\newline
+La primera capa recibe el nombre de \emph{capa de entrada} que posee $D$ neuronas, es decir, tantas como la dimensión de nuestros datos. Por otro lado tenemos la \emph{capa de salida} con $K$ neuronas, tantas como etiquetas o clases de clasificación tengamos. El resto de neuronas se distribuyen dentro de las \emph{capas ocultas} cuya distribución y conexiones dependen del modelo en concreto que queramos desarrollar, quedando a nuestro criterio.\newline
 
 
 Así, podemos afirmar que una red neuronal es la aplicación sucesiva de funciones de la forma
@@ -157,24 +160,36 @@ A continuación toca hablar del entrenamiento de la red completa, a los concepto
 FIXME: Definir epoch y la validación cruzada
 
 \chapter{Teoremas de Aproximación Universal}
-Hasta ahora se ha definido una estructura con una serie de parámetros con la esperanza de poder llegar a resolver el problema planteado. Sin embargo, en ningún momento hemos utilizado ningún resultado que nos asegure que dicha estructura puede llegar a resolver el problema que deseamos. A continuación, mostraremos diversos resultados, con diversos niveles de generalidad, que muestran cómo esta estructura puede llegar a cumplir con lo deseado. Estos resultados se dividen en dos grandes categorías \emph{anchura indeterminada} y \emph{profundidad indeterminada}.
+Hasta ahora se ha definido una estructura con una serie de parámetros con la esperanza de poder llegar a resolver el problema planteado. Sin embargo, en ningún momento hemos utilizado ningún resultado que nos asegure que dicha estructura puede llegar a resolver el problema que deseamos. A continuación, mostraremos diversos resultados, con diversos niveles de generalidad, que muestran cómo esta estructura es un aproximador universal y por ello resuelve nuestro problema. Estos resultados se dividen en dos grandes categorías \emph{anchura indeterminada} y \emph{profundidad indeterminada}.
 
 \section{Anchura indeterminada}
-\subsection{Geoge Cybenko, 1989}
-Cybenko, en \cite{cybenko1989approximation}, demostró la capacidad de aproximación en el caso de anchura indeterminada y profundidad fijada para funciones de activación sigmoidales \autoref{def:sigmoidal}. A partir de esta versión clásica, se logró considerar otras funciones de activación, e incluso, demostrar que era gracias a la arquitectura en sí misma, y no a la función de activación, que las redes neuronales eran aproximadores universales. Aquí mencionaremos la versión del teorema para funciones continuas, pero debemos mencionar que en el mismo artículo se mencionan también versiones para otros espacios de funciones.
+\subsection{George Cybenko, 1989}
+Cybenko, en \cite{cybenko1989approximation}, demostró la capacidad de aproximación en el caso de anchura indeterminada y profundidad fijada para funciones de activación sigmoidales \autoref{def:sigmoidal}. A partir de esta versión clásica, se logró considerar otras funciones de activación, e incluso, demostrar que era gracias a la arquitectura en sí misma, y no a la función de activación, que las redes neuronales eran aproximadores universales \cite{Kurt1991251}. Aquí estudiaremos la versión del teorema para funciones continuas, pero debemos destacar que en el mismo artículo se mencionan también versiones para otros espacios de funciones.
 \begin{definicion}\label{def:sigmoidal}
-Una función $\sigma : \R \to \R$ es \emph{sigmoidal} si $$\lim_{t\to +\infty} \sigma(t)=1 \;\;\;\;\;\;\; \lim_{t\to -\infty} \sigma(t)=0$$
+Una función $\sigma : \R \to \R$ es \emph{sigmoidal} si $$\lim_{t\to +\infty} \sigma(t)=1 \;\;\; y \;\;\;\; \lim_{t\to -\infty} \sigma(t)=0.$$
 \end{definicion}\\
 
+\begin{definicion}
+Dada una $\sigma$-álgebra $M$, una \emph{medida con signo $\mu$} sobre $M$ es una función del conjunto $\mu: M\to [-\infty,+\infty] \sigma$-aditiva.
+\end{definicion}
+\begin{definicion}
+Una medida se dice \emph{de Borel} si está definida sobre una $\sigma$-álgebra de Borel, es decir, la engendrada por los abiertos del espacio.
+\end{definicion}
+\begin{definicion}
+Una \emph{medida con signo regular de Borel} sobre una $\sigma$-álgebra $M$ es una medida con signo que cumple $$\mu(E)=\inf\{\mu(V): E\subset V, V \text{ abierto}\}=\sup\{\mu(C): C\subset E, C\text{ cerrado}\}$$
+para todo conjunto de Borel $E\in M$
+\end{definicion}
 En adelante, utilizaremos $I_n$ para referirnos al cubo unidad $n$-dimensional, $[0,1]^n$ y para el espacio de las medidas finitas con signo regulares de Borel sobre $I_n$ utilizaremos $M(I_n)$. Además, $C(I_n)$ denotará el espacio de funciones continuas en $I_n$.
 
 \begin{definicion}\label{def:discriminatoria}
-Una función $\sigma : \R \to \R$ es \emph{discriminatoria} si para una medida $\mu \in M(I_n)$ con $$\int_{I_n} \sigma(w^Tx+b) d\mu(x)=0$$ para todo $ w\in R^n$ y $b\in\R$ implique que $\mu=0$.
+Una función $\sigma : \R \to \R$ es \emph{discriminatoria} si, para una medida $\mu \in M(I_n)$ con $$\int_{I_n} \sigma(w^Tx+b) d\mu(x)=0$$ para todo $ w\in R^n$ y $b\in\R$, implica que $\mu=0$.
 \end{definicion}
 
 \begin{lema}\label{thm:lema-discriminatoria-sigmoidal}
 Cualquier función sigmoidal medible y acotada es discriminatoria. En particular, las funciones sigmoidales continuas son discriminatorias.
 \end{lema}
+\begin{proof}
+\end{proof}
 
 \begin{teorema}\label{thm:discriminatoria}
 Sea $\sigma$ una función discriminatoria continua. Entonces, las sumas finitas de la forma $$G(x)=\sum_{i=1}^n \alpha_i \sigma(w_i^Tx+b)$$ son densas en $C(I_n)$. En otra palabras, dados $f\in C(I_n)$ y $\varepsilon>0$, existe una suma, $G(x)$, de la forma anterior, para la cual $$|G(x)-f(x)|<\varepsilon \;\;\;\;\; \forall x \in I_n.$$
@@ -190,7 +205,7 @@ Para esta demostración, se combina \autoref{thm:lema-discriminatoria-sigmoidal}
 
 \subsection{Kurt Hornik, 1989 y 1991}
 
-En 1898 \cite{HornikEtAl89}, Hornik demostró que una red neuronal con una capa oculta que utiliza funciones de aplastamiento arbitrarias son capaces de aproximar cualquier función de medida Borel de un espacio finito unidimensional con cualquier grado deseado de precisión.\\
+En 1898 \cite{HornikEtAl89}, Hornik demostró que las redes neuronales con una capa oculta que utiliza funciones de aplastamiento (sigmoidal \autoref{def:sigmoidal} y no decreciente según la \emph{definición 2.3} del mismo artículo) arbitrarias son capaces de aproximar cualquier función Borel-medible de un espacio finito unidimensional con cualquier grado deseado de precisión.\\
 
 Más tarde, en 1991 \cite{Kurt1991251}, extendió los teoremas de Cybenko mostrando que no necesariamente tenía que utilizar funciones de activación sigmoidales para los espacios de funciones considerados. A continuación enunciaremos el teorema para el espacio de funciones continuas.\\
 
@@ -208,21 +223,29 @@ Para cualquier función Lebesgue-integrable $f:\R^n\to R$ y cualquier $\varepsil
 \end{teorema}
 
 \subsection{Patrick Kidger y Terry Lyons, 2019}
-Una de las variantes más recientes \cite{2019arXiv190508539K}, fue presentada para el caso de una función de activación no afín, que sea continuamente diferenciable y con derivada no nula en al menos un punto. Destaca porque con sus consideraciones abarca las funciones de activación utilizadas en la práctica, incluyendo las funciones de activación polinómicas. En el paper, se consideran otras extensiones o variaciones al teorema que enunciaremos.\\
+Una de las variantes más recientes \cite{2019arXiv190508539K}, fue presentada para el caso de una función de activación no afín, que sea continuamente diferenciable y con derivada no nula en al menos un punto. Destaca porque con sus consideraciones abarca las funciones de activación utilizadas en la práctica, incluyendo las funciones de activación polinómicas. En el artículo, se consideran otras extensiones o variaciones al teorema que enunciaremos.\\
 
 \begin{definicion}
 Sea $\sigma:\R\to\R$ y $n,m,k\in\N$. Entonces $NN_{n,m,k}^\sigma$ representa la clase de funciones $R^n\to \R^m$ descritas por una red neuronal hacia adelante con $n$ neuronas en la capa de entrada, $m$ neuronas en la capa de salida, y un numero arbitrario de capas ocultas, para las cuales $k$ neuronas tienen como función de activación la función $\sigma$. Cada neurona de la capa de salida tiene la función de activación identidad.
 \end{definicion}
 
 \begin{teorema}
-Sea $\sigma : \R \to \R$ una función de activación no afín que es continuamente diferenciable en al menos un punto, con derivada no nula en dicho punto. Sea $K \subset \R$ un compacto. Entonces $NN_{n,m,n+m+2}^\sigma$ es denso en $C(K;\R^m)$ con respecto a la norma del supremo.
+Sea $\sigma : \R \to \R$ una función continua y no polinómica que es continuamente diferenciable en al menos un punto, con derivada no nula en dicho punto. Sea $K \subset \R^n$ un compacto. Entonces $NN_{n,m,n+m+2}^\sigma$ es denso en $C(K;\R^m)$ con respecto a la norma del supremo.
 \end{teorema}
 
-\chapter{Redes Neuronales Convolucionadas (CNN)}
+\begin{teorema}
+Sea $\sigma : \R \to \R$ una función polinómica y no afín. Sea $K \subset \R^n$ un compacto. Entonces $NN_{n,m,n+m+2}^\sigma$ es denso en $C(K;\R^m)$ con respecto a la norma del supremo.
+\end{teorema}
 
-Hasta ahora, todo lo que hemos hablado es válido para casi cualquier contexto puesto que no hemos hecho ninguna presunción en cuanto a la estructura de los datos o sobre las peculiaridades que estos presentan, para nosotros todos los datos eran un vector con $D$ componentes a los que les correspondía una etiqueta y no le dábamos importancia a la estructura interna que estos pudieran llegar presentar. Esto cambia con el uso de las \emph{Redes Neuronales Convolucionadas} al ser un tipo de red exclusivo para imágenes en las cuáles no sólo podremos utilizar todos lo válido en el caso general sino que también utilizaremos una serie de bondades conocidas por el simple hecho de estar tratando con imágenes.\newline
+\chapter{Redes neuronales convolucionadas (CNN)}
 
-Anteriormente, comentábamos el ejemplo del conjunto de datos CIFAR-10 donde teníamos que $D=3072$ y mostrábamos cómo obteníamos ese valor. Para ello, utilizábamos la dimensión de la imagen de $ancho \times alto $ y la dimensión del \emph{espacio de color} que estábamos utilizando. De esta forma, si en lugar de trasladar estos valores a $\R^D$ como vectores nos quedamos en $M_{ancho,alto, \dim color}(\R)$ estaremos trabajando en un espacio de matrices tridimensionales. De esta forma, siendo $a$ el ancho, $h$ la altura y $c$ la dimensión del espacio de color, para cada matriz $m \in M_{a, h,c}(\R)$ tendremos que dado un píxel conocemos de forma inmediata sus píxeles más próximos sin necesidad de hacer ningún cálculo complejo. Nos aprovecharemos de esto para definir las \emph{capas convolucionadas} o \emph{convolutionals} y las \emph{capas de agrupación} o \emph{pooling}.\newline
+Hasta ahora, todo lo que hemos hablado es válido para casi cualquier contexto puesto que no hemos hecho ninguna presunción en cuanto a la estructura de los datos o sobre las peculiaridades que estos presentan. Para nosotros todos los datos eran un vector con $D$ componentes a los que les correspondía una etiqueta y no le dábamos importancia a la estructura interna que estos pudieran llegar a presentar.\\
+
+Para la edición y manipulación de imágenes, es común utilizar la operación de convolución como filtro. Las redes neuronales son aquellas que utilizan estos filtros, de ahí su nombre, para analizar las distintas características de las imágenes. Si bien, podemos fijar los pesos manualmente para utilizar algunos de los filtros más comunes en la edición de imágenes, se ha comprobado experimentalmente que por lo general se obtienen mejores resultados si es la propia red quien fija estos pesos a través de un proceso de aprendizaje.\\
+
+%Anteriormente, comentábamos el ejemplo del conjunto de datos CIFAR-10 donde teníamos que $D=3072$ y mostrábamos cómo obteníamos ese valor. Para ello, utilizábamos la dimensión de la imagen de $ancho \times alto $ y la dimensión del \emph{espacio de color} que estábamos utilizando. De esta forma, si en lugar de trasladar estos valores a $\R^D$ como vectores nos quedamos en $M_{ancho,alto, \dim color}(\R)$ estaremos trabajando en un espacio de matrices tridimensionales. De esta forma, siendo $a$ el ancho, $h$ la altura y $c$ la dimensión del espacio de color, para cada matriz $m \in M_{a, h,c}(\R)$ tendremos que dado un píxel conocemos de forma inmediata sus píxeles más próximos sin necesidad de hacer ningún cálculo complejo. Nos aprovecharemos de esto para definir las \emph{capas convolucionadas} o \emph{convolutionals} y las \emph{capas de agrupación} o \emph{pooling}.\newline
+
+En adelante, dejaremos de considerar que nuestros datos de entrada tienen una estructura de vector y consideraremos que estamos trabajando con matrices tridimensionales, es decir, nuestros datos estarán organizados como si fueran ortoedros. Esto lo representaremos como $M_{a,h,c}(\R)$ con $a,h,c\in \N$ donde $a$ representará la anchura, $h$ la altura y $c$ el número de canales. Para simplificarlo, cada entrada $X\in M_{a,h,c}(\R)$ representará $c$ imágenes en escala de grises de dimensiones $a\times h$. Como detalle, una imagen RGB está representada como tres imágenes en escala de grises($c=3$) donde cada canal representa un color primario y con la combinación de los tres obtenemos una imagen a color.
 
 \section{Capas Convolucionadas o Convolutionals}
 
@@ -271,16 +294,16 @@ FIXME: ¿Apéndices o distribuido en el pdf? Cosas a mencionar:
 \item Cómo los filtros modifican una imagen visualmente
 \end{itemize}
 
-\chapter{Operador no local}
+\chapter{Operador no local}\label{def:non-local}
 En la sección anterior se ha visto que una operación de convolución posee un kernel que limita la cantidad de posiciones que son observadas de forma que la cantidad de parámetros de la capa de convolución es dependiente al tamaño de este núcleo. Esto tiene como desventaja que, para cada posición de nuestra entrada de datos, las posiciones que influyen al resultado de la convolución están restringidas a un subconjunto de tamaño fijo de los datos de entrada por lo que se suele decir que es una operación \emph{local}. Si quisiéramos utilizar todos los datos de entrada para cada posición de la imagen, tendríamos un aumento considerable de parámetros a utilizar, con los consecuentes problemas de memoria y entrenamiento.\\
 
-El objetivo de esta sección es definir un tipo de operación que sea capaz de extraer características de nuestros datos de entrada utilizando toda su dimensión y sin tener un aumento drástico del número de parámetros a entrenar, será a lo que llamaremos un operador no local. La necesidad de este tipo de operación nace del hecho de que, por lo general, las imágenes a estudiar no suelen ser un conjunto de collage sin relación entre sí, sino que el entorno de nuestra imagen puede llegar a ser de utilidad a la hora de distinguir qué objetos estamos clasificando.\\
+El objetivo de esta sección es definir un tipo de operación que sea capaz de extraer características de nuestros datos de entrada utilizando toda su dimensión y sin tener un aumento drástico del número de parámetros a entrenar, será a lo que llamaremos un operador no local. La necesidad de este tipo de operación nace del hecho de que, por lo general, las imágenes a estudiar no suelen ser un conjunto de \emph{collage} sin relación entre sí, sino que el entorno de nuestra imagen puede llegar a ser de utilidad a la hora de distinguir qué objetos estamos clasificando.\\
 
 Para simplificar la definición, nos restringiremos al contexto de espacios vectoriales de dimensión finita sobre el cuerpo de los números reales.
 \begin{definicion}
- Sea $x=(x_1,...,x_D)\in \R^D$ una señal de entrada, $u:\R \times \R \to \R$ un producto escalar, $v:\R \to \R$ función real evaluada y $C_x\in \R$ una constante.  Se define una operación no local genérica o \emph{generic non-local operation} $f:\R^D \to \R^D$ con $f(x)=(f(x_1),...,f(x_D))$ aquella donde:
+ Sea $x=(x_1,...,x_D)\in \R^D$ una señal de entrada, $u:\R \times \R \to \R$ un producto escalar, $v:\R \to \R$ función real evaluada y $C:\R^D \to \R$.  Se define una operación no local genérica o \emph{generic non-local operation} $f:\R^D \to \R^D$ con $f(x)=(f_1(x_1),...,f_D(x_D))$ aquella donde:
 
- $$f(x_i)=\frac{1}{C_x}\sum_{j=1}^{D} u(x_i,x_j)v(x_j) \; \;  \forall i=1,...,D$$
+ $$f_i(x_i)=\frac{1}{C(x)}\sum_{j=1}^{D} u(x_i,x_j)v(x_j) \; \;  \forall i=1,...,D$$
 \end{definicion}
 
  En este contexto, $v(x_j)$ será una representación de la señal de $x$ entrada en la posición $j$, $u$ representará una relación, por ejemplo la afinidad, entre las posiciones $i$ y $j$. %La operación recibe este nombre debido a que considera todas las posiciones de la imagen para calcular el valor del filtro en la posición $i$ distinguiéndose así de una operación convolucional que se centraría en un rango \emph{local} de posiciones.% ($i-1\leq j \leq i+1$ en el caso de tener una convolución de núcleo de tamaño $3$).
@@ -290,13 +313,13 @@ Para simplificar la definición, nos restringiremos al contexto de espacios vect
 
  \begin{enumerate}
  \item \emph{Gaussiana} $u(x_i,x_j)=e^{x_i^T x_j}$ y $C(x)= \sum_{j=1}^D u(x_i,x_j)$.
- \item \emph{Embedded Gaussian} $u(x_i,x_j)=e^{\phi(x_i)^T,\theta(x_j)}$ donde $\phi(x_i)=W_\phi x_i$ y $\theta(x_j)=W_\theta x_j$ son dos inmersiones y  $C(x)= \sum_{j=1}^D u(x_i,x_j)$. Nótese que el módulo \emph{self-attention} es un caso particular de este ejemplo.
- \item \emph{Dot-product similarity} $u(x_i,x_j)=\phi(x_i)^T \theta(x_j)$ donde $\phi(x_i)=W_\phi x_i$ y $\theta(x_j)=W_\theta x_j$ son dos inmersiones y $C(x)=D$.
+ \item \emph{Embedded Gaussian} $u(x_i,x_j)=e^{\phi_i(x_i)^T,\theta_j(x_j)}$ donde $\phi_i(x_i)=W_{\phi_i} x_i$ y $\theta_j(x_j)=W_{\theta_j} x_j$ y  $C(x)= \sum_{j=1}^D u(x_i,x_j)$. Nótese que el módulo \emph{self-attention} \cite{DBLP:journals/corr/VaswaniSPUJGKP17} es un caso particular de este ejemplo.
+ \item \emph{Dot-product similarity} $u(x_i,x_j)=\phi_i(x_i)^T \theta_j(x_j)$ donde $\phi_i(x_i)=W_{\phi_i} x_i$, $\theta_j(x_j)=W_{\theta_j} x_j$ y $C(x)=D$.
  \item \emph{Non-local means} \cite{Buades:2005:NAI:1068508.1069066}
  % ¿Concatenacion?
  \end{enumerate}
 
-Para poder afirmar que un operador no local cumple con lo que buscamos, primero se debe de demostrar que las operaciones de este tipo nos dan el resultado deseado. Para ello, primero deberemos de enunciar una serie de conceptos.
+Para poder afirmar que un operador no local cumple con lo que buscamos, primero se debe demostrar que las operaciones de este tipo nos dan el resultado deseado. Para ello, primero deberemos de enunciar una serie de conceptos.
 
 \section{Conceptos previos}
 En adelante, el conjunto $\Omega$ será un espacio muestral y $\mathscr{A}$ será una \emph{$\sigma$-álgebra} sobre dicho $\Omega$. Además, $P$ será una probabilidad aplicada a los elementos de la $\sigma$-álgebra $\mathscr{A}$. Esto será representado como $(\Omega,\mathscr{A},P)$ siendo un espacio probabilístico y será donde trabajemos.
@@ -367,9 +390,9 @@ Para indicar las posiciones de los elementos, por lo general se utilizarán \emp
 \section{Dos pasos o basados en RCNN}
 El problema de detección se divide en dos etapas: una generación de propuestas y la realización de predicciones sobre estas propuestas. Como paradigmas de detección, destacan la familia \emph{R-CNN} y los que se encuentran basados en esta.\newline
 
-Esta familia surge en noviembre de 2013 con \emph{R-CNN} \cite{2013arXiv1311.2524G} que utiliza Selective Search \cite{Selective Search for object recognition} para generar 2000 bbox de propuestas que son redimensionadas para coincidir con las dimensiones de entrada una CNN pre-entrenada. Esta CNN debe volver a entrenarse, extrayéndole la última capa y añadiéndole una \emph{máquina de vectores de soporte(SVM)} con las categorías originales más una nueva clase llamada "fondo" que engloba a todas las propuestas que no pertenecen a ninguna categoría. Finalmente, las propuestas clasificadas son combinadas a través de un modelo de regresión lineal para así obtener una bbox con mejor ajuste y precisión.\newline
+Esta familia surge en noviembre de 2013 con \emph{R-CNN} \cite{2013arXiv1311.2524G} que utiliza Selective Search \cite{Selective Search for object recognition} para generar 2000 \emph{bbox} de propuestas que son redimensionadas para coincidir con las dimensiones de entrada una CNN pre-entrenada. Esta CNN debe volver a entrenarse, extrayéndole la última capa y añadiéndole una \emph{máquina de vectores de soporte (SVM)} con las categorías originales más una nueva clase llamada "fondo" que engloba a todas las propuestas que no pertenecen a ninguna categoría. Finalmente, las propuestas clasificadas son combinadas a través de un modelo de regresión lineal para así obtener una \emph{bbox} con mejor ajuste y precisión.\newline
 
-La principal diferencia que introduce \emph{Fast R-CNN} \cite{2015arXiv150408083G} reside en que, en lugar de pasar por la CNN todas las propuestas de Selective Search, nuestra CNN recibe como entrada la imagen completa reduciendo el coste computacional al analizar una única vez las zonas de solapamiento entre propuestas. Además, las propuestas dejan de ser escaladas para coincidir con una determinada dimensión y se introduce en una capa especial llamada \emph{Region of Interest Pooling Layer (RoI pooling)} que extrae un vector de longitud fija que será la entrada de las siguientes ramas. A continuación, el modelo se divide en dos ramas: un clasificador SoftMax y un modelo de regresión que calcula las bbox. \newline
+La principal diferencia que introduce \emph{Fast R-CNN} \cite{2015arXiv150408083G} reside en que, en lugar de pasar por la CNN todas las propuestas de Selective Search, nuestra CNN recibe como entrada la imagen completa reduciendo el coste computacional al analizar una única vez las zonas de solapamiento entre propuestas. Además, las propuestas dejan de ser escaladas para coincidir con una determinada dimensión y se introduce en una capa especial llamada \emph{Region of Interest Pooling Layer (RoI pooling)} que extrae un vector de longitud fija que será la entrada de las siguientes ramas. A continuación, el modelo se divide en dos ramas: un clasificador SoftMax y un modelo de regresión que calcula las \emph{bbox}. \newline
 
 \begin{figure}[htpb]
   \centering
@@ -380,7 +403,7 @@ La principal diferencia que introduce \emph{Fast R-CNN} \cite{2015arXiv150408083
 
 En \emph{Faster R-CNN} \cite{2015arXiv150601497R} se sustituye Selective Search por una red neuronal de generación propuestas, conocida como \emph{anchor boxes}, que no sólo reduce el tiempo de cómputo de la generación de propuestas sino que aporta un menor número de propuestas con mayor calidad y precisión. Un buen apunte de la red de generación de propuestas, es que esta no es pre-entrenada antes de ser añadido al modelo sino que aprende de forma conjunta con toda la red.\newline
 
-La última mejora de esta familia viene representada por \emph{Mask R-CNN} \cite{2017arXiv170306870H} que sustituye la capa RoI pooling introducida en el modelo Fast R-CNN por una RoI alignment que retiene más información de las características obtenidas por la CNN compartiendo la misma estructura de entrada y salida de datos con la RoI pooling. Mask R-CNN aprovecha esto para realizar predicciones del tipo pixel level con mayor precisión a través de una interpolación bilineal que se ejecuta paralelamente con las capas totalmente conectadas de los modelos anteriores. Así, en el mismo punto que sus predecesores eran divididos en tres ramas independientes, Mask R-CNN se divide en tres ramas: un clasificador SoftMax, un regresor de bbox y un otro regresor de pixel level.\newline
+La última mejora de esta familia viene representada por \emph{Mask R-CNN} \cite{2017arXiv170306870H} que sustituye la capa RoI pooling introducida en el modelo Fast R-CNN por una RoI alignment que retiene más información de las características obtenidas por la CNN compartiendo la misma estructura de entrada y salida de datos con la RoI pooling. Mask R-CNN aprovecha esto para realizar predicciones del tipo pixel level con mayor precisión a través de una interpolación bilineal que se ejecuta paralelamente con las capas totalmente conectadas de los modelos anteriores. Así, en el mismo punto que sus predecesores eran divididos en tres ramas independientes, Mask R-CNN se divide en tres ramas: un clasificador SoftMax, un regresor de \emph{bbox} y un otro regresor de pixel level.\newline
 
 Mencionar Mesh R-CNN
 https://arxiv.org/abs/1906.02739\newline
@@ -391,7 +414,7 @@ https://arxiv.org/pdf/1904.02701.pdf
 \section{Un paso o basados en YOLO}
 Estos modelos destacan por no hacer una separación directa de la generación de propuestas y la predicción de estas. Destaca \emph{YOLO} y sus sucesivas mejoras, así como los múltiples algoritmos basados en ellas, pero existen muchos más modelos que pueden ser identificados con esta estructura.\newline
 
-En junio de 2015 aparece \emph{You Only Look Once (YOLO)} \cite{2015arXiv150602640R}, un nuevo algoritmo que pretende realizar al mismo tiempo la generación de propuestas y la clasificación de estas, buscando así una mayor eficiencia computacional. Para ello, tras redimensionar la imagen en 448x448 píxeles, el algoritmo divide la imagen en una cuadrícula cuyas celdas se encargan de realizar un número fijo de propuestas indicando en cada una de ellas la probabilidad que tiene de ser un objeto, la bbox en la que se encuentra y la probabilidad de pertenecer a cada una de las clases de objetos de las que disponemos. Finalmente, descarta aquellas propuestas con baja probabilidad de ser un objeto y utiliza un algoritmo de \emph{non-max supression} \cite{2017arXiv170404503B} que unifica y combina las bbox con las máximas áreas compartidas.\newline
+En junio de 2015 aparece \emph{You Only Look Once (YOLO)} \cite{2015arXiv150602640R}, un nuevo algoritmo que pretende realizar al mismo tiempo la generación de propuestas y la clasificación de estas, buscando así una mayor eficiencia computacional. Para ello, tras redimensionar la imagen en 448x448 píxeles, el algoritmo divide la imagen en una cuadrícula cuyas celdas se encargan de realizar un número fijo de propuestas indicando en cada una de ellas la probabilidad que tiene de ser un objeto, la \emph{bbox} en la que se encuentra y la probabilidad de pertenecer a cada una de las clases de objetos de las que disponemos. Finalmente, descarta aquellas propuestas con baja probabilidad de ser un objeto y utiliza un algoritmo de \emph{non-max supression} \cite{2017arXiv170404503B} que unifica y combina las \emph{bbox} con las máximas áreas compartidas.\newline
 
 Buscando una mejora de la predicción pero sin perder el enfoque de la velocidad, surge \emph{YOLO9000} o \emph{YOLOv2} \cite{2016arXiv161208242R} que sigue la misma estructura que su predecesor pero sustituyendo algunos fragmentos por otros con mayor rendimiento. YOLOv2 redimensiona la imagen original a 416x416 píxeles y sustituye las capas totalmente conectadas que utilizaba para la generación de propuestas por un modelo de \emph{anchor boxes} \cite{2015arXiv150601497R} junto con otros cambios menores.\newline
 
@@ -400,20 +423,33 @@ La siguiente versión \emph{YOLOv3} \cite{2018arXiv180402767R} decide  no darle 
 Mencionar YOLOv4
 https://arxiv.org/pdf/2004.10934.pdf\newline
 
-Feature Pyramid Networks
-https://arxiv.org/pdf/1612.03144.pdf
+\section{Non-local neural networks}
 
-\section{Non-local Neural Networks}
+En \cite{DBLP:journals/corr/abs-1711-07971} se introduce el concepto de \emph{non-local neural networks} que utiliza una arquitectura ascendente y descendente, \emph{up-down architecture} \cite{2016arXiv160308695P}, para extraer las características de un clasificador a distintos niveles de profundidad y utilizarlas para segmentar semánticamente la imagen \autoref{fig:object-detection}.\newline
 
-En \cite{DBLP:journals/corr/abs-1711-07971} se introduce el concepto de \emph{Non-local Neural Networks} que plantea un modelo de \emph{Feature Pyramid Network} para extraer las características de un clasificador a distintos niveles de profundidad y utilizarlas para segmentar semánticamente la imagen. \ref{fig:object_detection}\newline
+\begin{figure}[htpb]
+  \centering
+  \includegraphics[width=0.6\textwidth]{up-down}
+  \caption{Ejemplo de una arquitectura ascendente y descentente con saltos de conexiones\cite{2016arXiv160308695P}.}
+  \label{fig:up-down}
+\end{figure}
 
-FIXME: Insertar imagen del modelo genérico
 
-Podemos distinguir tres tipos de componentes principales: clasificador, bloque no local o \emph{non-local block} y bloque de fusión o \emph{fuse up block}. Lo que más destaca de estas estructuras son los non-local block utilizados para extraer las características puesto que, en lugar obtenerlas utilizando de forma recurrente convoluciones en pequeñas áreas, comprueban las relaciones entre los datos con una única operación que, además, comprueba la afinidad con los datos más distantes.\newline
+En la parte ascendente de este tipo de arquitecturas nos encontraremos con un clasificador de imágenes, del cual extraeremos información a distintos niveles de profundidad que será unificada y analizada en la parte descendente de la arquitectura para poder predecir los distintos segmentos semánticos. \\
 
-A continuación, nos centraremos en los non-local block, definiendo las clase de funciones que los forman y demostrando algunas de sus propiedades que garantizarán su correcto funcionamiento. Seguidamente, mostraremos algunos ejemplos y cómo podemos configurar nuestra propia red según nuestras necesidades.\newline
+Las \emph{non-local neural networks} se distinguen por la utilización de \emph{non-local block} o bloques no locales como extractores de características en los distintos niveles de profundidad. Estos bloques serán de la forma: $$z_i=W f_i(x_i) + x_i,$$  donde $i$ representa el índice de una posición de salida, $x_i$ el $i$-ésimo elemento de la entrada $x$, $f_i$ la $i$-ésima coordenada de una operación no local $f$ (\autoref{def:non-local}) y $W$ un peso que será entrenado por la red. \\
 
-\subsection{Non-local block}
-Finalmente, el bloque non-local es de la forma: $$z_i=W_z f(x_i) + x_i$$, donde multiplicamos la función no local por un peso que será entrenado por la red y le añadimos una conexión residual para evitar perder las características del modelo pre-entrenado en caso de que $W_z$ comience siendo inicializado como $0$.
+%Podemos distinguir tres tipos de componentes principales: clasificador, bloque no local o \emph{non-local block} y bloque de fusión o \emph{fuse up block}. Lo que más destaca de estas estructuras son los non-local block utilizados para extraer las características puesto que, en lugar obtenerlas utilizando de forma recurrente convoluciones en pequeñas áreas, comprueban las relaciones entre los datos con una única operación que, además, comprueba la afinidad con los datos más distantes.\newline
 
-FIXME: Añadir más ventajas de la conexión residual.
+%A continuación, nos centraremos en los non-local block, definiendo las clase de funciones que los forman y demostrando algunas de sus propiedades que garantizarán su correcto funcionamiento. Seguidamente, mostraremos algunos ejemplos y cómo podemos configurar nuestra propia red según nuestras necesidades.\newline
+
+%\subsection{Non-local block}
+%Finalmente, el bloque non-local es de la forma: $$z_i=W_z f(x_i) + x_i,$$ donde multiplicamos la función no local por un peso que será entrenado por la red y le añadimos una conexión residual para evitar perder las características del modelo pre-entrenado en caso de que $W_z$ comience siendo inicializado como $0$.
+
+%FIXME: Añadir más ventajas de la conexión residual.
+
+\section{Experimentos}
+
+Para el desarrollo de la red neuronal que se ha implementado, se ha utilizado el artículo \emph{Real-time Semantic Segmentation with Fast Attention} \cite{2020arXiv200703815H} publicado el 9 de julio de 2020. En este artículo se busca implementar una red neuronal capaz de realizar segmentación semántica en tiempo real, sin una gran pérdida de precisión y pudiendo ser ejecutada en dispositivos con pocos recursos.\\
+
+Siguiendo sus ideas, se ha utilizado como clasificador un ResNet-18 \cite{DBLP:journals/corr/HeZRS15}. Como bloque no local se ha utilizado el, que los autores denominan, \emph{fast attention module}, que implementa como operación no local \autoref{def:non-local} una \emph{dot-product similarity} con $v(x_j)=W_{v_j}x_j$. Para reconstruir las formas a través de las características extraídas nos hemos basado en el modelo U-Net \cite{2015arXiv150504597R}.
