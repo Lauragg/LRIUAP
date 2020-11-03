@@ -153,6 +153,38 @@ $$F(x)=\sum_{j=1}^n \alpha_j \sigma(w_j^Tx+b_j) \;\;\; \forall x \in \R^n,$$
 
 donde $w_j\in\R^n,\;\; \alpha_j,b_j\in\R$ serán fijas una vez entrenada la red y $\sigma : \R \to \R$ la función de activación elegida en cada capa.\\
 
+\subsection{Propagación hacia adelante}
+\begin{algorithm}\label{alg:forward}
+\caption{Propagación hacia adelante mediante una red neuronal típica y el cálculo de la función de coste. La función de pérdida $L(\hat{y},y)$ depende de la salida de la red $\hat{y}$ y del objetivo $y$. Para obtener el coste total $J$, a la pérdida se le debería de añadir un regularizador $\Omega(\theta)$, donde $\theta$ contiene todos los parámetros (pesos y sesgos).}
+\begin{algorithmic}
+\REQUIRE Profundidad de la red $l$
+\REQUIRE $W^{(i)}, i\in\{1,...,l\}$, las matrices de pesos del modelo
+\REQUIRE $b^{(i)}, i\in\{1,...,l\}$, los parámetros de sesgos del modelo
+\REQUIRE $x$, la entrada al proceso
+\REQUIRE $y$, la salida objetivo
+\STATE $h^{(0)}=x$
+\FOR{$k=1,...,l$}
+\STATE $a^{(k)}=b^{(k)}+W^{(k)}h^{(k-1)}$
+\STATE $h^{(k)}=\sigma(a^{(k)})$
+\ENDFOR
+\STATE $\hat{y}=h^{(l)}$
+\STATE $J=L(\hat{y},y)+\lambda\Omega (\theta)$
+\end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}
+\caption{Computación hacia atrás para la red neuronal profunda del algoritmo \autoref{alg:forward}, que usa, en adición a la entrada $x$, un objetivo $y$.}
+\begin{algorithmic}
+\STATE Después del cálculo hacia adelante, calculamos el gradiente de la capa de salida:
+\STATE $g\leftarrow\nabla_{\hat{y}}J=\nabla_{\hat{y}}L(\hat{y},y)$
+\FOR{$k=l,l-1,...,1$}
+\STATE $g\leftarrow \nabla_{a^(k)}J=g\odot\sigma'(a^{(k)})$
+\STATE $\nabla_{b^{(k)}}J=g+\lambda\nabla_b^(k)\Omega(\theta)$
+\STATE $\nabla_{W^{(k)}}J=gh^{(k-1)}+\lambda\nabla_W^{(k)}\Omega(\theta)$
+\STATE $g\leftarrow \nabla_{h^{(k-1)}}J=W^{(k)T}g$
+\ENDFOR
+\end{algorithmic}
+\end{algorithm}
 FIXME el siguiente párrafo desaparece y en su lugar aparecerá los algoritmos escritos. Así no es tan sacado de la manga
 
 A continuación toca hablar del entrenamiento de la red completa, a los conceptos que ya conocíamos del clasificador lineal \ref{def:LinearClassifier} se añade el concepto de \emph{Backpropagation} o \emph{Propagación hacia atrás de errores} que hace uso de la \emph{regla de la cadena} para, a través de los cálculos locales realizados por cada neurona, obtener la función completa de clasificación. Así, buscamos que las neuronas se auto organicen para ser capaces de localizar patrones similares de forman que sepan cómo reaccionar ante la presencia de ruido o datos incompletos. Esto hace a través de la comunicación de sus valores locales y gradientes entre las distintas neuronas, comenzando por la capa de salida y avanzando hacia atrás. FIXME: Mencionar importancia del Subgradiente para el cálculo del gradiente, al no estar definido para cualquier función. \newline
