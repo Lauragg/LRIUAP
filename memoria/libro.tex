@@ -108,7 +108,7 @@
 
 \usepackage{tikz}
 \usetikzlibrary{arrows,scopes,calc,babel}
-\usepackage{xcolor, graphicx}
+\usepackage{xcolor, graphicx,float}
 % Carpeta donde buscar los archivos de imagen por defecto
 \graphicspath{{img/}}
 
@@ -218,13 +218,20 @@
 }
 \part{Conceptos previos}
 \input{capitulos/capitulo1}
+
 \setpartpreamble[c][0.75\linewidth]{%
 	\bigskip % Deja un espacio vertical en la parte superior
   Descripción :D FIXME
 }
-
-\part{Desarrollo de un sistema CBIR}
+\part{Segmentación semántica}
 \input{capitulos/capitulo2}
+
+\setpartpreamble[c][0.75\linewidth]{%
+	\bigskip % Deja un espacio vertical en la parte superior
+  Descripción :D FIXME
+}
+\part{Desarrollo de un sistema CBIR}
+\input{capitulos/capitulo3}
 %\part{Primera parte} % Dividir un libro en partes OPCIONAL
 
 %\input{capitulos/capitulo01}

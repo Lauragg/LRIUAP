@@ -153,9 +153,39 @@ $$F(x)=\sum_{j=1}^n \alpha_j \sigma(w_j^Tx+b_j) \;\;\; \forall x \in \R^n,$$
 
 donde $w_j\in\R^n,\;\; \alpha_j,b_j\in\R$ serán fijas una vez entrenada la red y $\sigma : \R \to \R$ la función de activación elegida en cada capa.\\
 
-\subsection{Propagación hacia adelante}
+\subsection{Función de pérdida y métricas}
+La función de pérdida, o \emph{loss function}, se trata de la función objetivo que querremos minimizar en el problema de optimización planteado durante el entrenamiento de una red neuronal. Existen muchas funciones de pérdida, que se pueden englobar en tres grandes categorías:
+\begin{itemize}
+\item Funciones de pérdida probabilísticas. Son aquellas cuyo resultado es interpretable como una medida de probabilidad. Un ejemplo de esto es la entropía cruzada, o \emph{cross entropy}, que mide la media de bits necesarios para identificar un evento.
+\item Funciones de pérdida de regresión. Son aquellas cuyos valores son reales o continuos. Como ejemplos se tiene el error cuadrático medio o la similitud del coseno.
+\item Funciones de pérdida para clasificaciones "máximo-margen". Un ejemplo de este tipo es la función de pérdida de bisagra, o \emph{hinge loss function}.
+\end{enumerate}
+
+Existen varias formas de medir el funcionamiento de una red neuronal sin que estas medidas lleguen a afectar al entrenamiento. Hay múltiples métricas de evaluación que se pueden utilizar en diferentes contextos, siendo la más común la precisión, exactitud o \emph{accuracy}.\\
+
+La métrica de \emph{accuracy} corresponde al número de datos correctamente predichos con respecto a todos los puntos. Formalmente está definida como el número de verdaderos positivos y negativos divido entre los falsos positivos, verdaderos positivos, falsos negativos y verdaderos negativos.\\
+\begin{figure}[htpb]
+  \centering
+  \includegraphics[width=0.6\textwidth]{accuracy}
+  \caption{Exactitud o \emph{accuracy}}
+  \label{fig:accuracy}
+\end{figure}
+
+Por otro lado, se mencionará también la intersección sobre la unión, mayormente conocida como \emph{intersection over union (IoU)}, que contabiliza el área de intersección y de unión entre las predicciones y los verdaderos valores para después dividir el primero entre el segundo.
+\begin{figure}[htpb]
+  \centering
+  \includegraphics[width=0.6\textwidth]{iou}
+  \caption{intersección sobre la unión o \emph{intersection over union (IoU)}}
+  \label{fig:iou}
+\end{figure}
+
+\subsection{Propagación y Optimización}
+Con el fin de simplificar la explicación de los algoritmos que se verán en esta subsección, nos centraremos en el caso de las redes neuronales prealimentadas, o \emph{feed forward neural networks}, que son aquellas donde las conexiones entre las distintas neuronas no forman un ciclo. También son conocidas como redes neuronales hacia adelante puesto que la información únicamente se mueve hacia adelante, diferenciándose de las redes neuronales recurrentes.\\
+
+El algoritmo que computa el avance de la información a través de estas redes recibe el nombre de propagación hacia adelante, o \emph{forward propagation}, \cite{Goodfellow-et-al-2016}. Durante el entrenamiento, la información de entrada continua hasta producir un coste escalar $J(\theta)$ y el algoritmo de propagación hacia atrás, o \emph{back propagation}, permite que ese coste fluya hacia atrás en la red para calcular el gradiente. \\
+
 \begin{algorithm}\label{alg:forward}
-\caption{Propagación hacia adelante mediante una red neuronal típica y el cálculo de la función de coste. La función de pérdida $L(\hat{y},y)$ depende de la salida de la red $\hat{y}$ y del objetivo $y$. Para obtener el coste total $J$, a la pérdida se le debería de añadir un regularizador $\Omega(\theta)$, donde $\theta$ contiene todos los parámetros (pesos y sesgos).}
+\caption{Propagación hacia adelante mediante una red neuronal típica, totalmente conectada, y el cálculo de la función de coste. La función de pérdida $L(\hat{y},y)$ depende de la salida de la red $\hat{y}$ y del objetivo $y$. Para obtener el coste total $J$, a la pérdida se le debería de añadir un regularizador $\Omega(\theta)$, donde $\theta$ contiene todos los parámetros (pesos y sesgos). \cite{Goodfellow-et-al-2016}}
 \begin{algorithmic}
 \REQUIRE Profundidad de la red $l$
 \REQUIRE $W^{(i)}, i\in\{1,...,l\}$, las matrices de pesos del modelo
@@ -172,25 +202,68 @@ donde $w_j\in\R^n,\;\; \alpha_j,b_j\in\R$ serán fijas una vez entrenada la red 
 \end{algorithmic}
 \end{algorithm}
 
+A menudo, se piensa que con la propagación hacia atrás se está realizado todo el proceso de aprendizaje de la red, cuando este algoritmo únicamente calcula el valor del gradiente y serás otro algoritmo, como, por ejemplo, el descenso del gradiente estocástico (\emph{stochastic gradient descent}), es el utilizado para realizar el aprendizaje por la red. Los algoritmos utilizados para calcular este aprendizaje reciben el nombre de optimizadores.\\
+
+La regla de la cadena del cálculo es utilizada para calcular las derivas de funciones compuestas por otras funciones cuyas derivadas son conocidas. De esta forma, el algoritmo de propagación hacia atrás realiza el cálculo de esta regla de la cadena, en un orden específico de operaciones que es muy eficiente. \\
 \begin{algorithm}
-\caption{Computación hacia atrás para la red neuronal profunda del algoritmo \autoref{alg:forward}, que usa, en adición a la entrada $x$, un objetivo $y$.}
+\caption{Computación hacia atrás para la red neuronal profunda del algoritmo \autoref{alg:forward}, que usa, en adición a la entrada $x$, un objetivo $y$. \cite{Goodfellow-et-al-2016}}
 \begin{algorithmic}
 \STATE Después del cálculo hacia adelante, calculamos el gradiente de la capa de salida:
 \STATE $g\leftarrow\nabla_{\hat{y}}J=\nabla_{\hat{y}}L(\hat{y},y)$
 \FOR{$k=l,l-1,...,1$}
+\STATE Se convierte el gradiente de la salida de las capas en un gradiente en la función de activación:
 \STATE $g\leftarrow \nabla_{a^(k)}J=g\odot\sigma'(a^{(k)})$
+\STATE Se calcula el gradiente el los pesos y sesgos, incluidos los términos de regularización cuando estos sean necesarios:
 \STATE $\nabla_{b^{(k)}}J=g+\lambda\nabla_b^(k)\Omega(\theta)$
 \STATE $\nabla_{W^{(k)}}J=gh^{(k-1)}+\lambda\nabla_W^{(k)}\Omega(\theta)$
+\STATE Se propaga el gradiente.
 \STATE $g\leftarrow \nabla_{h^{(k-1)}}J=W^{(k)T}g$
 \ENDFOR
 \end{algorithmic}
 \end{algorithm}
-FIXME el siguiente párrafo desaparece y en su lugar aparecerá los algoritmos escritos. Así no es tan sacado de la manga
 
-A continuación toca hablar del entrenamiento de la red completa, a los conceptos que ya conocíamos del clasificador lineal \ref{def:LinearClassifier} se añade el concepto de \emph{Backpropagation} o \emph{Propagación hacia atrás de errores} que hace uso de la \emph{regla de la cadena} para, a través de los cálculos locales realizados por cada neurona, obtener la función completa de clasificación. Así, buscamos que las neuronas se auto organicen para ser capaces de localizar patrones similares de forman que sepan cómo reaccionar ante la presencia de ruido o datos incompletos. Esto hace a través de la comunicación de sus valores locales y gradientes entre las distintas neuronas, comenzando por la capa de salida y avanzando hacia atrás. FIXME: Mencionar importancia del Subgradiente para el cálculo del gradiente, al no estar definido para cualquier función. \newline
+Todo esto es para poder plantear el objetivo más importante del entrenamiento de una red neuronal, el resolver un problema de optimización planteado al querer minimizar el valor de la función de pérdida. \\
 
-FIXME: Definir epoch y la validación cruzada
+Para ello, se describirá el algoritmo del descenso del gradiente estocástico, o \emph{stochastic gradient descent (SGD)}, que, junto a sus variantes, son los algoritmos de optimización más utilizados en el aprendizaje profundo. \\
 
+\begin{algorithm}
+\caption{Descenso del gradiente estocástico con cantidad de movimiento, o \emph{momentum}. \cite{Goodfellow-et-al-2016}}
+\begin{algorithmic}
+\REQUIRE Ratio de aprendizaje $\epsilon$ y \emph{momentum} $\alpha$.
+\REQUIRE Parámetro inicial $\theta$ y velocidad inicial $v$.
+\WHILE{no se cumpla el criterio de parada}
+\STATE Sea $\{x^{(1)},...,x^{(m)}\}$  un subconjunto del conjunto de entrenamiento con sus correspondientes etiquetas $y^{(i)}$.
+\STATE Calcular la estimación del gradiente: $g\leftarrow \frac{1}{m}\nabla_\theta \sum_i L(f(x^{(i)};\theta),y^{(i)})$.
+\STATE Calcular la actualización de la velocidad: $v \leftarrow \alpha v - \epsilon g$.
+\STATE Aplicar actualización: $\theta \leftarrow \theta + v$.
+\ENDWHILE
+\end{algorithmic}
+\end{algorithm}
+
+Finalmente, describiremos la variante \emph{Adam} del \emph{SGD} puesto que será la que utilicemos como optimizador más adelante.\\
+
+\begin{algorithm}
+\caption{El algoritmo \emph{Adam}. \cite{Goodfellow-et-al-2016}}
+\begin{algorithmic}
+\REQUIRE Tamaño de paso $\epsilon$. (Sugerido por defecto: 0.0001)
+\REQUIRE Ratio exponencial de caída para las estimaciones de momentos, $\rho_1$ y $\rho_2$ en $[0,1)]$. (Sugerido por defecto $0.9$ y $0.999$ respectivamente)
+\REQUIRE Una pequeña constante $\delta$ utilizada para una estabilización numérica. (Sugerida: $10^{-8}$)
+\REQUIRE Un parámetro inicial $\theta$0
+\STATE Incializar las variables de momentos $s=0$ y $r=0$.
+\STATE Inicializar el paso de tiempo $t=0$.
+\WHILE{No se cumple el criterio de parada}
+\STATE Sea $\{x^{(1)},...,x^{(m)}\}$  un subconjunto del conjunto de entrenamiento con sus correspondientes etiquetas $y^{(i)}$.
+\STATE Calcular la estimación del gradiente: $g\leftarrow \frac{1}{m}\nabla_\theta \sum_i L(f(x^{(i)};\theta),y^{(i)})$.
+\STATE Actualizar la estimación del primer momento sesgado: $s\leftarrow \rho_1 s+(1-\rho_1)g$.
+\STATE Actualizar la estimación del segundo momento sesgado: $r\leftarrow \rho_2 r +(1-\rho_2) \odot g$.
+\STATE Corregir el sesgo del primer momento: $\hat{s} \leftarrow \frac{s}{1-\rho_1^t}$.
+\STATE Corregir el sesgo del segundo momento: $\hat{r} \leftarrow \frac{r}{1-\rho_2^t}$.
+\STATE Calcular la actualización: $\Delta\theta = -\epsilon \frac{\hat{s}}{\sqrt{\hat{r}}+\delta}$ (Operaciones aplicadas elemento a elemento)
+\STATE Aplicar la actualización: $\theta \leftarrow \theta + \Delta \theta$
+\ENDWHILE
+\end{algorithmic}
+\end{algorithm}
+Para más detalles sobre estos algoritmos, se recomienda la consulta de los libros \emph{Deep Learning} \cite{Goodfellow-et-al-2016} y \emph{Learning from data} \cite{10.5555/2207825}. \\
 \chapter{Teoremas de Aproximación Universal}
 Hasta ahora se ha definido una estructura con una serie de parámetros con la esperanza de poder llegar a resolver el problema planteado. Sin embargo, en ningún momento hemos utilizado ningún resultado que nos asegure que dicha estructura puede llegar a resolver el problema que deseamos. A continuación, mostraremos diversos resultados, con diversos niveles de generalidad, que muestran cómo esta estructura es un aproximador universal y por ello resuelve nuestro problema. Estos resultados se dividen en dos grandes categorías \emph{anchura indeterminada} y \emph{profundidad indeterminada}.
 
@@ -402,86 +475,3 @@ Sea $Z=\{V(N_i\backslash{i}),V(i)\}_{i\ge 1}$ un proceso estocástico estrictame
 \end{teorema}
 
 En un contexto más general, la demostración se puede encontrar en \cite{Buades:2005:NAI:1068508.1069066} bajo la suposición de cualquiera de cuatro tipos de procesos mezclados enunciados en \autoref{def:mezcla}
-
-\chapter{Paradigmas de detección}
-Hasta este momento, hemos tratado un problema de clasificación global. Se suponía que la imagen tenía un único elemento que se quisiera clasificar e idealmente este estaría centrado con respecto el centro de la imagen. En adelante, querremos clasificar múltiples elementos pertenecientes a múltiples etiquetas distintas y querremos saber cuántos elementos hay, sus posiciones relativas a la imagen y la categoría a la que pertenecen cada una de ellas.\newline
-
-La gran mayoría de los paradigmas de detección utilizan una red neuronal pre-entrenada como clasificador dentro de sus estructuras. Suele recibir modificaciones en sus últimas capas ya sea sustituyéndolas, pasando por un proceso de \emph{fine-tunning}, o eliminándolas antes de ser añadidas como un elemento invariante durante el entrenamiento del modelo. Estas redes suelen recibir el nombre de \emph{backbone} y algunos modelos permiten la libre elección de estos clasificadores dependiendo del problema concreto que se desee abordar.\newline
-
-Para indicar las posiciones de los elementos, por lo general se utilizarán \emph{bounding-box} o \emph{bbox} que serán rectángulos que contendrán cada uno de los elementos o \emph{pixel level} que colorea cada uno de los píxeles pertenecientes a determinada categoría, ambos con la mayor precisión posible.
-
-\begin{figure}[htpb]
-  \centering
-  \includegraphics[width=0.8\textwidth]{object_detection}
-  \caption{Detección, clasificación y segmentación. \cite{2019arXiv190803673W}}
-  \label{fig:object-detection}
-\end{figure}
-
-
-
-\section{Dos pasos o basados en RCNN}
-El problema de detección se divide en dos etapas: una generación de propuestas y la realización de predicciones sobre estas propuestas. Como paradigmas de detección, destacan la familia \emph{R-CNN} y los que se encuentran basados en esta.\newline
-
-Esta familia surge en noviembre de 2013 con \emph{R-CNN} \cite{2013arXiv1311.2524G} que utiliza Selective Search \cite{Selective Search for object recognition} para generar 2000 \emph{bbox} de propuestas que son redimensionadas para coincidir con las dimensiones de entrada una CNN pre-entrenada. Esta CNN debe volver a entrenarse, extrayéndole la última capa y añadiéndole una \emph{máquina de vectores de soporte (SVM)} con las categorías originales más una nueva clase llamada "fondo" que engloba a todas las propuestas que no pertenecen a ninguna categoría. Finalmente, las propuestas clasificadas son combinadas a través de un modelo de regresión lineal para así obtener una \emph{bbox} con mejor ajuste y precisión.\newline
-
-La principal diferencia que introduce \emph{Fast R-CNN} \cite{2015arXiv150408083G} reside en que, en lugar de pasar por la CNN todas las propuestas de Selective Search, nuestra CNN recibe como entrada la imagen completa reduciendo el coste computacional al analizar una única vez las zonas de solapamiento entre propuestas. Además, las propuestas dejan de ser escaladas para coincidir con una determinada dimensión y se introduce en una capa especial llamada \emph{Region of Interest Pooling Layer (RoI pooling)} que extrae un vector de longitud fija que será la entrada de las siguientes ramas. A continuación, el modelo se divide en dos ramas: un clasificador SoftMax y un modelo de regresión que calcula las \emph{bbox}. \newline
-
-\begin{figure}[htpb]
-  \centering
-  \includegraphics[width=1\textwidth]{rcnn}
-  \caption{Comparativa de algunos modelos de la familia R-CNN. \cite{2019arXiv190803673W}}
-  \label{fig:r-cnn}
-\end{figure}
-
-En \emph{Faster R-CNN} \cite{2015arXiv150601497R} se sustituye Selective Search por una red neuronal de generación propuestas, conocida como \emph{anchor boxes}, que no sólo reduce el tiempo de cómputo de la generación de propuestas sino que aporta un menor número de propuestas con mayor calidad y precisión. Un buen apunte de la red de generación de propuestas, es que esta no es pre-entrenada antes de ser añadido al modelo sino que aprende de forma conjunta con toda la red.\newline
-
-La última mejora de esta familia viene representada por \emph{Mask R-CNN} \cite{2017arXiv170306870H} que sustituye la capa RoI pooling introducida en el modelo Fast R-CNN por una RoI alignment que retiene más información de las características obtenidas por la CNN compartiendo la misma estructura de entrada y salida de datos con la RoI pooling. Mask R-CNN aprovecha esto para realizar predicciones del tipo pixel level con mayor precisión a través de una interpolación bilineal que se ejecuta paralelamente con las capas totalmente conectadas de los modelos anteriores. Así, en el mismo punto que sus predecesores eran divididos en tres ramas independientes, Mask R-CNN se divide en tres ramas: un clasificador SoftMax, un regresor de \emph{bbox} y un otro regresor de pixel level.\newline
-
-Mencionar Mesh R-CNN
-https://arxiv.org/abs/1906.02739\newline
-Mencionar R-FCN
-https://arxiv.org/pdf/1605.06409.pdf\newline
-Libra R-CNN
-https://arxiv.org/pdf/1904.02701.pdf
-\section{Un paso o basados en YOLO}
-Estos modelos destacan por no hacer una separación directa de la generación de propuestas y la predicción de estas. Destaca \emph{YOLO} y sus sucesivas mejoras, así como los múltiples algoritmos basados en ellas, pero existen muchos más modelos que pueden ser identificados con esta estructura.\newline
-
-En junio de 2015 aparece \emph{You Only Look Once (YOLO)} \cite{2015arXiv150602640R}, un nuevo algoritmo que pretende realizar al mismo tiempo la generación de propuestas y la clasificación de estas, buscando así una mayor eficiencia computacional. Para ello, tras redimensionar la imagen en 448x448 píxeles, el algoritmo divide la imagen en una cuadrícula cuyas celdas se encargan de realizar un número fijo de propuestas indicando en cada una de ellas la probabilidad que tiene de ser un objeto, la \emph{bbox} en la que se encuentra y la probabilidad de pertenecer a cada una de las clases de objetos de las que disponemos. Finalmente, descarta aquellas propuestas con baja probabilidad de ser un objeto y utiliza un algoritmo de \emph{non-max supression} \cite{2017arXiv170404503B} que unifica y combina las \emph{bbox} con las máximas áreas compartidas.\newline
-
-Buscando una mejora de la predicción pero sin perder el enfoque de la velocidad, surge \emph{YOLO9000} o \emph{YOLOv2} \cite{2016arXiv161208242R} que sigue la misma estructura que su predecesor pero sustituyendo algunos fragmentos por otros con mayor rendimiento. YOLOv2 redimensiona la imagen original a 416x416 píxeles y sustituye las capas totalmente conectadas que utilizaba para la generación de propuestas por un modelo de \emph{anchor boxes} \cite{2015arXiv150601497R} junto con otros cambios menores.\newline
-
-La siguiente versión \emph{YOLOv3} \cite{2018arXiv180402767R} decide  no darle tanta importancia a la velocidad y centrarse en solucionar los problemas de detección presentados por sus antecesores. Mientras que YOLOv2 utiliza una arquitectura con 30 capas, YOLOv3 utiliza 106 capas totalmente convolucionadas e introduce la utilización de \emph{residual blocks}, \emph{skip connections} y \emph{upsampling}. Esta nueva arquitectura, realiza la detección de objetos en tres escalas distintas en diferentes profundidades de la red Darknet-53 y utilizando una estructura piramidal \cite{2016arXiv161203144L} para comunicar la detección entre las diferentes escalas.\newline
-
-Mencionar YOLOv4
-https://arxiv.org/pdf/2004.10934.pdf\newline
-
-\section{Non-local neural networks}
-
-En \cite{DBLP:journals/corr/abs-1711-07971} se introduce el concepto de \emph{non-local neural networks} que utiliza una arquitectura ascendente y descendente, \emph{up-down architecture} \cite{2016arXiv160308695P}, para extraer las características de un clasificador a distintos niveles de profundidad y utilizarlas para segmentar semánticamente la imagen \autoref{fig:object-detection}.\newline
-
-\begin{figure}[htpb]
-  \centering
-  \includegraphics[width=0.6\textwidth]{up-down}
-  \caption{Ejemplo de una arquitectura ascendente y descentente con saltos de conexiones\cite{2016arXiv160308695P}.}
-  \label{fig:up-down}
-\end{figure}
-
-
-En la parte ascendente de este tipo de arquitecturas nos encontraremos con un clasificador de imágenes, del cual extraeremos información a distintos niveles de profundidad que será unificada y analizada en la parte descendente de la arquitectura para poder predecir los distintos segmentos semánticos. \\
-
-Las \emph{non-local neural networks} se distinguen por la utilización de \emph{non-local block} o bloques no locales como extractores de características en los distintos niveles de profundidad. Estos bloques serán de la forma: $$z_i=W f_i(x_i) + x_i,$$  donde $i$ representa el índice de una posición de salida, $x_i$ el $i$-ésimo elemento de la entrada $x$, $f_i$ la $i$-ésima coordenada de una operación no local $f$ (\autoref{def:non-local}) y $W$ un peso que será entrenado por la red. \\
-
-%Podemos distinguir tres tipos de componentes principales: clasificador, bloque no local o \emph{non-local block} y bloque de fusión o \emph{fuse up block}. Lo que más destaca de estas estructuras son los non-local block utilizados para extraer las características puesto que, en lugar obtenerlas utilizando de forma recurrente convoluciones en pequeñas áreas, comprueban las relaciones entre los datos con una única operación que, además, comprueba la afinidad con los datos más distantes.\newline
-
-%A continuación, nos centraremos en los non-local block, definiendo las clase de funciones que los forman y demostrando algunas de sus propiedades que garantizarán su correcto funcionamiento. Seguidamente, mostraremos algunos ejemplos y cómo podemos configurar nuestra propia red según nuestras necesidades.\newline
-
-%\subsection{Non-local block}
-%Finalmente, el bloque non-local es de la forma: $$z_i=W_z f(x_i) + x_i,$$ donde multiplicamos la función no local por un peso que será entrenado por la red y le añadimos una conexión residual para evitar perder las características del modelo pre-entrenado en caso de que $W_z$ comience siendo inicializado como $0$.
-
-%FIXME: Añadir más ventajas de la conexión residual.
-
-\section{Experimentos}
-
-Para el desarrollo de la red neuronal que se ha implementado, se ha utilizado el artículo \emph{Real-time Semantic Segmentation with Fast Attention} \cite{2020arXiv200703815H} publicado el 9 de julio de 2020. En este artículo se busca implementar una red neuronal capaz de realizar segmentación semántica en tiempo real, sin una gran pérdida de precisión y pudiendo ser ejecutada en dispositivos con pocos recursos.\\
-
-Siguiendo sus ideas, se ha utilizado como clasificador un ResNet-18 \cite{DBLP:journals/corr/HeZRS15}. Como bloque no local se ha utilizado el, que los autores denominan, \emph{fast attention module}, que implementa como operación no local \autoref{def:non-local} una \emph{dot-product similarity} con $v(x_j)=W_{v_j}x_j$. Para reconstruir las formas a través de las características extraídas nos hemos basado en el modelo U-Net \cite{2015arXiv150504597R}.

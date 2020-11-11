@@ -1,198 +1,347 @@
-\chapter{Recuperación de imágenes basadas en su contenido (CBIR)}
+\chapter{Introducción}
+Dependiendo del contexto de trabajo, se suelen utilizar diferentes terminologías para referirse a los mismos conceptos. Por ello, antes que nada, se mencionará los términos utilizados para referirnos a diferentes objetivos o problemas basándonos en \cite{2019arXiv190803673W}. \autoref{fig:object-detection}\\
 
-En el contexto de las ciencias de información, en el Capítulo 1 de \cite{10.5555/1394399} podemos encontrar una definición genérica para el contexto de las ciencias de computación del término "recuperación de información" que dice que:
+Diremos que estamos en un problema de clasificación de imágenes (global), o \emph{(global) image classification}, cuando se pretenda asignar una única etiqueta a una imagen, de forma que esta categoría represente a toda la imagen o sea la que más se acerque a ella.\\
 
-\begin{definicion}
-La recuperación de información, o \emph{information retrieval (IR)}, consiste en encontrar material de una naturaleza no estructurada que satisface una necesidad de información dentro de grandes colecciones.
-\end{definicion}
+El siguiente paso, es la detección de objetos, o \emph{object detection}, que será cuando la imagen pueda ser dividida en múltiples cuadros, o \emph{frames}, que serán clasificados con una etiqueta cada uno, obteniendo así múltiples etiquetas para la misma imagen y conociendo la localización correspondiente a cada categoría.\\
 
-En particular, nos encontramos trabajando en la recuperación de imágenes que pertenece a la categoría de recuperación de información multimedia. Este, a su vez, se divide en dos tipos de recuperación, las basadas en texto, \emph{text-based image retrieval (TBIR)}, o las basadas en su contenido, \emph{content-based image retrieval (CBIR)}.\\
+Cuando se busca conocer los píxeles concretos pertenecientes a determinada categoría, estaremos ante un problema de segmentación semántica, o \emph{semantic segmentation}, en el que estaremos distinguiendo las regiones de la imagen por el significado que estas pueden conllevar consigo.\\
 
-En \cite{content-based} se dice, en que los sistemas TBIR, los usuarios utilizan palabras clave o descripciones de las imágenes como consulta en una base de datos para recuperar las imágenes que sean relevantes a la palabra clave. Para ello, primeramente las imágenes deben de ser anotados con texto ya sea de forma manual o automática. Esto posee la desventaja de que los algoritmos de anotación automática de imágenes no son factibles para generar textos descriptivos para un amplio espectro de imágenes requiriendo la anotación manual que, a su vez, suele ser subjetiva y dependiente del contexto. Como ventaja, al realizar utilizar únicamente texto para describir la imagen, sus consultas son rápidas ya que la coincidencia de cadenas es un proceso que requiere menos tiempo de cómputo.\\
-
-Por otro lado, la recuperación de imágenes basada en el contenido (CBIR), también conocida como consulta por el contenido de una imagen o \emph{query by image content (QBIC)}, es una técnica automatizada que toma una imagen como consulta y devuelve un conjunto de imágenes similares a esta \cite{content-based}. La imagen consultada es convertida en la representación interna de un vector de características usando la misma rutina de extracción que fue utilizada para crear la base de datos. Se utiliza una medida de similitud para calcular las distancias entre los vectores de características de la imagen consultada y de las imágenes destino en la base de datos de características. Por último, la recuperación se realiza mediante un esquema de indexación que facilita la búsqueda eficiente de la base de datos de imágenes \autoref{fig:content-based-esquema}.\\
+Finalmente, cuando no sólo se distingue entre qué píxeles pertenecen a determinada categoría sino que también distinguimos cuáles conforman distintos objetos, estaremos ante un problema de instanciación semántica de objetos, o \emph{instance segmentation}.\\
 
 \begin{figure}[htpb]
   \centering
-  \includegraphics[width=0.55\textwidth]{content-based-esquema}
-  \caption{Arquitectura de un sistema CBIR típico. \cite{content-based}}
-  \label{fig:content-based-esquema}
+  \includegraphics[width=0.65\textwidth]{object_detection}
+  \caption{Detección, clasificación y segmentación. \cite{2019arXiv190803673W}}
+  \label{fig:object-detection}
 \end{figure}
 
-En las páginas 7-8 y 22-26 de \cite{report:39} se mencionan tres niveles de consultas en un CBIR siendo:
+Para indicar las posiciones de los elementos, por lo general se utilizarán \emph{bounding-box} o \emph{bbox} que serán \emph{frames} que contendrán cada uno de los elementos o \emph{pixel level} que colorea cada uno de los píxeles pertenecientes a determinada categoría, ambos con la mayor precisión posible.\\
 
-\begin{itemize}
-\item Nivel 1: La recuperación de imágenes a través de características primitivas como pueden ser diferentes medidas de representación matemática de colores, texturas o formas. Un ejemplo sería un histograma de color que muestra la proporción de píxeles de cada color dentro de la imagen y la consulta sería encontrar imágenes con valores similares.
-\item Nivel 2: Comprende la recuperación por características derivadas, también conocidas como lógicas, incluyendo un cierto grado de inferencia lógica sobre la identidad de los objetos representados en la imagen. Además puede ser dividido en:
-\begin{itemize}
-\item recuperación de objetos de un determinado tipo o categoría. Por ejemplo, ``encuentra imágenes de un autobús de dos pisos''.
-\item recuperación de objetos individuales o personas. Por ejemplo, ``encuentra una imagen de la torre Eiffle''.
-\end{itemize}
-\item Nivel 3: Se trata de la recuperación por atributos abstractos, incluyendo una cantidad significativa de razonamiento de alto nivel sobre el propósito de los objetos o escenas representadas. Por ejemplo, ``encuentra imágenes de una multitud alegre''.
-\end{itemize}
+Hasta este momento, hemos tratado un problema de clasificación global. Se suponía que la imagen tenía un único elemento que se quisiera clasificar e idealmente este estaría centrado con respecto el centro de la imagen. En adelante, querremos clasificar múltiples elementos pertenecientes a múltiples etiquetas distintas y querremos saber cuántos elementos hay, sus posiciones relativas a la imagen y la categoría a la que pertenecen cada una de ellas. En concreto, estaremos ante un problema de segmentación semántica.\\
 
-El objetivo de este proyecto es desarrollar una aplicación en java que represente un sistema CBIR que siga una arquitectura como la mostrada en \autoref{fig:content-based-esquema}. Este será capaz de extraer distintas características de una imagen y de comparar, o calcular la similitud, entre las imágenes de distintas formas para obtener distintas clasificaciones ordenadas que serán visualizadas en la aplicación. \\
+El objetivo no es utilizar directamente la mejor de las opciones sino explorar otras opciones, ya existentes, que puedan llegar a ser de utilidad en las investigaciones venideras. En particular, nos centraremos en los \emph{non-local block} \autoref{def:non-local} \autoref{def:non-local-block} al crear ejemplos de redes neuronales y comprobar el comportamiento ante la eliminación o sustitución de este bloque.\\
 
-Se podrán realizar consultas de nivel 1 a través de características de color y de nivel 2 utilizando segmentación semántica para la distinción de categorías con una red neuronal implementada en Python.
+Como tampoco debemos olvidarnos de lo que realmente se utiliza, en la siguiente sección hablaremos de del estado del arte para la detección de objetos, segmentación semántica e instanciación semántica en conjunto, al ser problemas íntimamente relacionados. Seguidamente mostraremos las estructuras analizadas y algunas de las gráficas obtenidas durante el entrenamiento de estas.
 
-\chapter{Planificación y presupuesto.}
-\chapter{Requisitos}
-Antes de desarrollar la aplicación se debe comenzar con la exposición de los requisitos de datos, funcionales y no funcionales que esta requerirá para así poder tener en mente qué es lo que necesitamos, de qué es lo disponemos y cómo podremos trabajar de forma óptima para llegar al resultado deseado.\\
+\chapter{Estado del arte}
+La gran mayoría de los paradigmas de detección utilizan una red neuronal pre-entrenada como clasificador dentro de sus estructuras. Recibiendo modificaciones en sus últimas capas ya sea sustituyéndolas, pasando por un proceso de \emph{fine-tunning}, o eliminándolas antes de ser añadidas como un elemento invariante durante el entrenamiento del modelo. Estas redes suelen recibir el nombre de \emph{backbone} y algunos modelos permiten la libre elección de estos clasificadores dependiendo del problema concreto que se desee abordar.\newline
 
-Teniendo en mente \autoref{fig:content-based-esquema}, sabemos que debemos de tener los siguientes requisitos de datos:\\
-\begin{enumerate}
-\item Representación de una imagen
-\item Vector de características, en adelante descriptor, por cada característica que se quiera extraer o analizar.
-\item Base de datos capaz de almacenar los descriptores correspondientes a cada una de las imágenes que estarán almacenadas en dicha base o fácilmente accesibles a través de la información almacenada en ella.
-\item Representación de un descriptor genérico almacenado en la base de datos.
-\item Concepto de clasificador utilizado para extraer las características.
-\item Concepto de comparador para calcular la similitud entre las distintas características.
-\end{enumerate}
-Seguidamente, respecto a los requisitos funcionales debemos de considerar:\\
-\begin{enumerate}
-\item Abrir, guardar y cerrar una imagen.
-\item Realización de consultas basadas en el contenido de una imagen.
-\item Realización de consultas basadas en texto, siendo estas las categorías a las cuales pueden pertenecer nuestras imágenes.
-\item Agrupación de categorías.
-\item Extracción de descriptores de nivel 1.
-\item Extracción de un descriptor de nivel 2.
-\item Almacenaje de un conjunto de imágenes para poder ser comparadas.
-\item Crear, modificar, guardar y abrir bases de datos.
-\item Almacenaje de los descriptores correspondientes a dichas imágenes en una base de datos.
-\item Enlace entre las imágenes y sus correspondientes descriptores para un fácil acceso.
-\item Comparación entre descriptores.
-\item Comparación utilizando múltiples descriptores de las propias imágenes.
-\item Ordenación de imágenes resultantes de la consulta utilizando el resultado de la comparación entre descriptores.
-\item Capacidad de visualizar las imágenes resultado de forma ordenada según la puntuación obtenida.
-\item Capacidad de cambiar los comparadores utilizados sin que se vean afectados los descriptores utilizados.
-\item Capacidad de crear nuevas bases de datos utilizando diferentes descriptores.
-\item Capacidad de crear nuevas bases de datos utilizando múltiples descriptores.
-\item Importar un clasificador a través de un fichero.
-\end{enumerate}
-Respecto a los requisitos no funcionales nos referimos a las características de funcionamiento que nos servirán para mantener la calidad de nuestro programa. Estos serán, principalmente: rendimiento, durabilidad, estabilidad, seguridad, eficiencia, compatibilidad, garantía e integración de datos.\\
+En particular, se mencionará dos de las familias más fuertes para la detección en imágenes, la familia RCNN y la famila YOLO.
 
-Finalmente, se debe comentar que todo el proyecto deberá de poder ejecutarse en ordenadores que no dispongan de muchos recursos en unos tiempos razonables, al ser el material del que se dispone y siendo esta la prueba del funcionamiento en uno de los peores casos posibles.
+\section{Dos pasos o basados en RCNN}
+El problema de detección se divide en dos etapas: una generación de propuestas y la realización de predicciones sobre estas propuestas. Como paradigmas de detección, destacan la familia \emph{R-CNN} y los que se encuentran basados en esta.\newline
 
-\chapter{Análisis}
-Comenzaremos analizando los requisitos mencionados en el capítulo anterior para poder enfrentarnos correctamente al diseño de nuestro sistema.\\
+Esta familia surge en noviembre de 2013 con \emph{R-CNN} \cite{2013arXiv1311.2524G} que utiliza Selective Search \cite{Selective Search for object recognition} para generar 2000 \emph{bbox} de propuestas que son redimensionadas para coincidir con las dimensiones de entrada una CNN pre-entrenada. Esta CNN debe volver a entrenarse, extrayéndole la última capa y añadiéndole una \emph{máquina de vectores de soporte (SVM)} con las categorías originales más una nueva clase llamada "fondo" que engloba a todas las propuestas que no pertenecen a ninguna categoría. Finalmente, las propuestas clasificadas son combinadas a través de un modelo de regresión lineal para así obtener una \emph{bbox} con mejor ajuste y precisión.\newline
 
-Para los requisitos de datos se considera el encapsular apropiadamente cada uno de estos en una clase propia que sirva como una correcta representación de cada uno de los conceptos. En particular, si consideramos las especificaciones planteadas en los requisitos funcionales, se hace evidente la necesidad de la utilización de herencia para un correcto diseño del software al haber conceptos genéricos que más adelante se dividen teniendo diferentes especificaciones.\\
+La principal diferencia que introduce \emph{Fast R-CNN} \cite{2015arXiv150408083G} reside en que, en lugar de pasar por la CNN todas las propuestas de Selective Search, nuestra CNN recibe como entrada la imagen completa reduciendo el coste computacional al analizar una única vez las zonas de solapamiento entre propuestas. Además, las propuestas dejan de ser escaladas para coincidir con una determinada dimensión y se introduce en una capa especial llamada \emph{Region of Interest Pooling Layer (RoI pooling)} que extrae un vector de longitud fija que será la entrada de las siguientes ramas. A continuación, el modelo se divide en dos ramas: un clasificador SoftMax y un modelo de regresión que calcula las \emph{bbox}. \newline
 
-Además, es necesario desarrollar una aplicación de escritorio que haga mucho más intuitivo la utilización de cada uno de los elementos a implementar. Así, alguien sin conocimientos de programación, pero con interés o una cantidad relativa de estudios en la materia, podría utilizarla cómodamente.\\
+\begin{figure}[htpb]
+  \centering
+  \includegraphics[width=1\textwidth]{rcnn}
+  \caption{Comparativa de algunos modelos de la familia R-CNN. \cite{2019arXiv190803673W}}
+  \label{fig:r-cnn}
+\end{figure}
 
-Teniendo también en cuenta que sería ideal que la aplicación fuese multiplataforma y la existencia de la \emph{Java Multimedia Retrieval (JMR)} \cite{JMR}, librería desarrollada por Jesús Chamorro Martínez que resuelve de forma genérica gran parte de las funcionalidades solicitadas, se ha decidido utilizar Java como lenguaje de programación.\\
+En \emph{Faster R-CNN} \cite{2015arXiv150601497R} se sustituye Selective Search por una red neuronal de generación propuestas, conocida como \emph{anchor boxes}, que no sólo reduce el tiempo de cómputo de la generación de propuestas sino que aporta un menor número de propuestas con mayor calidad y precisión. Un buen apunte de la red de generación de propuestas, es que esta no es pre-entrenada antes de ser añadido al modelo sino que aprende de forma conjunta con toda la red.\newline
 
-Sin embargo, se debe de tener en cuenta que este proyecto ha sido planteado bajo la premisa de la utilización de aprendizaje profundo. Este será utilizado para la extracción de características de nivel 2, mediante la utilización de una red neuronal convolucionada \autoref{ch:cnn} que realizará una segmentación semántica para obtener diversas categorías así como los píxeles concretos de cada imagen que pertenecerán a cada categoría \cite{ch:fast-attention}.\\
+La última mejora de esta familia viene representada por \emph{Mask R-CNN} \cite{2017arXiv170306870H} que sustituye la capa RoI pooling introducida en el modelo Fast R-CNN por una RoI alignment que retiene más información de las características obtenidas por la CNN compartiendo la misma estructura de entrada y salida de datos con la RoI pooling. Mask R-CNN aprovecha esto para realizar predicciones del tipo pixel level con mayor precisión a través de una interpolación bilineal que se ejecuta paralelamente con las capas totalmente conectadas de los modelos anteriores. Así, en el mismo punto que sus predecesores eran divididos en tres ramas independientes, Mask R-CNN se divide en tres ramas: un clasificador SoftMax, un regresor de \emph{bbox} y un otro regresor de pixel level.\newline
 
-Si bien existen bibliotecas para el aprendizaje profundo en Java, estas no están tan desarrolladas como podrían estarlo en otros lenguajes de programación como Python. Por ello, se utilizará Python 3 para la creación, el entrenamiento y la carga de los modelos que se lleguen a probar a lo largo del proyecto.\\
+Mencionar Mesh R-CNN
+https://arxiv.org/abs/1906.02739\newline
+Mencionar R-FCN
+https://arxiv.org/pdf/1605.06409.pdf\newline
+Libra R-CNN
+https://arxiv.org/pdf/1904.02701.pdf
+\section{Un paso o basados en YOLO}
+Estos modelos destacan por no hacer una separación directa de la generación de propuestas y la predicción de estas. Destaca \emph{YOLO} y sus sucesivas mejoras, así como los múltiples algoritmos basados en ellas, pero existen muchos más modelos que pueden ser identificados con esta estructura.\newline
 
-Esto plantea la cuestión de cómo resolver la comunicación entre los distintos lenguajes, que será resulta mediante la utilización de una conexión TCP.\\
+En junio de 2015 aparece \emph{You Only Look Once (YOLO)} \cite{2015arXiv150602640R}, un nuevo algoritmo que pretende realizar al mismo tiempo la generación de propuestas y la clasificación de estas, buscando así una mayor eficiencia computacional. Para ello, tras redimensionar la imagen en 448x448 píxeles, el algoritmo divide la imagen en una cuadrícula cuyas celdas se encargan de realizar un número fijo de propuestas indicando en cada una de ellas la probabilidad que tiene de ser un objeto, la \emph{bbox} en la que se encuentra y la probabilidad de pertenecer a cada una de las clases de objetos de las que disponemos. Finalmente, descarta aquellas propuestas con baja probabilidad de ser un objeto y utiliza un algoritmo de \emph{non-max supression} \cite{2017arXiv170404503B} que unifica y combina las \emph{bbox} con las máximas áreas compartidas.\newline
+
+Buscando una mejora de la predicción pero sin perder el enfoque de la velocidad, surge \emph{YOLO9000} o \emph{YOLOv2} \cite{2016arXiv161208242R} que sigue la misma estructura que su predecesor pero sustituyendo algunos fragmentos por otros con mayor rendimiento. YOLOv2 redimensiona la imagen original a 416x416 píxeles y sustituye las capas totalmente conectadas que utilizaba para la generación de propuestas por un modelo de \emph{anchor boxes} \cite{2015arXiv150601497R} junto con otros cambios menores.\newline
+
+La siguiente versión \emph{YOLOv3} \cite{2018arXiv180402767R} decide  no darle tanta importancia a la velocidad y centrarse en solucionar los problemas de detección presentados por sus antecesores. Mientras que YOLOv2 utiliza una arquitectura con 30 capas, YOLOv3 utiliza 106 capas totalmente convolucionadas e introduce la utilización de \emph{residual blocks}, \emph{skip connections} y \emph{upsampling}. Esta nueva arquitectura, realiza la detección de objetos en tres escalas distintas en diferentes profundidades de la red Darknet-53 y utilizando una estructura piramidal \cite{2016arXiv161203144L} para comunicar la detección entre las diferentes escalas.\newline
+
+Mencionar YOLOv4
+https://arxiv.org/pdf/2004.10934.pdf\newline
+
+\chapter{Non-local neural networks} \label{def:non-local-block}
+
+En \cite{DBLP:journals/corr/abs-1711-07971} se introduce el concepto de \emph{non-local neural networks} que utiliza una arquitectura ascendente y descendente, \emph{up-down architecture} \cite{2016arXiv160308695P}, para extraer las características de un clasificador a distintos niveles de profundidad y utilizarlas para segmentar semánticamente la imagen \autoref{fig:object-detection}.\newline
+
+\begin{figure}[htpb]
+  \centering
+  \includegraphics[width=0.6\textwidth]{up-down}
+  \caption{Ejemplo de una arquitectura ascendente y descentente con saltos de conexiones\cite{2016arXiv160308695P}.}
+  \label{fig:up-down}
+\end{figure}
+
+
+En la parte ascendente de este tipo de arquitecturas nos encontraremos con un clasificador de imágenes, del cual extraeremos información a distintos niveles de profundidad que será unificada y analizada en la parte descendente de la arquitectura para poder predecir los distintos segmentos semánticos. \\
+
+Las \emph{non-local neural networks} se distinguen por la utilización de \emph{non-local block}, o bloques no locales, como extractores de características en los distintos niveles de profundidad. Estos bloques serán de la forma: $$z_i=W f_i(x_i) + x_i,$$  donde $i$ representa el índice de una posición de salida, $x_i$ el $i$-ésimo elemento de la entrada $x$, $f_i$ la $i$-ésima coordenada de una operación no local $f$ (\autoref{def:non-local}) y $W$ un peso que será entrenado por la red. \\
+
+%Podemos distinguir tres tipos de componentes principales: clasificador, bloque no local o \emph{non-local block} y bloque de fusión o \emph{fuse up block}. Lo que más destaca de estas estructuras son los non-local block utilizados para extraer las características puesto que, en lugar obtenerlas utilizando de forma recurrente convoluciones en pequeñas áreas, comprueban las relaciones entre los datos con una única operación que, además, comprueba la afinidad con los datos más distantes.\newline
+
+%A continuación, nos centraremos en los non-local block, definiendo las clase de funciones que los forman y demostrando algunas de sus propiedades que garantizarán su correcto funcionamiento. Seguidamente, mostraremos algunos ejemplos y cómo podemos configurar nuestra propia red según nuestras necesidades.\newline
+
+%\subsection{Non-local block}
+%Finalmente, el bloque non-local es de la forma: $$z_i=W_z f(x_i) + x_i,$$ donde multiplicamos la función no local por un peso que será entrenado por la red y le añadimos una conexión residual para evitar perder las características del modelo pre-entrenado en caso de que $W_z$ comience siendo inicializado como $0$.
+
+%FIXME: Añadir más ventajas de la conexión residual.
+
 \chapter{Diseño}
 
-Como se mencionó en el capítulo anterior, la aplicación será diseñada en dos partes conectadas por una conexión TCP. Comenzaremos mencionando las librerías utilizadas para cada una de las partes, prosiguiendo con mostrar una serie de diagramas que mostrarán la estructura interna utilizará nuestra aplicación haciendo uso del material disponible.
+Para el desarrollo de la red neuronal que se ha implementado, se ha utilizado el artículo \emph{Real-time Semantic Segmentation with Fast Attention} \cite{2020arXiv200703815H} publicado el 9 de julio de 2020. En este artículo se busca implementar una red neuronal capaz de realizar segmentación semántica en tiempo real, sin una gran pérdida de precisión y pudiendo ser ejecutada en dispositivos con pocos recursos.\\
 
-\section{Librerías utilizadas}
+Siguiendo sus ideas, se ha utilizado como clasificador un ResNet-18 \cite{DBLP:journals/corr/HeZRS15} para la región ascendente de las \emph{non local neural network} a desarrollar. Como bloque no local \autoref{fig:non-local} se ha utilizado el, que los autores denominan, \emph{fast attention module}, que implementa como operación no local \autoref{def:non-local} una \emph{dot-product similarity} con $v(x_j)=W_{v_j}x_j$ que tendrá la función de extraer y analizar las características del clasificador. \\
 
-Comenzaremos mencionando las librerías utilizadas para la creación, entrenamiento y carga de la red neuronal. Principalmente se ha utilizado:
-\begin{enumerate}
-\item Tensorflow \cite{tensorflow2015-whitepaper}:  se trata de una plataforma de código abierto de extremo a extremo para el aprendizaje automático. Posee una API para diversos lenguajes de programación como son Javascript y Python además de estar disponible tanto para ordenadores como para dispositivos móviles, en este caso bajo su versión Tensorflow Lite. Como extra, permite utilizar varias CPUs o GPUs, con la consecuente posibilidad de aceleración GPU, y ofrece soporte experimental para \emph{Cloud TPUs} en Keras y Google Colab. En particular se utilizará Tensorflow 2.0 que es compatible con Python 3.5 a 3.8.
-\item Keras \cite{chollet2015keras} : es una API construida sobre TensorFlow 2.0 que, según su propia página web, ``está diseñada para seres humanos, no para máquinas''. Está optimizada para GPU, CPU y TPU.Fue concebida para actuar como una interfaz en lugar de un framework de machine learning standalone por lo que ofrece un conjunto de abstracciones más intuitivas y de alto nivel, haciendo más sencillo el desarrollo de modelos de aprendizaje profundo.
-\item Classification models Zoo - Keras \cite{classification_models}: se trata de un conjunto de clasificadores entrenados en el conjunto de datos ImageNet \cite{imagenet_cvpr09}. De esta forma podremos obtener clasificadores que no están disponibles ni en Keras ni en TensorFlow, en particular ResNet18 \cite{DBLP:journals/corr/HeZRS15}.
-\item Imgaug \cite{imgaug} es una biblioteca para el aumento de imágenes en los experimentos de aprendizaje automático. Soporta un gran rango de técnicas de aumento de datos, permite combinarlas fácilmente y ejecutarlas de forma aleatoria en múltiples núcleos CPU.
-\end{enumerate}
-
-Para el tratamiento de los datos resultantes de la red neuronal con el fin de adaptarlos para utilizarlos en la aplicación, se ha utilizado el ecosistema basado en Python SciPy, principalmente las librerías:
-\begin{enumerate}
-\item SciPy \cite{2020SciPy-NMeth} librería fundamental para el cálculo científico.
-\item NumPy \cite{2020NumPy-Array} paquete de vectores n-dimensionales.
-\item Pandas \cite{reback2020pandas} \cite{mckinney-proc-scipy-2010} estructura de datos y análisis.
-\item Matplotlib \cite{Hunter:2007} trazado completo en 2D.
-\end{enumerate}
-Además, se ha utilizado scikit-image \cite{scikit-image} (o skimage) que es una colección de algoritmos para procesamiento de imágenes y la visión por computador.\\
-
-Como se mencionó en el capítulo anterior, para como esqueleto genérico del sistema CBIR se utilizará la biblioteca \emph{Java Multimedia Retrieval (JMR)} \cite{JMR} sobre la cual desarrollaremos en más detalle los elementos que utilizaremos. En particular, estaremos utilizando una versión actualizada por Miriam Mengíbar Rodríguez para su trabajo de fin de master \cite{TFM}.\\
-
-\begin{figure}[htpb]
+\begin{figure}[h]
   \centering
-  \includegraphics[width=0.9\textwidth]{jmrpackage}
-  \caption{Diagrama representante de algunos de los paquetes de la JMR. \cite{JMR}}
-  \label{fig:jmrpackage}
+  \includegraphics[width=1.05\textwidth]{Nonlocal}
+  \caption{Módulo \emph{fast attention}. Diseño implementado del bloque no local \autoref{def:non-local-block} que utiliza la operación no local \autoref{def:non-local} siguiendo \cite{2020arXiv200703815H}.}
+  \label{fig:non-local}
 \end{figure}
 
-De los paquetes mostrados, concretamente se utilizarán:
-\begin{itemize}
-\item \emph{db} : Paquete que simula una base de datos. Posee su propio elemento creado a partir de los datos de entrada y de los descriptores, compatibles con la comparación con las consultas y con una cómoda recuperación de los datos originales.
-\item \emph{descriptor} : Paquete que engloba los elementos necesarios para una correcta representación de un descriptor o vector de características, como es el caso de la interfaz \emph{Comparator} o la interfaz \emph{MediaDescriptor}. Posee dos subpaquetes:
-\begin{itemize}
-\item \emph{descriptor.color} : Paquete que implementa descriptores de colores de acuerdo al estándar MPEG7 \cite{MPPEG7}.
-\item \emph{descriptor.label} : Paquete que implementa un descriptor por etiquetas genérico así como definir las interfaces necesarias para la clasificación de las etiquetas.
-\end{itemize}
-\item \emph{region} : Paquete diseñado para la representación de una región contenida en una imagen. Si bien este paquete no se ha utilizado directamente, servirá como inspiración para la definición de la clase \emph{MultiRegion} que se verá más adelante.
-\end{itemize}
+Este módulo permite la fijación del parámetro $m$, correspondiente al número de canales que tendrán las convoluciones que poseen regulación L2 y que serán mantenidas por el resto de operaciones hasta desaparecer esta cantidad por el producto matricial implementado. Por otro lado, el parámetro $n$ corresponderá a los canales de los datos de entrada.\\
 
-Además, también se utilizarán las clases \emph{LabelGroup} y \emph{TCPClient}, siendo esta última a través de la cual se consigue la conexión TCP con el módulo de python, ambas implementas por Miriam en su trabajo de fin de master \cite{TFM}.
+A nivel comparativo, como extractor de características, se utilizará también una convolución \autoref{ch:cnn} de núcleo de dimensión $2$. El objetivo será comprobar empíricamente que el número de variables utilizadas no es lo que determinada la efectividad de un modelo, sino el cómo estas son utilizadas. Por ello, se ha decidido utilizar esta capa que es comúnmente utilizada para los problemas que estamos mencionando y que utiliza, únicamente, $4$ variables por cada $3$ utilizadas por el módulo \emph{fast attention} \autoref{fig:non-local} implementado.\\
+
+Para reconstruir las formas a través de las características extraídas nos hemos basado en el modelo U-Net \cite{2015arXiv150504597R}, en particular en la implementación realizada por el tutorial de segmentación de imágenes de Tensorflow \cite{tensorflowTutorial} \autoref{fig:fuse-up}.\\
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=0.4\textwidth]{FuseUP}
+  \caption{Diseño implementado del bloque de fusión de capas utilizado para la reconstrucción en la sección descendente de la arquitectura.}
+  \label{fig:fuse-up}
+\end{figure}
 
 \newpage
-\section{Descriptores}
-A la hora de diseñar los descriptores, debemos de tener especial atención en no diseñar nada de lo que ya dispongamos. Por ello, no será necesario el diseño de descriptores de nivel 1 de tipo color, puesto que estos ya están diseñados e implementados a través de los paquetes \emph{descriptor} y \emph{descriptor.color} de la JMR \cite{JMR}.\\
+Así, como estructura base tendremos:\\
 
-El principal trabajo será el diseño e implementación de un descriptor de nivel 2 con su respectivo comparador. En particular, se ha diseñado el descriptor \emph{RegionLabelDescriptor} que, dada una imagen, describirá cada una de las categorías pertenecientes a dicha imagen así como los píxeles concretos que pertenecerán a cada una de estas categorías. De esta forma, no sólo conoceremos qué etiquetas o categorías estarán presentes en la propia imagen sino que además la localización a nivel de píxel de cada una de estas categorías.\\
-
-\begin{figure}[htpb]
+\begin{figure}[h!]
   \centering
-  \includegraphics[width=1.1\textwidth]{DescriptorsAndComparators}
-  \caption{Diagrama de herencia y clases internas para los descriptores y comparadores de etiquetas. \cite{JMR}}
-  \label{fig:DescriptorsAndComparators}
+  \includegraphics[width=0.9\textwidth]{DiagramaUnet}
+  \caption{Diseño base basado en U-net \cite{2015arXiv150504597R} que utiliza como \emph{backbone} una ResNet-18 \cite{DBLP:journals/corr/HeZRS15}.}
+  \label{fig:DiagramaUnet}
 \end{figure}
 
-Para la extracción de estas características para la creación de este descriptor, se ha definido un clasificador llamado \emph{AttentionClassifier} que recibirá la url de la imagen cuyas características se desean extraer y, a través del uso de la clase \emph{TCPClient}, se conectará con un servidor de python llamado \emph{server.py} que segmentará semánticamente la imagen. Con esta información, almacenada en un objeto de la clase \emph{RegionClassification}, se construirá correctamente un objeto \emph{RegionLabelDescriptor} que podrá ser comparado utilizando los comparadores internos de su clase madre \emph{LabelDescriptor} y el comparador \emph{IoUComparator} que se definirá y creará para este descriptor concreto.\\
+\newpage
+Que al añadir el bloque no local denominado como módulo \emph{fast attention} queda como:\\
 
-\begin{figure}[htpb]
+\begin{figure}[h]
   \centering
-  \includegraphics[width=1.1\textwidth]{DiagramaSecuencia}
-  \caption{Diagrama de secuencia que muestra la creación de un descriptor del tipo \emph{RegionLabelDescriptor}}
-  \label{fig:DiagramaSecuencia}
+  \includegraphics[width=0.9\textwidth]{DiagramaCompleto}
+  \caption{Diseño base basado en U-net \cite{2015arXiv150504597R} que utiliza como \emph{backbone} una ResNet-18 \cite{DBLP:journals/corr/HeZRS15}. Utiliza el módulo \autoref{fig:non-local} como extractor de características.}
+  \label{fig:DiagramaCompleto}
 \end{figure}
 
-Un detalle importante a tener en cuenta, se trata de que, mientras que en los descriptores de color se definen con \emph{T=BufferedImage}, para el nuevo descriptor que estaremos creando se utilizará \emph{T=String} siendo este \emph{string} la dirección donde esta almacenada en nuestro dispositivo la imagen representante. Se ha elegido este método para facilitar la conexión TCP, así como su velocidad, pero tendremos la desventaja de que no podremos crear una base de datos que contemple tanto descriptores de color como descriptores de regiones al estar trabajando sobre tipos distintos.\\
+\newpage
+Sin embargo, en la siguiente sección veremos que al aumentar el número de categorías los resultados decaen. Por ello, se añade una nueva convolución al final de la reconstrucción y se modifica la convolución traspuesta original, con el fin de analizar las características obtenidas en los diferentes niveles de profundidad, quedando la estructura base como:\\
 
-Resumiendo, se deberán de implementar las clases \emph{RegionLabelDescriptor}, \emph{AttentionClassifier} y \emph{RegionClassification} para tener la funcionalidad del descriptor deseado. Además, también se implementará la clase \emph{IoUComparator} para añadir una nueva opción de comparación entre descriptores.\\
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.9\textwidth]{DiagramaUnetExtra}
+  \caption{Diseño base basado en U-net \cite{2015arXiv150504597R} que utiliza como \emph{backbone} una ResNet-18 \cite{DBLP:journals/corr/HeZRS15}. Utiliza una convolución extra al final para analizar la información obtenida y distinguir a través de esta.}
+  \label{fig:DiagramaUnetExtra}
+\end{figure}
 
-En la sección de implementación, se describirá el funcionamiento de \emph{IoUComparator} así como el funcionamiento y utilidad de otras clases desarrolladas para facilitar la comunicación con \emph{JMRFrame}, en particular se tratará de la clase \emph{MultiRegion} y de clases que tendrán la funcionalidad de renderizar la información de los cuadros combinados a implementar en la interfaz de usuario.
+\newpage
+Por lo que añadiendo el bloque no local tendremos:\\
 
-\chapter{Implementación}
-Para la implementación con el lenguaje Java se ha utilizado el entorno de desarrollo \emph{Apache Netbeans IDE 12.1}, sobre todo teniendo en mente el desarrollo de la interfaz gráfica que se ve sumamente facilitado gracias a las herramientas de la que dispone esta interfaz de desarrollo. Mientras que para el código en python y la propia memoria se ha utilizado el editor \emph{Atom} que permite una comunicación interactiva con el repositorio de GitHub utilizado para este proyecto \cite{GitHub} en el cual se pondrá encontrar todo el código desarrollado.\\
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.9\textwidth]{DiagramaNonlocalExtra}
+  \caption{Diseño base basado en U-net \cite{2015arXiv150504597R} que utiliza como \emph{backbone} una ResNet-18 \cite{DBLP:journals/corr/HeZRS15}. Utiliza una convolución extra al final para analizar la información obtenida y distinguir a través de esta. Utiliza el módulo \autoref{fig:non-local} como extractor de características.}
+  \label{fig:DiagramaNonlocalExtra}
+\end{figure}
+\newpage
+Y al sustituir el bloque no local como extractor de características por la convolución de núcleo de tamaño $2$ se obtendrá:\\
 
-Además, se podrán encontrar en dicho repositorio algunos de los múltiples entrenamientos de redes neuronales realizados así como cuadernillos de \emph{Jupyter Notebook} que mostrarán los diversos detalles de estos. Así, se podrá ver de forma interactiva los detalles analizados, en caso de ser de interés, sin necesidad de extender más de lo necesario esta memoria.
-\section{Comparadores}
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.9\textwidth]{DiagramaConvExtra}
+  \caption{Diseño base basado en U-net \cite{2015arXiv150504597R} que utiliza como \emph{backbone} una ResNet-18 \cite{DBLP:journals/corr/HeZRS15}. Utiliza una convolución extra al final para analizar la información obtenida y distinguir a través de esta. Utiliza convoluciones de núcleo de tamaño $2$ como extractor de características.}
+  \label{fig:DiagramaConvExtra}
+\end{figure}
 
-Antes de proceder a explicar la implementación de la clase \emph{IoUComparator} es necesario que se haga una pequeña pausa para comprender el funcionamiento de los comparadores de los ya existentes, en particular los pertenecientes a \emph{LabelDescriptor} para asegurarnos tener una buena compatibilidad con ellos y poder comprender mejor la futura implementación de \emph{IoUComparator}.\\
+\newpage
+Al añadir otro bloque de \emph{fuse up} surgió la posibilidad de que, añadiendo otro bloque no local, se consiguiera mejorar los resultados. Como se verá en la siguiente sección, no fue así.\\
 
-Dados dos descriptores, la imagen de la función de comparación entre ambos será $[0,+\infty]$, donde el resultado $0$ indicará que bajo esta comparación son iguales y cualquier otro valor significará que son distintos indicando una medida de la diferencia de relativa a esos dos descriptores bajo dicha comparación. En particular, el valor $+\infty$ representará la máxima diferencia posible, también interpretable como incomparables.\\
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.9\textwidth]{DiagramaNonlocal+Extra}
+  \caption{Diseño base basado en U-net \cite{2015arXiv150504597R} que utiliza como \emph{backbone} una ResNet-18 \cite{DBLP:journals/corr/HeZRS15}. Utiliza una convolución extra al final para analizar la información obtenida y distinguir a través de esta. Utiliza el módulo \autoref{fig:non-local} como extractor de características y posee un módulo extra.}
+  \label{fig:DiagramaNonlocal+Extra}
+\end{figure}
 
-Sabiendo que un descriptor de tipo \emph{LabelDescriptor} posee un vector de etiquetas de tipo \emph{string}, se dirá que un \emph{LabelDescriptor} $t$ está incluido en otro \emph{LabelDescriptor} $u$ si cada etiqueta perteneciente al vector de etiquetas de $t$ esta incluida en el vector de etiquetas de $u$. En particular, si existen etiquetas repetidas en $t$ bastará con que estas aparezcan una única vez en $u$ para que se siga considerando como verdadera la relación $t \subset u$, o $t$ incluido en $u$.\\
+\newpage
+Ante la posibilidad anterior, y su resultado, se diseñó otro planteamiento que veía reducido su número de bloques no locales, sin llegar a eliminarlos todos, para poder observar cómo esta reducción afectaba a la segmentación y si era necesario, o no, la utilización de todos los bloques.\\
 
-Dicho esto, podemos explicar el comportamiento de los descriptores sin pesos de \emph{LabelDescriptor}. Sean $t$ y $u$ dos \emph{LabelDescriptor}, el comparador
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.9\textwidth]{DiagramaSemiNonlocalExtra}
+  \caption{Diseño base basado en U-net \cite{2015arXiv150504597R} que utiliza como \emph{backbone} una ResNet-18 \cite{DBLP:journals/corr/HeZRS15}. Utiliza una convolución extra al final para analizar la información obtenida y distinguir a través de esta. Utiliza el módulo \autoref{fig:non-local} como extractor de características en la máxima profundidad.}
+  \label{fig:DiagramaSemiNonlocalExtra}
+\end{figure}
+
+\newpage
+Y comprobaremos también esta posibilidad utilizando la convolución de núcleo de tamaño $2$:
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.9\textwidth]{DiagramaSemiConvExtra}
+  \caption{Diseño base basado en U-net \cite{2015arXiv150504597R} que utiliza como \emph{backbone} una ResNet-18 \cite{DBLP:journals/corr/HeZRS15}. Utiliza una convolución extra al final para analizar la información obtenida y distinguir a través de esta. Utiliza convoluciones de núcleo de tamaño $2$ como extractor de características en la máxima profundidad.}
+  \label{fig:DiagramaSemiConvExtra}
+\end{figure}
+
+\chapter{Experimentos}
+
+\section{Parámetros y configuración de entrenamiento}
+Como función de pérdida se ha utilizado la \emph{Sparse Categorial Crossentropy} ofrecida por Keras \cite{chollet2015keras}. Esta función aplica una función \emph{SoftMax} a la salida de la red antes de calcular su entropía cruzada. Se diferencia de la \emph{Categorical Crossentropy} por el formato de entrada de las etiquetas verdaderas, al requerir una matriz bidimensional en lugar de una tridimensional con el fin de reducir el cómputo. \\
+
+El optimizador empleado será emph{Adam}, con los parámetros por defecto, e iremos reduciendo el ratio de aprendizaje un factor de $0.1$ cada $3$ épocas sin reducir la pérdida en el conjunto de validación hasta un valor mínimo de $10^{-10}$. Además, si ocurren $10$ épocas y no mejora el valor de pérdida en el conjunto de validación, el entrenamiento se detendrá al interpretarse que ha llegado a su límite y no será capaz de aprender mucho más. Cada vez que obtengamos un mejor valor de pérdida en el conjunto de validación, se guardarán los pesos que posea la red neuronal en dicho momento.\\
+
+Como métricas, se utilizará la clásica \emph{accuracy}, o precisión, junto con la \emph{Mean IoU}, o media de la intersección sobre la unión, siendo que será esta última la que realmente prediga cómo de bien se comporta la red. Esto es debido a que podríamos predecir que no existe ningún objeto en la imagen y obtener una precisión alta cuando realmente existen pequeños objetos que no han sido predichos. En \cite{accvsiou} se puede ver una explicación más detallada de este fenómeno y el por qué del uso de la intersección sobre la unión. \\
+
+
+Como conjunto de datos de entrenamiento, se ha utilizado COCO 2017 \cite{2014arXiv1405.0312L} \cite{COCO} que posee un total de 91 categorías correspondientes a objetos del día a día. Estas categorías pueden ser agrupadas en hiper categorías, de forma que se realizarán entrenamientos con todo el conjunto de datos y también con aquellos pertenecientes a la hiper categorías de transportes. El objetivo es comparar el comportamiento en diferentes cantidades de categorías a aprender.\\
+
+Para incrementar la variedad de imágenes sin aumentar la cantidad de estas, buscando obtener una mayor generalidad de la red sin aumentar el cómputo, se implementarán una serie de incrementos de datos, o \emph{data augmentations}. Esto será la aplicación de un conjunto de transformaciones a las imágenes originales y a sus máscaras de etiquetas cada vez que estas sean consultadas para el entrenamiento. En particular, se aplicarán, en orden, entre una o dos transformaciones de las siguientes opciones \cite{imgaug}: \\
 \begin{itemize}
-\item \emph{InclusionComparator} devolverá la igualdad, es decir, el valor $0$ si $t\subset u$. Se retornará $+\infty$ si no se cumple la relación.
-\item \emph{SoftEqualComparator} devolverá la igualdad, es decir, el valor $0$ si $t\subset u$ o $u\subset t$. Se retornará $+\infty$ si no se cumple ninguna relación.
-\item \emph{EqualComparator} devolverá la igualdad, es decir, el valor $0$ si $t \subset u $, $u \subset t$ y tanto $t$ como $u$ poseen la misma cantidad de etiquetas. Se retornará $+\infty$ si no se cumplen ambas relaciones.
+\item Reflejo horizontal. En caso  de salir esta opción, tendrá una probabilidad de $0.5$ de ser aplicado.
+\item Escalado. La imagen será escalada de forma aleatoria, como mínimo será la mitad de su escala original y como máximo se verá incrementada un $50\%$.
+\item Traslación. La imagen será trasladada entre el $-20\%$ y el $+20\%$ de su tamaño, representando un valor negativo la traslación hacia la izquierda y un valor positivo la traslación hacia la derecha.
 \end{itemize}
 
-Por otro lado, si se le añade un valor de pesos no nulo a cada una de las etiquetas de un \emph{LabelDescriptor}, por defecto, se utiliza el \emph{WeightBasedComparator} que permite elegir entre la utilización de comparación con igualdad o inclusión de etiquetas, además de calcular el valor absoluto de la diferencia de pesos de las etiquetas. Se permite elegir entre devolver el máximo, mínimo, media aritmética o media euclídea de los resultados de cada valor absoluto de la diferencia de las etiquetas como valor real, teniendo en cuenta que se devolverá, además, $+\infty$ en caso de que este sea el valor devuelto por la operación de igualdad o inclusión seleccionada.\\
+Se pueden llegar a aplicar muchas más operaciones para el aumento de datos, pero se ha decidido utilizar estas que son fácilmente interpretables y que, por el contexto actual de imágenes, no insertan información conflictiva tras la transformación. Un ejemplo de transformación a aplicar sería el reflejo vertical, que podría dar como resultado tener el cielo abajo y un bosque arriba de este. No es esperable recibir imágenes de este tipo, y por ello entrenar la red para tenerlas en cuenta podría emitir peores resultados.
 
-Una vez explicado esto, se procederá a realizar las explicación de la implementación del \emph{IoUComparator} que ha sido desarrollado para este proyecto.\\
+\section{Gráficas}
 
-Comenzando, realiza una comparación por etiquetas utilizando \emph{EqualComparator} o \emph{InclusionComparator} según se desee, devolviendo $+\infty$ en caso de que este sea el resultado de esta primera comparación.\\
+\begin{figure}[htpb]
+  \centering
+  \includegraphics[width=0.48\textwidth]{../../modelos-entrenados/unet/ejecucion1/lossUnet}
+  \includegraphics[width=0.48\textwidth]{../../modelos-entrenados/unet/ejecucion1/accUnet}
+  \caption{Entrenamiento del modelo mostrado en \autoref{fig:DiagramaUnet} sin aumento de datos y sin detención temprana. Subcategoría de Transportes.}
+  \label{fig:ejec1}
+\end{figure}
 
-Si se obtiene un valor distinto, se procede a unificar temporalmente las categorías duplicadas de forma que las siguientes operaciones se realicen de forma independiente para cada categoría distinta. Seguidamente, para cada categoría se calcula la cantidad de píxeles que pertenecen a la intersección de esta categoría para el \emph{RegionLabelDescriptor} $t$ y el \emph{RegionLabelDescriptor} $u$, de la misma forma se contabiliza para la unión y se divide el valor de la intersección entre la unión.\\
+\begin{figure}[htpb]
+  \centering
+  \includegraphics[width=0.48\textwidth]{../../modelos-entrenados/unet/ejecucion2/lossUnet2}
+  \includegraphics[width=0.48\textwidth]{../../modelos-entrenados/unet/ejecucion2/accUnet2}
+  \caption{Entrenamiento del modelo mostrado en \autoref{fig:DiagramaUnet} con aumento de datos tanto en los datos de entrenamiento como en los de validación. Subcategoría de Transportes.}
+  \label{fig:ejec2}
+\end{figure}
 
-Con esta operación, obtendremos tenderemos al valor $0$ cuantos menos píxeles coincidan en ambas imágenes y obtendremos el valor $1$ si todos los píxeles de la categoría seleccionada coinciden. Sin embargo, estos valores no comparten el mismo criterio que compartían los comparadores de la clase madre, por lo que aplicaremos una transformación no lineal para seguir el mismo criterio. En concreto, se hará:
+\begin{figure}[htpb]
+  \centering
+  \includegraphics[width=0.48\textwidth]{../../modelos-entrenados/unet-nonlocal/ejecucion3/loss}
+  \includegraphics[width=0.48\textwidth]{../../modelos-entrenados/unet-nonlocal/ejecucion3/acc}
+  \caption{Entrenamiento del modelo mostrado en \autoref{fig:DiagramaCompleto} con aumento de datos tanto en los datos de entrenamiento como en los de validación. $64$ canales en el bloque de atención. Subcategoría de Transportes.}
+  \label{fig:ejec3}
+\end{figure}
 
-$$\frac{1}{IoU}-1,$$
+\begin{figure}[htpb]
+  \centering
+  \includegraphics[width=0.48\textwidth]{../../modelos-entrenados/unet-nonlocal/ejecucion4/loss}
+  \includegraphics[width=0.48\textwidth]{../../modelos-entrenados/unet-nonlocal/ejecucion4/acc}
+  \includegraphics[width=0.48\textwidth]{../../modelos-entrenados/unet-nonlocal/ejecucion4/iou}
+  \caption{Entrenamiento del modelo mostrado en \autoref{fig:DiagramaCompleto} con aumento de datos en los datos de entrenamiento. $64$ canales en el bloque de atención. Subcategoría de Transportes.}
+  \label{fig:ejec4}
+\end{figure}
 
-que devolverá $0$ si ambas comparten los mismos píxeles en la categoría y tenderá a $+\infty$ cuantos menos píxeles coincidan.\\
+\begin{figure}[htpb]
+  \centering
+  \includegraphics[width=0.48\textwidth]{../../modelos-entrenados/unet-nonlocal/ejecucion5/loss}
+  \includegraphics[width=0.48\textwidth]{../../modelos-entrenados/unet-nonlocal/ejecucion5/acc}
+  \includegraphics[width=0.48\textwidth]{../../modelos-entrenados/unet-nonlocal/ejecucion5/iou}
+  \caption{Entrenamiento del modelo mostrado en \autoref{fig:DiagramaCompleto} con aumento de datos en los datos de entrenamiento. $128$ canales en el bloque de atención. Subcategoría de Transportes.}
+  \label{fig:ejec5}
+\end{figure}
+\begin{figure}[htpb]
+  \centering
+  \includegraphics[width=0.48\textwidth]{../../modelos-entrenados/unet-nonlocal/ejecucion7/loss}
+  \includegraphics[width=0.48\textwidth]{../../modelos-entrenados/unet-nonlocal/ejecucion7/acc}
+  \includegraphics[width=0.48\textwidth]{../../modelos-entrenados/unet-nonlocal/ejecucion7/iou}
+  \caption{Entrenamiento del modelo mostrado en \autoref{fig:DiagramaCompleto} con aumento de datos en los datos de entrenamiento. $64$ canales en el bloque de atención. Conjunto de datos completo.}
+  \label{fig:ejec7}
+\end{figure}
+\begin{figure}[htpb]
+  \centering
+  \includegraphics[width=0.48\textwidth]{../../modelos-entrenados/unet-nonlocal/ejecucion8/loss}
+  \includegraphics[width=0.48\textwidth]{../../modelos-entrenados/unet-nonlocal/ejecucion8/acc}
+  \includegraphics[width=0.48\textwidth]{../../modelos-entrenados/unet-nonlocal/ejecucion8/iou}
+  \caption{Entrenamiento del modelo mostrado en \autoref{fig:DiagramaCompleto} con aumento de datos en los datos de entrenamiento. $128$ canales en el bloque de atención. Conjunto de datos completo.}
+  \label{fig:ejec8}
+\end{figure}
 
-Finalmente, de forma similar a como sucedía en \emph{WeightBasedComparator}, se permite elegir entre el máximo, mínimo, media aritmética o media euclídea para obtener el resultado final a partir de los resultados parciales correspondientes a cada categoría, siendo este el valor devuelto para la comparación de los dos descriptores.\\
+\begin{figure}[htpb]
+  \centering
+  \includegraphics[width=0.48\textwidth]{../../modelos-entrenados/unet-conv/ejecucion12/loss}
+  \includegraphics[width=0.48\textwidth]{../../modelos-entrenados/unet-conv/ejecucion12/acc}
+  \includegraphics[width=0.48\textwidth]{../../modelos-entrenados/unet-conv/ejecucion12/iou}
+  \caption{Entrenamiento del modelo mostrado en \autoref{fig:DiagramaUnetExtra} con aumento de datos en los datos de entrenamiento. $64$ canales en el bloque de atención. Conjunto de datos completo.}
+  \label{fig:ejec12}
+\end{figure}
+\begin{figure}[htpb]
+  \centering
+  \includegraphics[width=0.48\textwidth]{../../modelos-entrenados/unet-nonlocal-conv/ejecucion10/loss}
+  \includegraphics[width=0.48\textwidth]{../../modelos-entrenados/unet-nonlocal-conv/ejecucion10/acc}
+  \includegraphics[width=0.48\textwidth]{../../modelos-entrenados/unet-nonlocal-conv/ejecucion10/iou}
+  \caption{Entrenamiento del modelo mostrado en \autoref{fig:DiagramaNonlocalExtra} con aumento de datos en los datos de entrenamiento. $64$ canales en el bloque de atención. Conjunto de datos completo.}
+  \label{fig:ejec10}
+\end{figure}
+\end{figure}
+\begin{figure}[htpb]
+  \centering
+  \includegraphics[width=0.48\textwidth]{../../modelos-entrenados/unet-nonlocalextra-conv/ejecucion9/loss}
+  \includegraphics[width=0.48\textwidth]{../../modelos-entrenados/unet-nonlocalextra-conv/ejecucion9/acc}
+  \includegraphics[width=0.48\textwidth]{../../modelos-entrenados/unet-nonlocalextra-conv/ejecucion9/iou}
+  \caption{Entrenamiento del modelo mostrado en \autoref{fig:DiagramaNonlocal+Extra} con aumento de datos en los datos de entrenamiento. $64$ canales en el bloque de atención. Conjunto de datos completo.}
+  \label{fig:ejec9}
+\end{figure}
+\begin{figure}[htpb]
+  \centering
+  \includegraphics[width=0.48\textwidth]{../../modelos-entrenados/unet-semnonlocal-conv/ejecucion11/loss}
+  \includegraphics[width=0.48\textwidth]{../../modelos-entrenados/unet-semnonlocal-conv/ejecucion11/acc}
+  \includegraphics[width=0.48\textwidth]{../../modelos-entrenados/unet-semnonlocal-conv/ejecucion11/iou}
+  \caption{Entrenamiento del modelo mostrado en \autoref{fig:DiagramaSemiNonlocalExtra} con aumento de datos en los datos de entrenamiento. $64$ canales en el bloque de atención. Conjunto de datos completo.}
+  \label{fig:ejec11}
+\end{figure}
+\section{Análisis y conclusiones}
 
-FIXME: Añadir un diagramaita que simplifique la explicación
+Debido a la cantidad de gráficas, se irá seleccionando diferentes combinaciones a comparar, con el fin de resaltar de forma específica qué se quería analizar en cada momento.\\
+
+\subsection{Diferentes cantidades de bloques no locales.}
+Lo primero a comparar será los resultados obtenidos dependiendo de la cantidad de módulos no locales empleados en la red. En particular, se observarán las gráficas \autoref{fig:ejec11}, \autoref{fig:ejec9} y \autoref{fig:ejec10} que únicamente se diferencian en dicha cantidad.\\
+
+Las gráficas correspondientes tienen una estructura similar, siendo que en las 3 se alcanza el mínimo valor de pérdida en el conjunto de validación entre las épocas 20 y 25. Además, en los tres modelos existe un aumento  sustancial del valor medio de la intersección sobre la unión en el conjunto de validación entre las épocas 10 y 15, siendo que este coincide con la primera reducción del ratio de aprendizaje por llevar 3 épocas sin que viera reducido la pérdida en la validación.\\
+
+A pesar de seguir realizándose reducciones del ratio de aprendizaje ante la falta de mejoría, no vuelven a producirse mejoras sustanciales durante el aprendizaje en ninguna de ellas.\\
+
+Teniendo en cuenta esto, se comprueba empíricamente que no por añadir más cantidad de bloques no locales se podrán extraer más características de la imagen. Pero, además, debemos de tener en cuenta la gráfica \autoref{fig:ejec12}, correspondiente a la misma arquitectura pero sin bloques no locales, por lo que estos bloques sí establecen una mejoría ante la inexistencia de ningún otro.
+
+\subsection{Bloque no locales y convoluciones}
+
+\subsection{Diferentes números de canales en los bloques de atención}
+Para esta comparativa, se podrán utilizar las gráficas \autoref{fig:ejec4}, \autoref{fig:ejec5}, \autoref{fig:ejec7} y \autoref{fig:ejec8}. Siendo que la primera y tercera figura corresponderán a 64 canales mientras que las otras corresponderán a 128, todos ellos en el modelo \autoref{fig:DiagramaNonlocalExtra}.\\
+
+Aquí se puede apreciar que el incremento del número de canales, para este bloque y en estas circunstancias, permite acelerar la velocidad de aprendizaje pero no evita que el modelo alcance el mismo límite de reducción de pérdida y de aumento de la \emph{mean IoU}.
+
+\subsection{Convolución extra tras la obtención de la dimensión deseada}
+A continuación, prestaremos atención a \autoref{fig:ejec7} y a \autoref{fig:ejec10}, en la que destaca la reducción de oscilaciones al añadir la nueva convolución. A pesar de ello, la modificación no cumple con el objetivo de aumentar el valor medio de la intersección sobre la unión ni de reducir el valor de la pérdida.\\
+
+Esta fue mantenida con el fin de visualizar mejor las modificaciones ofrecidas en las diferentes comparaciones.
+
+\subsection{Conclusiones}
+Pese a no obtener los mejores resultados, no pudiendo competir con los métodos presentes en el estado de arte actual para la segmentación semántica o la instanciación de objetos, se ha podido comprobar de forma empírica, en un ejemplo concreto, la utilidad de los bloques no locales para la extracción de características en imágenes.\\
+
+Como se sigue comprobando día a día en las diferentes arquitecturas y modelos presentados, no se trata de añadir capas y capas que ofrezcan una mayor cantidad de variables para resolver los problemas planteados. En su lugar, es más adecuado el razonar qué capas o conjunto de capas será más útil en cada momento, buscando el conseguir los mejores resultados ocupando la menor cantidad posible de recursos.\\
+
+En este caso, los bloques no locales han resultado ser una buena alternativa a la utilización de simples convoluciones como extractor de características, puesto que se obtenían mejores resultados con la utilización de una menor cantidad de memoria. También se ha podido comprobar que la adicción de estos bloques en exceso no supondrá ninguna mejora.\\
+
+Se desea realizar la conjetura de que esta falta de mejora puede ser debida a que no se está extrayendo nuevas características en la arquitectura actual con el incremento de bloques, sino que se está recibiendo información con la relativa similitud que carece de la suficiente distinción como para aprender algo nuevo. \\
+
+Por ello, y teniendo en cuenta \autoref{def:non-local}, se concluye que los bloques que implementan operaciones no locales pueden llegar a ser de utilidad, con un correcto uso, para aquellas redes neuronales en las que la correlación a lo largo del dato entrada es importante para realizar una predicción.\\
+
+Ejemplos de esto en distintos ámbitos, se puede encontrar a través de la tendencia creada por el artículo \emph{Attention is all you need} \cite{DBLP:journals/corr/VaswaniSPUJGKP17} que, bajo la utilización de otra nomenclatura, utiliza y recomienda el uso de operaciones no locales para la traducción de texto.
