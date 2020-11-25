@@ -4,15 +4,26 @@
 %*******************************************************
 % Summary
 %*******************************************************
+\chapter{Resumen}
+\emph{Palabras clave:} imagen, descriptor, red neuronal, red neuronal convolucionada, atención, operador no local, consulta, etiquetado y comparador.\\
+
+El auge de las \emph{TIC}s ha provocado que mucha de la información que diariamente manejamos esté representada en forma de imágenes digitales. Cada vez aumenta más y más la demanda de soluciones que permitan una interacción inteligente y amigable en una variedad cada vez mayor de dispositivos de todo tipo. En particular nos centraremos en los sistemas de recuperación de información visual, por el incremento existente en los contenidos multimedia.\\
+
+Buscamos poder etiquetar de forma correcta, y extrayendo la mayor cantidad posible de información, las imágenes que tendremos. En concreto, se busca conocer la información con carácter local en las distintas regiones de la imagen y no una etiqueta que caracterice a todo el conjunto. Es decir, dada una imagen no queremos tener únicamente asociada la etiqueta ``perro'' a esta, sino saber la localización concreta del animal y la existencia o falta de esta de otros elementos que pudieran llegar a ser localizables. Con este objetivo en mente, se utilizará la \emph{segmentación semántica} y se desarrollará un sistema de recuperación de información basado en el contenido de la imagen.\\
+
+Para lograrlo, se dividirá el proyecto en tres partes fundamentales. Primero, se estudiarán los fundamentos de las redes neuronales, las redes neuronales convolucionadas (CNN), se demostrará el teorema de aproximación universal de una red neuronal y se conocerán algunas operaciones útiles, además de motivar por qué pueden serlo. Seguidamente, y con esta información, se diseñarán redes neuronales convolucionadas y se analizará cómo se comportan con el conjunto de datos utilizado. Finalmente, se desarrollará una aplicación prototipo que realice la recuperación.
 
 \selectlanguage{english}
-\chapter{Summary}
+\chapter{Abstract}
 
-An english summary of the project (around 800 and 1500 words are recommended).
+\emph{Key words:} image, descriptor, neural network, convolutional neural network, non local operator, query, label and comparator.\\
 
-File: \texttt{preliminares/summary.tex}
+Due to the rise of the ICTs, a wide range of the information that we use in our daily lifes are digital images. Lately, solutions that allow intelligent and user-friendly interaction are more and more demanded for any kind of electronic device. In this work, we will focus in visual information recovery systems, because of this increase of multimedia content at all levels.\\
 
+Our aim will be to correctly label images by extracting the bigest amount of information that we can obtain from it. Particularly, the most important part in the process is to obtain local information in different regions of the image, rather than obtaining a label for the whole image. That is, imagine that we have an image of a dog. Then,we will not only obtain the "dog" label from it, but we will also obtain the location of the animal in the image and, furthermore, the existence (or the lack of it) of other elements in the image that could be locatable. With this in mind, \emph{semantic segmentation} will be used, and we will design a system to obtain the information of the image making use of the content of this image. \\
+
+In order to achieve our objectives, the project is divided in three fundamental parts. Firtly, the fundamentals of the neural networks and convolutional neural networks will be exposed. Secondly, the Universal Approximation Theorem will be presented and proved, and some util local operations will also be presented. We will also see how we apply the theorem and the operations. Thirdly, using this information and operations, convolutional neural networks (CNNs) will be designed and trained using a dataset. An analysis of the results will be done. Finally, we will present the development of an application that , given an image, recovers all the information in it and shows what it has found.
 
 % Al finalizar el resumen en inglés, volvemos a seleccionar el idioma español para el documento
-\selectlanguage{spanish} 
+\selectlanguage{spanish}
 \endinput

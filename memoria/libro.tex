@@ -196,8 +196,7 @@
 
 \input{preliminares/portada}
 \input{preliminares/titulo}
-\input{preliminares/declaracion-originalidad}
-\input{preliminares/dedicatoria}                % Opcional
+\input{preliminares/declaracion-originalidad}               % Opcional
 \input{preliminares/tablacontenidos}
 \input{preliminares/agradecimientos}            % Opcional
 
@@ -213,7 +212,7 @@
 
 \setpartpreamble[c][0.75\linewidth]{%
 	\bigskip % Deja un espacio vertical en la parte superior
-  En esta parte, introduciremos una serie de conceptos previos necesarios para poder hablar con propiedad en adelante. Explicaremos los conceptos de red neuronal y red neuronal convolucionada. Veremos que se las redes neuronales son aproximadores universales y, además, conoceremos el concepto operación no local así como ver su consistencia.
+  En esta parte, introduciremos una serie de conceptos matemáticos necesarios para poder hablar con propiedad en adelante, así como una serie de teoremas relacionados con algunos de los términos. Explicaremos los conceptos de red neuronal y red neuronal convolucionada. Veremos que las redes neuronales son aproximadores universales y, además, veremos lo que es un operador no local, junto con su consistencia.
   %A continuación, explicaremos de forma concisa lo que es una \emph{red neuronal} y una \emph{red neuronal convolucionada} para, seguidamente, hablar sobre los últimos avances en la localización de regiones de interés en imágenes.
 }
 \part{Conceptos previos}
@@ -221,14 +220,14 @@
 
 \setpartpreamble[c][0.75\linewidth]{%
 	\bigskip % Deja un espacio vertical en la parte superior
-  Descripción :D FIXME
+  Se comentará algunas de las familias de redes neuronales convolucionadas más importantes para la segmentación semántica e instanciación de objetos. Se diseñarán y compararán diferentes modelos para comprobar la efectividad de operaciones no locales.
 }
 \part{Segmentación semántica}
 \input{capitulos/capitulo2}
 
 \setpartpreamble[c][0.75\linewidth]{%
 	\bigskip % Deja un espacio vertical en la parte superior
-  Descripción :D FIXME
+  Se diseñará e implementara un sistema de recuperación de imágenes basado en su contenido.
 }
 \part{Desarrollo de un sistema CBIR}
 \input{capitulos/capitulo3}
@@ -244,17 +243,17 @@
 % APPENDIX: Opcional
 % --------------------------------------------------------------------
 
-\appendix % Reinicia la numeración de los capítulos y usa letras para numerarlos
-\pdfbookmark[-1]{Apéndices}{appendix} % Alternativamente podemos agrupar los apéndices con un nuevo \part{Apéndices}
+%\appendix % Reinicia la numeración de los capítulos y usa letras para numerarlos
+%\pdfbookmark[-1]{Apéndices}{appendix} % Alternativamente podemos agrupar los apéndices con un nuevo \part{Apéndices}
 
-\input{apendices/apendice01}
+%\input{apendices/apendice01}
 % Añadir tantos apéndices como sea necesario
 
 % --------------------------------------------------------------------
 % GLOSARIO: Opcional
 % --------------------------------------------------------------------
 
-\input{glosario}
+%\input{glosario}
 
 % -------------------------------------------------------------------
 % BACKMATTER

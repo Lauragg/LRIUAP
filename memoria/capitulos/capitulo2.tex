@@ -20,12 +20,12 @@ Para indicar las posiciones de los elementos, por lo general se utilizarán \emp
 
 Hasta este momento, hemos tratado un problema de clasificación global. Se suponía que la imagen tenía un único elemento que se quisiera clasificar e idealmente este estaría centrado con respecto el centro de la imagen. En adelante, querremos clasificar múltiples elementos pertenecientes a múltiples etiquetas distintas y querremos saber cuántos elementos hay, sus posiciones relativas a la imagen y la categoría a la que pertenecen cada una de ellas. En concreto, estaremos ante un problema de segmentación semántica.\\
 
-El objetivo no es utilizar directamente la mejor de las opciones sino explorar otras opciones, ya existentes, que puedan llegar a ser de utilidad en las investigaciones venideras. En particular, nos centraremos en los \emph{non-local block} \autoref{def:non-local} \autoref{def:non-local-block} al crear ejemplos de redes neuronales y comprobar el comportamiento ante la eliminación o sustitución de este bloque.\\
+El objetivo no es utilizar directamente la mejor de las opciones sino explorar otras opciones, ya existentes, que puedan llegar a ser de utilidad en las investigaciones venideras. En particular, nos centraremos en los \emph{non-local block} (\autoref{def:non-local} \autoref{def:non-local-block}) al crear ejemplos de redes neuronales y comprobar el comportamiento ante la eliminación o sustitución de este bloque.\\
 
-Como tampoco debemos olvidarnos de lo que realmente se utiliza, en la siguiente sección hablaremos de del estado del arte para la detección de objetos, segmentación semántica e instanciación semántica en conjunto, al ser problemas íntimamente relacionados. Seguidamente mostraremos las estructuras analizadas y algunas de las gráficas obtenidas durante el entrenamiento de estas.
+Como tampoco debemos olvidarnos de lo que realmente se utiliza, en la siguiente sección hablaremos del estado del arte para la detección de objetos, segmentación semántica e instanciación semántica en conjunto, al ser problemas íntimamente relacionados. Seguidamente mostraremos las estructuras analizadas y algunas de las gráficas obtenidas durante el entrenamiento de estas.
 
 \chapter{Estado del arte}
-La gran mayoría de los paradigmas de detección utilizan una red neuronal pre-entrenada como clasificador dentro de sus estructuras. Recibiendo modificaciones en sus últimas capas ya sea sustituyéndolas, pasando por un proceso de \emph{fine-tunning}, o eliminándolas antes de ser añadidas como un elemento invariante durante el entrenamiento del modelo. Estas redes suelen recibir el nombre de \emph{backbone} y algunos modelos permiten la libre elección de estos clasificadores dependiendo del problema concreto que se desee abordar.\newline
+La gran mayoría de los paradigmas de detección utilizan una red neuronal pre-entrenada como clasificador dentro de sus estructuras. Recibiendo modificaciones en sus últimas capas ya sea sustituyéndolas, pasando por un proceso de \emph{fine-tuning}, o eliminándolas antes de ser añadidas como un elemento invariante durante el entrenamiento del modelo. Estas redes suelen recibir el nombre de \emph{backbone} y algunos modelos permiten la libre elección de estos clasificadores dependiendo del problema concreto que se desee abordar.\newline
 
 En particular, se mencionará dos de las familias más fuertes para la detección en imágenes, la familia RCNN y la famila YOLO.
 
@@ -43,16 +43,16 @@ La principal diferencia que introduce \emph{Fast R-CNN} \cite{2015arXiv150408083
   \label{fig:r-cnn}
 \end{figure}
 
-En \emph{Faster R-CNN} \cite{2015arXiv150601497R} se sustituye Selective Search por una red neuronal de generación propuestas, conocida como \emph{anchor boxes}, que no sólo reduce el tiempo de cómputo de la generación de propuestas sino que aporta un menor número de propuestas con mayor calidad y precisión. Un buen apunte de la red de generación de propuestas, es que esta no es pre-entrenada antes de ser añadido al modelo sino que aprende de forma conjunta con toda la red.\newline
+En \emph{Faster R-CNN} \cite{2015arXiv150601497R} se sustituye Selective Search por una red neuronal de generación propuestas, conocida como \emph{anchor boxes}, que no sólo reduce el tiempo de cómputo de la generación de propuestas sino que aporta un menor número de propuestas con mayor calidad y precisión. Un buen apunte de la red de generación de propuestas es que esta no es pre-entrenada antes de ser añadida al modelo, sino que aprende de forma conjunta con toda la red.\newline
 
 La última mejora de esta familia viene representada por \emph{Mask R-CNN} \cite{2017arXiv170306870H} que sustituye la capa RoI pooling introducida en el modelo Fast R-CNN por una RoI alignment que retiene más información de las características obtenidas por la CNN compartiendo la misma estructura de entrada y salida de datos con la RoI pooling. Mask R-CNN aprovecha esto para realizar predicciones del tipo pixel level con mayor precisión a través de una interpolación bilineal que se ejecuta paralelamente con las capas totalmente conectadas de los modelos anteriores. Así, en el mismo punto que sus predecesores eran divididos en tres ramas independientes, Mask R-CNN se divide en tres ramas: un clasificador SoftMax, un regresor de \emph{bbox} y un otro regresor de pixel level.\newline
 
-Mencionar Mesh R-CNN
-https://arxiv.org/abs/1906.02739\newline
-Mencionar R-FCN
-https://arxiv.org/pdf/1605.06409.pdf\newline
-Libra R-CNN
-https://arxiv.org/pdf/1904.02701.pdf
+%Mencionar Mesh R-CNN
+%https://arxiv.org/abs/1906.02739\newline
+%Mencionar R-FCN
+%https://arxiv.org/pdf/1605.06409.pdf\newline
+%Libra R-CNN
+%https://arxiv.org/pdf/1904.02701.pdf
 \section{Un paso o basados en YOLO}
 Estos modelos destacan por no hacer una separación directa de la generación de propuestas y la predicción de estas. Destaca \emph{YOLO} y sus sucesivas mejoras, así como los múltiples algoritmos basados en ellas, pero existen muchos más modelos que pueden ser identificados con esta estructura.\newline
 
@@ -62,8 +62,8 @@ Buscando una mejora de la predicción pero sin perder el enfoque de la velocidad
 
 La siguiente versión \emph{YOLOv3} \cite{2018arXiv180402767R} decide  no darle tanta importancia a la velocidad y centrarse en solucionar los problemas de detección presentados por sus antecesores. Mientras que YOLOv2 utiliza una arquitectura con 30 capas, YOLOv3 utiliza 106 capas totalmente convolucionadas e introduce la utilización de \emph{residual blocks}, \emph{skip connections} y \emph{upsampling}. Esta nueva arquitectura, realiza la detección de objetos en tres escalas distintas en diferentes profundidades de la red Darknet-53 y utilizando una estructura piramidal \cite{2016arXiv161203144L} para comunicar la detección entre las diferentes escalas.\newline
 
-Mencionar YOLOv4
-https://arxiv.org/pdf/2004.10934.pdf\newline
+%Mencionar YOLOv4
+%https://arxiv.org/pdf/2004.10934.pdf\newline
 
 \chapter{Non-local neural networks} \label{def:non-local-block}
 
@@ -199,146 +199,467 @@ Y comprobaremos también esta posibilidad utilizando la convolución de núcleo 
 \section{Parámetros y configuración de entrenamiento}
 Como función de pérdida se ha utilizado la \emph{Sparse Categorial Crossentropy} ofrecida por Keras \cite{chollet2015keras}. Esta función aplica una función \emph{SoftMax} a la salida de la red antes de calcular su entropía cruzada. Se diferencia de la \emph{Categorical Crossentropy} por el formato de entrada de las etiquetas verdaderas, al requerir una matriz bidimensional en lugar de una tridimensional con el fin de reducir el cómputo. \\
 
-El optimizador empleado será emph{Adam}, con los parámetros por defecto, e iremos reduciendo el ratio de aprendizaje un factor de $0.1$ cada $3$ épocas sin reducir la pérdida en el conjunto de validación hasta un valor mínimo de $10^{-10}$. Además, si ocurren $10$ épocas y no mejora el valor de pérdida en el conjunto de validación, el entrenamiento se detendrá al interpretarse que ha llegado a su límite y no será capaz de aprender mucho más. Cada vez que obtengamos un mejor valor de pérdida en el conjunto de validación, se guardarán los pesos que posea la red neuronal en dicho momento.\\
+El optimizador empleado será \emph{Adam}, con los parámetros por defecto, e iremos reduciendo el ratio de aprendizaje un factor de $0.1$ cada $3$ épocas sin reducir la pérdida en el conjunto de validación hasta un valor mínimo de $10^{-10}$. Además, si ocurren $10$ épocas y no mejora el valor de pérdida en el conjunto de validación, el entrenamiento se detendrá al interpretarse que ha llegado a su límite y no será capaz de aprender mucho más. Cada vez que obtengamos un mejor valor de pérdida en el conjunto de validación, se guardarán los pesos que posea la red neuronal en dicho momento.\\
 
-Como métricas, se utilizará la clásica \emph{accuracy}, o precisión, junto con la \emph{Mean IoU}, o media de la intersección sobre la unión, siendo que será esta última la que realmente prediga cómo de bien se comporta la red. Esto es debido a que podríamos predecir que no existe ningún objeto en la imagen y obtener una precisión alta cuando realmente existen pequeños objetos que no han sido predichos. En \cite{accvsiou} se puede ver una explicación más detallada de este fenómeno y el por qué del uso de la intersección sobre la unión. \\
-
+Como métrica, se utilizará \emph{Mean IoU}, o media de la intersección sobre la unión, en lugar de la clásica \emph{accuracy}, puesto que será la que realmente prediga cómo de bien se comporta la red. Esto es debido a que podríamos predecir que no existe ningún objeto en la imagen y obtener una precisión alta cuando realmente existen pequeños objetos que no han sido predichos. En \cite{accvsiou} se puede ver una explicación más detallada de este fenómeno y el por qué del uso de la intersección sobre la unión. \\
 
 Como conjunto de datos de entrenamiento, se ha utilizado COCO 2017 \cite{2014arXiv1405.0312L} \cite{COCO} que posee un total de 91 categorías correspondientes a objetos del día a día. Estas categorías pueden ser agrupadas en hiper categorías, de forma que se realizarán entrenamientos con todo el conjunto de datos y también con aquellos pertenecientes a la hiper categorías de transportes. El objetivo es comparar el comportamiento en diferentes cantidades de categorías a aprender.\\
 
-Para incrementar la variedad de imágenes sin aumentar la cantidad de estas, buscando obtener una mayor generalidad de la red sin aumentar el cómputo, se implementarán una serie de incrementos de datos, o \emph{data augmentations}. Esto será la aplicación de un conjunto de transformaciones a las imágenes originales y a sus máscaras de etiquetas cada vez que estas sean consultadas para el entrenamiento. En particular, se aplicarán, en orden, entre una o dos transformaciones de las siguientes opciones \cite{imgaug}: \\
+Para incrementar la variedad de imágenes sin aumentar la cantidad de estas, buscando obtener una mayor generalidad de la red sin aumentar el cómputo, se implementarán una serie de transformaciones de los datos. Esto será la aplicación de un conjunto de transformaciones a las imágenes originales y a sus máscaras de etiquetas cada vez que estas sean consultadas para el entrenamiento. \\
+
+\newpage
+En particular, se aplicarán, en orden, entre una o dos transformaciones de las siguientes opciones \cite{imgaug}: \\
 \begin{itemize}
 \item Reflejo horizontal. En caso  de salir esta opción, tendrá una probabilidad de $0.5$ de ser aplicado.
 \item Escalado. La imagen será escalada de forma aleatoria, como mínimo será la mitad de su escala original y como máximo se verá incrementada un $50\%$.
 \item Traslación. La imagen será trasladada entre el $-20\%$ y el $+20\%$ de su tamaño, representando un valor negativo la traslación hacia la izquierda y un valor positivo la traslación hacia la derecha.
 \end{itemize}
 
-Se pueden llegar a aplicar muchas más operaciones para el aumento de datos, pero se ha decidido utilizar estas que son fácilmente interpretables y que, por el contexto actual de imágenes, no insertan información conflictiva tras la transformación. Un ejemplo de transformación a aplicar sería el reflejo vertical, que podría dar como resultado tener el cielo abajo y un bosque arriba de este. No es esperable recibir imágenes de este tipo, y por ello entrenar la red para tenerlas en cuenta podría emitir peores resultados.
+Se pueden llegar a aplicar muchas más operaciones para la transformación de datos, pero se ha decidido utilizar estas que son fácilmente interpretables y que, por el contexto actual de imágenes, no insertan información conflictiva tras la transformación. Un ejemplo de transformación a evitar sería el reflejo vertical, que podría dar como resultado tener el cielo abajo y un bosque arriba de este. No es esperable recibir imágenes de este tipo, y por ello entrenar la red para tenerlas en cuenta podría emitir peores resultados.\\
 
-\section{Gráficas}
+Todas las gráficas e imágenes comparativas que utilizaremos en futuras secciones se podrán encontrar en diversos cuadernillos de \emph{jupyter notebook}, que podrán ser encontrados dentro de las subcarpetas localizadas en \emph{modelos-entrenados} junto con los archivos de pesos y del historial del entrenamiento guardados. Todo esto puede ser encontrado en el repositorio de GitHub del proyecto \cite{GitHub}.\\
 
-\begin{figure}[htpb]
+%\begin{figure}[htpb]
+%  \centering
+%  \includegraphics[width=0.48\textwidth]{../../modelos-entrenados/unet/ejecucion1/lossUnet}
+%  \includegraphics[width=0.48\textwidth]{../../modelos-entrenados/unet/ejecucion1/accUnet}
+%  \caption{Entrenamiento del modelo mostrado en \autoref{fig:DiagramaUnet} sin transformación de datos y sin detención temprana. Subcategoría de Transportes.}
+%  \label{fig:ejec1}
+%\end{figure}
+
+%\begin{figure}[htpb]
+%  \centering
+%  \includegraphics[width=0.48\textwidth]{../../modelos-entrenados/unet/ejecucion2/lossUnet2}
+%  \includegraphics[width=0.48\textwidth]{../../modelos-entrenados/unet/ejecucion2/accUnet2}
+%  \caption{Entrenamiento del modelo mostrado en \autoref{fig:DiagramaUnet} con transformación de datos tanto en los datos de entrenamiento como en los de validación. Subcategoría de Transportes.}
+%  \label{fig:ejec2}
+%\end{figure}
+
+%\begin{figure}[htpb]
+%  \centering
+%  \includegraphics[width=0.48\textwidth]{../../modelos-entrenados/unet-nonlocal/ejecucion3/loss}
+%  \includegraphics[width=0.48\textwidth]{../../modelos-entrenados/unet-nonlocal/ejecucion3/acc}
+%  \caption{Entrenamiento del modelo mostrado en \autoref{fig:DiagramaCompleto} con transformación de datos tanto en los datos de entrenamiento como en los de validación. $64$ canales en el bloque de atención. Subcategoría de Transportes.}
+%  \label{fig:ejec3}
+%\end{figure}
+
+\section{Análisis}
+
+Debido a la cantidad de gráficas, se irá seleccionando diferentes combinaciones a comparar, con el fin de resaltar de forma específica qué se quería analizar en cada momento. De esta forma, nos iremos centrando en las diferencias presentes en cada modelo entrenado y se podrá ver si estas diferencias afectan de forma significativa al resultado y, en caso de afectar, cómo lo hace.\\
+\begin{figure}[h]
   \centering
-  \includegraphics[width=0.48\textwidth]{../../modelos-entrenados/unet/ejecucion1/lossUnet}
-  \includegraphics[width=0.48\textwidth]{../../modelos-entrenados/unet/ejecucion1/accUnet}
-  \caption{Entrenamiento del modelo mostrado en \autoref{fig:DiagramaUnet} sin aumento de datos y sin detención temprana. Subcategoría de Transportes.}
-  \label{fig:ejec1}
+  \includegraphics[width=0.35\textwidth]{../../modelos-entrenados/unet-conv/ejecucion12/img1}
+  \vrule
+  \includegraphics[width=0.35\textwidth]{../../modelos-entrenados/unet-conv/ejecucion12/img-ann1}
+  \vrule
+  \includegraphics[width=0.35\textwidth]{../../modelos-entrenados/unet-conv/ejecucion12/val2}
+  \vrule
+  \includegraphics[width=0.35\textwidth]{../../modelos-entrenados/unet-conv/ejecucion12/val-ann2}
+  \caption{Imágenes de muestra utilizada en las futuras comparativas. A la izquierda la imagen redimensionada y a la derecha las máscaras verdaderas correspondientes. Arriba conjunto de entrenamiento y abajo conjunto de validación. Cada color distinto representa una capa en las máscaras veraderas.}
+  \label{fig:imagenes-muestra}
 \end{figure}
 
-\begin{figure}[htpb]
+Además de las gráficas, también se utilizarán las imágenes mostradas en \autoref{fig:imagenes-muestra} como comparativa de resultados en diferentes ocasiones. Debemos mencionar también que las máscaras verdaderas están almacenadas como imágenes en escala de grises donde cada valor representa a una categoría en concreto y, teniendo en cuenta el método de visualización elegido, siempre se mostrará el mayor valor en color amarillo mientras que los colores más pequeños se irán tornando más azulados. En concreto el valor $0$ corresponde a la ausencia de objetos y se muestra como un color azul oscuro en las imágenes de máscaras verdaderas.\\
+
+\newpage
+La representación por colores mencionada en las máscaras verdaderas, debemos de diferenciarlas de la representación utilizada para la comparativa entre predicción y verdadero valor para una máscara concreta, donde se analiza una única categoría en lugar de mostrar los píxeles de todas ellas. En este caso, el color azul intermedio corresponderá a las predicciones y el color amarillo a los falsos negativos.\\
+
+\newpage
+\subsection{Diferentes cantidades de bloques no locales.}
+Lo primero a comparar será los resultados obtenidos dependiendo de la cantidad de módulos no locales empleados en la red. En particular, se observarán las gráficas \autoref{fig:ejec10}, \autoref{fig:ejec9} y \autoref{fig:ejec11} que únicamente se diferencian en dicha cantidad.\\
+
+\begin{figure}[h!]
   \centering
-  \includegraphics[width=0.48\textwidth]{../../modelos-entrenados/unet/ejecucion2/lossUnet2}
-  \includegraphics[width=0.48\textwidth]{../../modelos-entrenados/unet/ejecucion2/accUnet2}
-  \caption{Entrenamiento del modelo mostrado en \autoref{fig:DiagramaUnet} con aumento de datos tanto en los datos de entrenamiento como en los de validación. Subcategoría de Transportes.}
-  \label{fig:ejec2}
+  \includegraphics[width=0.48\textwidth]{../../modelos-entrenados/unet-nonlocal-conv/ejecucion10/loss}
+  %\includegraphics[width=0.48\textwidth]{../../modelos-entrenados/unet-nonlocal-conv/ejecucion10/acc}
+  \includegraphics[width=0.48\textwidth]{../../modelos-entrenados/unet-nonlocal-conv/ejecucion10/iou}
+  \caption{Entrenamiento del modelo mostrado en \autoref{fig:DiagramaNonlocalExtra} con transformación de datos en los datos de entrenamiento. $64$ canales en el bloque de atención. Conjunto de datos completo.}
+  \label{fig:ejec10}
 \end{figure}
 
-\begin{figure}[htpb]
+\end{figure}
+\begin{figure}[h!]
   \centering
-  \includegraphics[width=0.48\textwidth]{../../modelos-entrenados/unet-nonlocal/ejecucion3/loss}
-  \includegraphics[width=0.48\textwidth]{../../modelos-entrenados/unet-nonlocal/ejecucion3/acc}
-  \caption{Entrenamiento del modelo mostrado en \autoref{fig:DiagramaCompleto} con aumento de datos tanto en los datos de entrenamiento como en los de validación. $64$ canales en el bloque de atención. Subcategoría de Transportes.}
-  \label{fig:ejec3}
+  \includegraphics[width=0.48\textwidth]{../../modelos-entrenados/unet-nonlocalextra-conv/ejecucion9/loss}
+  %\includegraphics[width=0.48\textwidth]{../../modelos-entrenados/unet-nonlocalextra-conv/ejecucion9/acc}
+  \includegraphics[width=0.48\textwidth]{../../modelos-entrenados/unet-nonlocalextra-conv/ejecucion9/iou}
+  \caption{Entrenamiento del modelo mostrado en \autoref{fig:DiagramaNonlocal+Extra} con transformación de datos en los datos de entrenamiento. $64$ canales en el bloque de atención. Conjunto de datos completo.}
+  \label{fig:ejec9}
 \end{figure}
 
-\begin{figure}[htpb]
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=0.48\textwidth]{../../modelos-entrenados/unet-semnonlocal-conv/ejecucion11/loss}
+  %\includegraphics[width=0.48\textwidth]{../../modelos-entrenados/unet-semnonlocal-conv/ejecucion11/acc}
+  \includegraphics[width=0.48\textwidth]{../../modelos-entrenados/unet-semnonlocal-conv/ejecucion11/iou}
+  \caption{Entrenamiento del modelo mostrado en \autoref{fig:DiagramaSemiNonlocalExtra} con transformación de datos en los datos de entrenamiento. $64$ canales en el bloque de atención. Conjunto de datos completo.}
+  \label{fig:ejec11}
+\end{figure}
+Las gráficas correspondientes tienen una estructura similar, siendo que en las 3 se alcanza el mínimo valor de pérdida en el conjunto de validación entre las épocas 20 y 25. Además, en los tres modelos existe un aumento  sustancial del valor medio de la intersección sobre la unión en el conjunto de validación entre las épocas 10 y 15, siendo que este coincide con la primera reducción del ratio de aprendizaje por llevar 3 épocas sin que viera reducido la pérdida en la validación.\\
+
+\newpage
+A pesar de seguir realizándose reducciones del ratio de aprendizaje ante la falta de mejoría, no vuelven a producirse mejoras sustanciales durante el aprendizaje en ninguna de ellas.\\
+
+Teniendo en cuenta esto, se comprueba empíricamente que no por añadir más cantidad de bloques no locales se podrán extraer más características de la imagen. Pero, además, debemos de tener en cuenta la gráfica \autoref{fig:ejec12}, correspondiente a la misma arquitectura pero sin bloques no locales, por lo que estos bloques sí establecen una mejoría ante la inexistencia de ningún otro.\\
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=0.48\textwidth]{../../modelos-entrenados/unet-conv/ejecucion12/loss}
+  %\includegraphics[width=0.48\textwidth]{../../modelos-entrenados/unet-conv/ejecucion12/acc}
+  \includegraphics[width=0.48\textwidth]{../../modelos-entrenados/unet-conv/ejecucion12/iou}
+  \caption{Entrenamiento del modelo mostrado en \autoref{fig:DiagramaUnetExtra} con transformación de datos en los datos de entrenamiento. $64$ canales en el bloque de atención. Conjunto de datos completo.}
+  \label{fig:ejec12}
+\end{figure}
+
+\newpage
+De forma visual, se puede comprobar tanto en \autoref{fig:comparativa1-train}, que pertenece al conjunto de entrenamiento y muestra la salida de las capas ``nada'' y la capa ``autobús'', como en \autoref{fig:comparativa1-val}, que muestra el resultado de las capas ``nada'', ``coche'', ``autobús'' y ``reloj'' en una imagen perteneciente al conjunto de validación.\\
+
+\begin{figure}[h!tpb]
+  \centering
+  \includegraphics[width=0.2\textwidth]{../../modelos-entrenados/unet-nonlocal-conv/ejecucion10/predtrainmid0}
+  \vrule
+  \includegraphics[width=0.2\textwidth]{../../modelos-entrenados/unet-nonlocal-conv/ejecucion10/predtrainmid6}
+  \vrule
+  \includegraphics[width=0.2\textwidth]{../../modelos-entrenados/unet-nonlocalextra-conv/ejecucion9/predtrainmid0}
+  \vrule
+  \includegraphics[width=0.2\textwidth]{../../modelos-entrenados/unet-nonlocalextra-conv/ejecucion9/predtrainmid6}
+  \vrule
+  \includegraphics[width=0.2\textwidth]{../../modelos-entrenados/unet-semnonlocal-conv/ejecucion11/predtrainmid0}
+  \vrule
+  \includegraphics[width=0.2\textwidth]{../../modelos-entrenados/unet-semnonlocal-conv/ejecucion11/predtrainmid6}
+  \vrule
+  \includegraphics[width=0.2\textwidth]{../../modelos-entrenados/unet-conv/ejecucion12/predtrainmid0}
+  \vrule
+  \includegraphics[width=0.2\textwidth]{../../modelos-entrenados/unet-conv/ejecucion12/predtrainmid6}
+  \caption{Comparativa con una imagen del conjunto de entrenamiento. Mostradas las capas correspondientes a etiquetas no vacías para la imagen actual. En este caso esta partido en pares, siendo cada par capas el resultado de la predicción de un entrenamiento. De izquierda a derecha y de arriba a abajo, corresponde con las gráficas: \autoref{fig:ejec10}, \autoref{fig:ejec9}, \autoref{fig:ejec11} y \autoref{fig:ejec12}.}
+  \label{fig:comparativa1-train}
+\end{figure}
+
+\begin{figure}[h!tpb]
+  \centering
+  \includegraphics[width=0.2\textwidth]{../../modelos-entrenados/unet-nonlocal-conv/ejecucion10/predvalmid0}
+  \vrule
+  \includegraphics[width=0.2\textwidth]{../../modelos-entrenados/unet-nonlocal-conv/ejecucion10/predvalmid3}
+  \vrule
+  \includegraphics[width=0.2\textwidth]{../../modelos-entrenados/unet-nonlocal-conv/ejecucion10/predvalmid6}
+  \vrule
+  \includegraphics[width=0.2\textwidth]{../../modelos-entrenados/unet-nonlocal-conv/ejecucion10/predvalmid85}
+  \vrule
+  \includegraphics[width=0.2\textwidth]{../../modelos-entrenados/unet-nonlocalextra-conv/ejecucion9/predvalmid0}
+  \vrule
+  \includegraphics[width=0.2\textwidth]{../../modelos-entrenados/unet-nonlocalextra-conv/ejecucion9/predvalmid3}
+  \vrule
+  \includegraphics[width=0.2\textwidth]{../../modelos-entrenados/unet-nonlocalextra-conv/ejecucion9/predvalmid6}
+  \vrule
+  \includegraphics[width=0.2\textwidth]{../../modelos-entrenados/unet-nonlocalextra-conv/ejecucion9/predvalmid85}
+  \vrule
+  \includegraphics[width=0.2\textwidth]{../../modelos-entrenados/unet-semnonlocal-conv/ejecucion11/predvalmid0}
+  \vrule
+  \includegraphics[width=0.2\textwidth]{../../modelos-entrenados/unet-semnonlocal-conv/ejecucion11/predvalmid3}
+  \vrule
+  \includegraphics[width=0.2\textwidth]{../../modelos-entrenados/unet-semnonlocal-conv/ejecucion11/predvalmid6}
+  \vrule
+  \includegraphics[width=0.2\textwidth]{../../modelos-entrenados/unet-semnonlocal-conv/ejecucion11/predvalmid85}
+  \vrule
+  \includegraphics[width=0.2\textwidth]{../../modelos-entrenados/unet-conv/ejecucion12/predvalmid0}
+  \vrule
+  \includegraphics[width=0.2\textwidth]{../../modelos-entrenados/unet-conv/ejecucion12/predvalmid3}
+  \vrule
+  \includegraphics[width=0.2\textwidth]{../../modelos-entrenados/unet-conv/ejecucion12/predvalmid6}
+  \vrule
+  \includegraphics[width=0.2\textwidth]{../../modelos-entrenados/unet-conv/ejecucion12/predvalmid85}
+  \caption{Comparativa con una imagen del conjunto de validación. Mostradas las capas correspondientes a etiquetas no vacías para la imagen actual. En este caso, cada fila corresponde a las predicciones para de la imagen en un entrenamiento concreto. De arriba a abajo, corresponde con las gráficas: \autoref{fig:ejec10}, \autoref{fig:ejec9}, \autoref{fig:ejec11} y \autoref{fig:ejec12}.}
+  \label{fig:comparativa1-val}
+\end{figure}
+\newpage
+\subsection{Bloque no locales y convoluciones}
+De forma similar a como pasaba teniendo diferentes cantidades de bloques no locales, tener distintas cantidades de convoluciones como extractores de características no aporta una diferencia significativa en los resultados de entrenamiento, como podemos ver en \autoref{fig:ejec14} y \autoref{fig:ejec13}. \\
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=0.48\textwidth]{../../modelos-entrenados/unet-conv-conv/ejecucion14/loss}
+  %\includegraphics[width=0.48\textwidth]{../../modelos-entrenados/unet-conv-conv/ejecucion14/acc}
+  \includegraphics[width=0.48\textwidth]{../../modelos-entrenados/unet-conv-conv/ejecucion14/iou}
+  \caption{Entrenamiento del modelo mostrado en \autoref{fig:DiagramaConvExtra} con transformación de datos en los datos de entrenamiento. $64$ canales en convoluciones extractoras. Conjunto de datos completo.}
+  \label{fig:ejec14}
+\end{figure}
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=0.48\textwidth]{../../modelos-entrenados/unet-semconv-conv/ejecucion13/loss}
+  %\includegraphics[width=0.48\textwidth]{../../modelos-entrenados/unet-semconv-conv/ejecucion13/acc}
+  \includegraphics[width=0.48\textwidth]{../../modelos-entrenados/unet-semconv-conv/ejecucion13/iou}
+  \caption{Entrenamiento del modelo mostrado en \autoref{fig:DiagramaSemiConvExtra} con transformación de datos en los datos de entrenamiento. $64$ canales en convoluciones extractoras. Conjunto de datos completo.}
+  \label{fig:ejec13}
+\end{figure}
+
+A pesar de ello, el cambio sí afecta a la velocidad de convergencia del entrenamiento siendo que se produce una buena mejora entre las épocas 25 y 30 en \autoref{fig:ejec13} mientras que en \autoref{fig:ejec14} se produce entre la época 30 y 40.\\
+\newpage
+De forma visual, se puede comprobar tanto en \autoref{fig:comparativa2-train}, que pertenece al conjunto de entrenamiento y muestra la salida de las capas ``nada'' y la capa ``autobús'', como en \autoref{fig:comparativa2-val}, que muestra el resultado de las capas ``nada'', ``coche'', ``autobús'' y ``reloj'' en una imagen perteneciente al conjunto de validación.\\
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=0.2\textwidth]{../../modelos-entrenados/unet-conv/ejecucion12/predtrainmid0}
+  \vrule
+  \includegraphics[width=0.2\textwidth]{../../modelos-entrenados/unet-conv/ejecucion12/predtrainmid6}
+  \vrule
+  \includegraphics[width=0.2\textwidth]{../../modelos-entrenados/unet-conv-conv/ejecucion14/predtrainmid0}
+  \vrule
+  \includegraphics[width=0.2\textwidth]{../../modelos-entrenados/unet-conv-conv/ejecucion14/predtrainmid6}
+  \vrule
+  \includegraphics[width=0.2\textwidth]{../../modelos-entrenados/unet-semconv-conv/ejecucion13/predtrainmid0}
+  \vrule
+  \includegraphics[width=0.2\textwidth]{../../modelos-entrenados/unet-semconv-conv/ejecucion13/predtrainmid6}
+  \caption{Comparativa con una imagen del conjunto de entrenamiento. Mostradas las capas correspondientes a etiquetas no vacías para la imagen actual. En este caso esta partido en pares, siendo cada capa el resultado de la predicción de un entrenamiento. De izquierda a derecha y de arriba a abajo, corresponde con las gráficas: \autoref{fig:ejec12}, \autoref{fig:ejec14} y \autoref{fig:ejec13}.}
+  \label{fig:comparativa2-train}
+\end{figure}
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=0.2\textwidth]{../../modelos-entrenados/unet-conv/ejecucion12/predvalmid0}
+  \vrule
+  \includegraphics[width=0.2\textwidth]{../../modelos-entrenados/unet-conv/ejecucion12/predvalmid3}
+  \vrule
+  \includegraphics[width=0.2\textwidth]{../../modelos-entrenados/unet-conv/ejecucion12/predvalmid6}
+  \vrule
+  \includegraphics[width=0.2\textwidth]{../../modelos-entrenados/unet-conv/ejecucion12/predvalmid85}
+  \vrule
+  \includegraphics[width=0.2\textwidth]{../../modelos-entrenados/unet-conv-conv/ejecucion14/predvalmid0}
+  \vrule
+  \includegraphics[width=0.2\textwidth]{../../modelos-entrenados/unet-conv-conv/ejecucion14/predvalmid3}
+  \vrule
+  \includegraphics[width=0.2\textwidth]{../../modelos-entrenados/unet-conv-conv/ejecucion14/predvalmid6}
+  \vrule
+  \includegraphics[width=0.2\textwidth]{../../modelos-entrenados/unet-conv-conv/ejecucion14/predvalmid85}
+  \vrule
+  \includegraphics[width=0.2\textwidth]{../../modelos-entrenados/unet-semconv-conv/ejecucion13/predvalmid0}
+  \vrule
+  \includegraphics[width=0.2\textwidth]{../../modelos-entrenados/unet-semconv-conv/ejecucion13/predvalmid3}
+  \vrule
+  \includegraphics[width=0.2\textwidth]{../../modelos-entrenados/unet-semconv-conv/ejecucion13/predvalmid6}
+  \vrule
+  \includegraphics[width=0.2\textwidth]{../../modelos-entrenados/unet-semconv-conv/ejecucion13/predvalmid85}
+  \caption{Comparativa con una imagen del conjunto de validación. Mostradas las capas correspondientes a etiquetas no vacías para la imagen actual. En este caso, cada fila corresponde a las predicciones para de la imagen en un entrenamiento concreto. De arriba a abajo, corresponde con las gráficas: \autoref{fig:ejec12}, \autoref{fig:ejec14} y \autoref{fig:ejec13}.}
+  \label{fig:comparativa2-val}
+\end{figure}
+
+\newpage
+Aunque no existe una mejora tan significativa como sucedía con los bloques no locales, los resultados son mejores de los que podemos comprobar en \autoref{fig:ejec12} sin dichos bloques.\\
+
+\newpage
+Sin embargo, la diferencia con \autoref{fig:ejec10}, \autoref{fig:ejec9} y \autoref{fig:ejec11}, pese a tener una mayor cantidad de pesos a ajustar en el caso de una convolución de núcleo de tamaño $2$, nos dice que en este caso interesa más la utilización de los bloques no locales como extractores de características.\\
+
+Esto es debido a que, no sólo tenemos una mayor pérdida y un menor valor de \emph{mean IoU}, sino que, además, incluso en las propias imágenes de muestra se obtiene peores resultados utilizando convoluciones en lugar del bloque no local. Se tiene un mayor consumo de memoria, sin llegar a tener mejores resultados.\\
+
+\newpage
+\subsection{Diferentes números de canales en los bloques de atención}
+Para esta comparativa, se podrán utilizar las gráficas \autoref{fig:ejec4}, \autoref{fig:ejec5}, \autoref{fig:ejec7} y \autoref{fig:ejec8}. Siendo que la primera y tercera figura corresponderán a 64 canales mientras que las otras corresponderán a 128, todos ellos en el modelo \autoref{fig:DiagramaCompleto}.\\
+
+\begin{figure}[h!]
   \centering
   \includegraphics[width=0.48\textwidth]{../../modelos-entrenados/unet-nonlocal/ejecucion4/loss}
-  \includegraphics[width=0.48\textwidth]{../../modelos-entrenados/unet-nonlocal/ejecucion4/acc}
+  %\includegraphics[width=0.48\textwidth]{../../modelos-entrenados/unet-nonlocal/ejecucion4/acc}
   \includegraphics[width=0.48\textwidth]{../../modelos-entrenados/unet-nonlocal/ejecucion4/iou}
-  \caption{Entrenamiento del modelo mostrado en \autoref{fig:DiagramaCompleto} con aumento de datos en los datos de entrenamiento. $64$ canales en el bloque de atención. Subcategoría de Transportes.}
+  \caption{Entrenamiento del modelo mostrado en \autoref{fig:DiagramaCompleto} con transformación de datos en los datos de entrenamiento. $64$ canales en el bloque de atención. Subcategoría de Transportes.}
   \label{fig:ejec4}
 \end{figure}
 
-\begin{figure}[htpb]
+\begin{figure}[h!]
   \centering
   \includegraphics[width=0.48\textwidth]{../../modelos-entrenados/unet-nonlocal/ejecucion5/loss}
-  \includegraphics[width=0.48\textwidth]{../../modelos-entrenados/unet-nonlocal/ejecucion5/acc}
+  %\includegraphics[width=0.48\textwidth]{../../modelos-entrenados/unet-nonlocal/ejecucion5/acc}
   \includegraphics[width=0.48\textwidth]{../../modelos-entrenados/unet-nonlocal/ejecucion5/iou}
-  \caption{Entrenamiento del modelo mostrado en \autoref{fig:DiagramaCompleto} con aumento de datos en los datos de entrenamiento. $128$ canales en el bloque de atención. Subcategoría de Transportes.}
+  \caption{Entrenamiento del modelo mostrado en \autoref{fig:DiagramaCompleto} con transformación de datos en los datos de entrenamiento. $128$ canales en el bloque de atención. Subcategoría de Transportes.}
   \label{fig:ejec5}
 \end{figure}
-\begin{figure}[htpb]
+
+\begin{figure}[h!]
   \centering
   \includegraphics[width=0.48\textwidth]{../../modelos-entrenados/unet-nonlocal/ejecucion7/loss}
-  \includegraphics[width=0.48\textwidth]{../../modelos-entrenados/unet-nonlocal/ejecucion7/acc}
+  %\includegraphics[width=0.48\textwidth]{../../modelos-entrenados/unet-nonlocal/ejecucion7/acc}
   \includegraphics[width=0.48\textwidth]{../../modelos-entrenados/unet-nonlocal/ejecucion7/iou}
-  \caption{Entrenamiento del modelo mostrado en \autoref{fig:DiagramaCompleto} con aumento de datos en los datos de entrenamiento. $64$ canales en el bloque de atención. Conjunto de datos completo.}
+  \caption{Entrenamiento del modelo mostrado en \autoref{fig:DiagramaCompleto} con transformación de datos de datos en los datos de entrenamiento. $64$ canales en el bloque de atención. Conjunto de datos completo.}
   \label{fig:ejec7}
 \end{figure}
-\begin{figure}[htpb]
+
+\begin{figure}[h!]
   \centering
   \includegraphics[width=0.48\textwidth]{../../modelos-entrenados/unet-nonlocal/ejecucion8/loss}
-  \includegraphics[width=0.48\textwidth]{../../modelos-entrenados/unet-nonlocal/ejecucion8/acc}
+  %\includegraphics[width=0.48\textwidth]{../../modelos-entrenados/unet-nonlocal/ejecucion8/acc}
   \includegraphics[width=0.48\textwidth]{../../modelos-entrenados/unet-nonlocal/ejecucion8/iou}
   \caption{Entrenamiento del modelo mostrado en \autoref{fig:DiagramaCompleto} con aumento de datos en los datos de entrenamiento. $128$ canales en el bloque de atención. Conjunto de datos completo.}
   \label{fig:ejec8}
 \end{figure}
 
-\begin{figure}[htpb]
+\begin{figure}[h!]
   \centering
-  \includegraphics[width=0.48\textwidth]{../../modelos-entrenados/unet-conv/ejecucion12/loss}
-  \includegraphics[width=0.48\textwidth]{../../modelos-entrenados/unet-conv/ejecucion12/acc}
-  \includegraphics[width=0.48\textwidth]{../../modelos-entrenados/unet-conv/ejecucion12/iou}
-  \caption{Entrenamiento del modelo mostrado en \autoref{fig:DiagramaUnetExtra} con aumento de datos en los datos de entrenamiento. $64$ canales en el bloque de atención. Conjunto de datos completo.}
-  \label{fig:ejec12}
+  \includegraphics[width=0.2\textwidth]{../../modelos-entrenados/unet-nonlocal/ejecucion4/predtrainmid0}
+  \vrule
+  \includegraphics[width=0.2\textwidth]{../../modelos-entrenados/unet-nonlocal/ejecucion4/predtrainmid5}
+  \vrule
+  \includegraphics[width=0.2\textwidth]{../../modelos-entrenados/unet-nonlocal/ejecucion5/predtrainmid0}
+  \vrule
+  \includegraphics[width=0.2\textwidth]{../../modelos-entrenados/unet-nonlocal/ejecucion5/predtrainmid5}
+  \vrule
+  \includegraphics[width=0.2\textwidth]{../../modelos-entrenados/unet-nonlocal/ejecucion7/predtrainmid0}
+  \vrule
+  \includegraphics[width=0.2\textwidth]{../../modelos-entrenados/unet-nonlocal/ejecucion7/predtrainmid6}
+  \vrule
+  \includegraphics[width=0.2\textwidth]{../../modelos-entrenados/unet-nonlocal/ejecucion8/predtrainmid0}
+  \vrule
+  \includegraphics[width=0.2\textwidth]{../../modelos-entrenados/unet-nonlocal/ejecucion8/predtrainmid6}
+  \caption{Comparativa con una imagen del conjunto de entrenamiento. Mostradas las capas correspondientes a etiquetas no vacías para la imagen actual. En este caso esta partido en pares, siendo cada capa el resultado de la predicción de un entrenamiento. De izquierda a derecha y de arriba a abajo, corresponde con las gráficas: \autoref{fig:ejec4}, \autoref{fig:ejec5}, \autoref{fig:ejec7} y \autoref{fig:ejec8}. Es decir, las de arriba corresponderán al entrenamiento en el subconjunto de transportes y los de abajo a todo el conjunto de datos, las de la izquierda a 64 canales y las de la derecha a 128.}
+  \label{fig:comparativa3-train}
 \end{figure}
-\begin{figure}[htpb]
+
+\begin{figure}[h!]
   \centering
-  \includegraphics[width=0.48\textwidth]{../../modelos-entrenados/unet-nonlocal-conv/ejecucion10/loss}
-  \includegraphics[width=0.48\textwidth]{../../modelos-entrenados/unet-nonlocal-conv/ejecucion10/acc}
-  \includegraphics[width=0.48\textwidth]{../../modelos-entrenados/unet-nonlocal-conv/ejecucion10/iou}
-  \caption{Entrenamiento del modelo mostrado en \autoref{fig:DiagramaNonlocalExtra} con aumento de datos en los datos de entrenamiento. $64$ canales en el bloque de atención. Conjunto de datos completo.}
-  \label{fig:ejec10}
+  \includegraphics[width=0.2\textwidth]{../../modelos-entrenados/unet-nonlocal/ejecucion4/predvalmid0}
+  \vrule
+  \includegraphics[width=0.2\textwidth]{../../modelos-entrenados/unet-nonlocal/ejecucion4/predvalmid2}
+  \vrule
+  \includegraphics[width=0.2\textwidth]{../../modelos-entrenados/unet-nonlocal/ejecucion4/predvalmid5}
+  \newline
+  \includegraphics[width=0.2\textwidth]{../../modelos-entrenados/unet-nonlocal/ejecucion5/predvalmid0}
+  \vrule
+  \includegraphics[width=0.2\textwidth]{../../modelos-entrenados/unet-nonlocal/ejecucion5/predvalmid2}
+  \vrule
+  \includegraphics[width=0.2\textwidth]{../../modelos-entrenados/unet-nonlocal/ejecucion5/predvalmid5}
+  \newline
+  \includegraphics[width=0.2\textwidth]{../../modelos-entrenados/unet-nonlocal/ejecucion7/predvalmid0}
+  \vrule
+  \includegraphics[width=0.2\textwidth]{../../modelos-entrenados/unet-nonlocal/ejecucion7/predvalmid3}
+  \vrule
+  \includegraphics[width=0.2\textwidth]{../../modelos-entrenados/unet-nonlocal/ejecucion7/predvalmid6}
+  \vrule
+  \includegraphics[width=0.2\textwidth]{../../modelos-entrenados/unet-nonlocal/ejecucion7/predvalmid85}
+  \vrule
+  \includegraphics[width=0.2\textwidth]{../../modelos-entrenados/unet-nonlocal/ejecucion8/predvalmid0}
+  \vrule
+  \includegraphics[width=0.2\textwidth]{../../modelos-entrenados/unet-nonlocal/ejecucion8/predvalmid3}
+  \vrule
+  \includegraphics[width=0.2\textwidth]{../../modelos-entrenados/unet-nonlocal/ejecucion8/predvalmid6}
+  \vrule
+  \includegraphics[width=0.2\textwidth]{../../modelos-entrenados/unet-nonlocal/ejecucion8/predvalmid85}
+  \caption{Comparativa con una imagen del conjunto de validación. Mostradas las capas correspondientes a etiquetas no vacías para la imagen actual. En este caso, cada fila corresponde a las predicciones para de la imagen en un entrenamiento concreto. De arriba a abajo, corresponde con las gráficas: \autoref{fig:ejec4}, \autoref{fig:ejec5}, \autoref{fig:ejec7} y \autoref{fig:ejec8}.}
+  \label{fig:comparativa3-val}
 \end{figure}
-\end{figure}
-\begin{figure}[htpb]
-  \centering
-  \includegraphics[width=0.48\textwidth]{../../modelos-entrenados/unet-nonlocalextra-conv/ejecucion9/loss}
-  \includegraphics[width=0.48\textwidth]{../../modelos-entrenados/unet-nonlocalextra-conv/ejecucion9/acc}
-  \includegraphics[width=0.48\textwidth]{../../modelos-entrenados/unet-nonlocalextra-conv/ejecucion9/iou}
-  \caption{Entrenamiento del modelo mostrado en \autoref{fig:DiagramaNonlocal+Extra} con aumento de datos en los datos de entrenamiento. $64$ canales en el bloque de atención. Conjunto de datos completo.}
-  \label{fig:ejec9}
-\end{figure}
-\begin{figure}[htpb]
-  \centering
-  \includegraphics[width=0.48\textwidth]{../../modelos-entrenados/unet-semnonlocal-conv/ejecucion11/loss}
-  \includegraphics[width=0.48\textwidth]{../../modelos-entrenados/unet-semnonlocal-conv/ejecucion11/acc}
-  \includegraphics[width=0.48\textwidth]{../../modelos-entrenados/unet-semnonlocal-conv/ejecucion11/iou}
-  \caption{Entrenamiento del modelo mostrado en \autoref{fig:DiagramaSemiNonlocalExtra} con aumento de datos en los datos de entrenamiento. $64$ canales en el bloque de atención. Conjunto de datos completo.}
-  \label{fig:ejec11}
-\end{figure}
-\section{Análisis y conclusiones}
 
-Debido a la cantidad de gráficas, se irá seleccionando diferentes combinaciones a comparar, con el fin de resaltar de forma específica qué se quería analizar en cada momento.\\
+\newpage
+Aquí se puede apreciar que el incremento del número de canales, para este bloque y en estas circunstancias, permite acelerar la velocidad de aprendizaje pero no evita que el modelo alcance el mismo límite de reducción de pérdida y de aumento de la \emph{mean IoU}.\\
 
-\subsection{Diferentes cantidades de bloques no locales.}
-Lo primero a comparar será los resultados obtenidos dependiendo de la cantidad de módulos no locales empleados en la red. En particular, se observarán las gráficas \autoref{fig:ejec11}, \autoref{fig:ejec9} y \autoref{fig:ejec10} que únicamente se diferencian en dicha cantidad.\\
+\newpage
+Una pequeña muestra de que, pese a la variación del número de canales, de que el modelo sigue prediciendo de forma similar se puede encontrar en \autoref{fig:comparativa3-train} y en \autoref{fig:comparativa3-val}. En particular, en la segunda figura se tiene que tener en cuenta que estamos en el caso de entrenamiento en el subconjunto de transportes, para la primera y la segunda predicción, y que por ello no aparece la clase ``reloj'', puesto que el modelo no ha sido entrenado para aprender las características relacionadas con esta clase.
+\afterpage{\null\newpage}
 
-Las gráficas correspondientes tienen una estructura similar, siendo que en las 3 se alcanza el mínimo valor de pérdida en el conjunto de validación entre las épocas 20 y 25. Además, en los tres modelos existe un aumento  sustancial del valor medio de la intersección sobre la unión en el conjunto de validación entre las épocas 10 y 15, siendo que este coincide con la primera reducción del ratio de aprendizaje por llevar 3 épocas sin que viera reducido la pérdida en la validación.\\
-
-A pesar de seguir realizándose reducciones del ratio de aprendizaje ante la falta de mejoría, no vuelven a producirse mejoras sustanciales durante el aprendizaje en ninguna de ellas.\\
-
-Teniendo en cuenta esto, se comprueba empíricamente que no por añadir más cantidad de bloques no locales se podrán extraer más características de la imagen. Pero, además, debemos de tener en cuenta la gráfica \autoref{fig:ejec12}, correspondiente a la misma arquitectura pero sin bloques no locales, por lo que estos bloques sí establecen una mejoría ante la inexistencia de ningún otro.
-
-\subsection{Bloque no locales y convoluciones}
-
-\subsection{Diferentes números de canales en los bloques de atención}
-Para esta comparativa, se podrán utilizar las gráficas \autoref{fig:ejec4}, \autoref{fig:ejec5}, \autoref{fig:ejec7} y \autoref{fig:ejec8}. Siendo que la primera y tercera figura corresponderán a 64 canales mientras que las otras corresponderán a 128, todos ellos en el modelo \autoref{fig:DiagramaNonlocalExtra}.\\
-
-Aquí se puede apreciar que el incremento del número de canales, para este bloque y en estas circunstancias, permite acelerar la velocidad de aprendizaje pero no evita que el modelo alcance el mismo límite de reducción de pérdida y de aumento de la \emph{mean IoU}.
-
+\newpage
 \subsection{Convolución extra tras la obtención de la dimensión deseada}
-A continuación, prestaremos atención a \autoref{fig:ejec7} y a \autoref{fig:ejec10}, en la que destaca la reducción de oscilaciones al añadir la nueva convolución. A pesar de ello, la modificación no cumple con el objetivo de aumentar el valor medio de la intersección sobre la unión ni de reducir el valor de la pérdida.\\
+A continuación, prestaremos atención a \autoref{fig:ejec10} y a \autoref{fig:ejec7}, en la que destaca la reducción de oscilaciones al añadir la nueva convolución. A pesar de ello, la modificación no cumple con el objetivo de aumentar el valor medio de la intersección sobre la unión ni de reducir el valor de la pérdida.\\
 
 Esta fue mantenida con el fin de visualizar mejor las modificaciones ofrecidas en las diferentes comparaciones.
 
-\subsection{Conclusiones}
+\newpage
+\section{Resultados de segmentación utilizando los bloques no locales.}\label{resultados}
+En esta sección se pretenderá mostrar la gran variedad de opciones que puede identificar un modelo que utilice un bloque no local y que este entrenado para una gran variedad de imágenes. En concreto, mostraremos ejemplos de resultados de \autoref{fig:ejec10} que ha sido entrenado con todas las imágenes del conjunto de datos de entrenamiento de COCO \cite{COCO}.\\
+
+Las imágenes mostradas a continuación pertenecerán al subconjunto de validación y, por tanto, estas no han sido aprendidas de forma explícita por la red sino que, gracias a lo aprendido durante el entrenamiento, es capaz de mostrar los siguientes resultados.\\
+
+En este primer ejemplo \autoref{fig:predict1}, se muestra un escritorio en el que pueden ser identificados dos ordenadores con sus respectivos teclados. Aquí se aprecia cómo identifica múltiples objetos relacionados, distinguiendo por zonas. Con esto podemos apreciar cómo se ha conseguido una clasificación local de los objetos, conociendo dónde están e identificando qué son.\\
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=1.0\textwidth]{DetectingObjects/pred-1}
+  \caption{Muestra de resultados utilizando \autoref{fig:ejec10}, que utiliza el conjunto de datos completo, a través del prototipo que será comentado en \autoref{ch:CBIR}.}
+  \label{fig:predict1}
+\end{figure}
+
+Otros ejemplos de clasificación múltiple pueden ser encontrados en \autoref{fig:predict2} y \autoref{fig:predict3}.\\
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=1.0\textwidth]{DetectingObjects/pred-2}
+  \caption{Muestra de resultados utilizando \autoref{fig:ejec10}, que utiliza el conjunto de datos completo, a través del prototipo que será comentado en \autoref{ch:CBIR}.}
+  \label{fig:predict2}
+\end{figure}
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=1.0\textwidth]{DetectingObjects/pred-3}
+  \caption{Muestra de resultados utilizando \autoref{fig:ejec10}, que utiliza el conjunto de datos completo, a través del prototipo que será comentado en \autoref{ch:CBIR}.}
+  \label{fig:predict3}
+\end{figure}
+
+\newpage
+En particular, en \autoref{fig:predict4} se puede apreciar que identifica en muy pocos píxeles y con muy poca confianza la existencia de un ``microondas'' pese a no existir ninguno en la imagen. Esto es debido a que, debido al entrenamiento, ha relacionado la existencia de ``microondas'' en imágenes relacionas con cocinas y, por ello, al existir un ``horno'' y una ``nevera'' la red creía que debería de haber también un microondas. Pero, como no había ninguno, la región de píxeles identificada con este ha sido muy pequeña y con una confianza muy baja de que realmente perteneciera a dicha categoría. \\
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=1.0\textwidth]{DetectingObjects/pred-4}
+  \caption{Muestra de resultados utilizando \autoref{fig:ejec10}, que utiliza el conjunto de datos completo, a través del prototipo que será comentado en \autoref{ch:CBIR}.}
+  \label{fig:predict4}
+\end{figure}
+
+Pese a estar equivocada esa etiqueta, era importante el conocer el motivo y razonamiento de su existencia, puesto que este error llevaría a mejores predicciones en otras imágenes.\\
+
+En las siguientes imágenes, se mostrarán más ejemplos de predicciones de esta red, con la idea de mostrar la variedad de etiquetas distintas que es capaz de clasificar.\\
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=1.0\textwidth]{DetectingObjects/pred-5}
+  \caption{Muestra de resultados utilizando \autoref{fig:ejec10}, que utiliza el conjunto de datos completo, a través del prototipo que será comentado en \autoref{ch:CBIR}.}
+  \label{fig:predict5}
+\end{figure}
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=1.0\textwidth]{DetectingObjects/pred-6}
+  \caption{Muestra de resultados utilizando \autoref{fig:ejec10}, que utiliza el conjunto de datos completo, a través del prototipo que será comentado en \autoref{ch:CBIR}.}
+  \label{fig:predict6}
+\end{figure}
+\newpage
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=1.0\textwidth]{DetectingObjects/pred-7}
+  \caption{Muestra de resultados utilizando \autoref{fig:ejec10}, que utiliza el conjunto de datos completo, a través del prototipo que será comentado en \autoref{ch:CBIR}.}
+  \label{fig:predict7}
+\end{figure}
+%\begin{figure}[h!]
+%  \centering
+%  \includegraphics[width=1.0\textwidth]{DetectingObjects/pred-8}
+%  \caption{Muestra de resultados utilizando \autoref{fig:ejec10}, que utiliza el conjunto de datos completo, a través del prototipo que será comentado en \autoref{ch:CBIR}.}
+%  \label{fig:predict8}
+%\end{figure}
+\newpage
+.
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=1.0\textwidth]{DetectingObjects/pred-9}
+  \caption{Muestra de resultados utilizando \autoref{fig:ejec10}, que utiliza el conjunto de datos completo, a través del prototipo que será comentado en \autoref{ch:CBIR}.}
+  \label{fig:predict9}
+\end{figure}
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=1.0\textwidth]{DetectingObjects/pred-10}
+  \caption{Muestra de resultados utilizando \autoref{fig:ejec10}, que utiliza el conjunto de datos completo, a través del prototipo que será comentado en \autoref{ch:CBIR}.}
+  \label{fig:predict10}
+\end{figure}
+\newpage
+.
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=1.0\textwidth]{DetectingObjects/pred-11}
+  \caption{Muestra de resultados utilizando \autoref{fig:ejec10}, que utiliza el conjunto de datos completo, a través del prototipo que será comentado en \autoref{ch:CBIR}.}
+  \label{fig:predict11}
+\end{figure}
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=1.0\textwidth]{DetectingObjects/pred-12}
+  \caption{Muestra de resultados utilizando \autoref{fig:ejec10}, que utiliza el conjunto de datos completo, a través del prototipo que será comentado en \autoref{ch:CBIR}.}
+  \label{fig:predict12}
+\end{figure}
+
+\newpage
+\section{Conclusiones}
 Pese a no obtener los mejores resultados, no pudiendo competir con los métodos presentes en el estado de arte actual para la segmentación semántica o la instanciación de objetos, se ha podido comprobar de forma empírica, en un ejemplo concreto, la utilidad de los bloques no locales para la extracción de características en imágenes.\\
 
 Como se sigue comprobando día a día en las diferentes arquitecturas y modelos presentados, no se trata de añadir capas y capas que ofrezcan una mayor cantidad de variables para resolver los problemas planteados. En su lugar, es más adecuado el razonar qué capas o conjunto de capas será más útil en cada momento, buscando el conseguir los mejores resultados ocupando la menor cantidad posible de recursos.\\
 
-En este caso, los bloques no locales han resultado ser una buena alternativa a la utilización de simples convoluciones como extractor de características, puesto que se obtenían mejores resultados con la utilización de una menor cantidad de memoria. También se ha podido comprobar que la adicción de estos bloques en exceso no supondrá ninguna mejora.\\
+En este caso, los bloques no locales han resultado ser una buena alternativa a la utilización de simples convoluciones como extractor de características, puesto que se obtenían mejores resultados con la utilización de una menor cantidad de memoria. También se ha podido comprobar que la adición de estos bloques en exceso no supondrá ninguna mejora.\\
 
 Se desea realizar la conjetura de que esta falta de mejora puede ser debida a que no se está extrayendo nuevas características en la arquitectura actual con el incremento de bloques, sino que se está recibiendo información con la relativa similitud que carece de la suficiente distinción como para aprender algo nuevo. \\
 

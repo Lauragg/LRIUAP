@@ -17,7 +17,7 @@ Idealmente, en esta imagen desearíamos que fuera capaz de identificar que se tr
 
 Dejamos todos estos detalles, a los cuales esperamos poder llegar en secciones futuras, y simplificamos el problema a tener un conjunto de etiquetas y buscar con cuál de todas ellas tiene mayor relación nuestra imagen.\newline
 
-Una primera idea sería utilizar utilizar \emph{$k$-nearest neighbor classifier}, en adelante $k$-NN. Este clasificador consiste en, para cada etiqueta, determinar las $k$ imágenes cuya distancia, siendo Manhattan y Euclídea las más comunes, entre los píxeles de nuestra imagen sea menor. La etiqueta idónea será aquella cuya dicha distancia sea menor considerando las $k$ imágenes.\\
+Una primera idea podría ser utilizar utilizar \emph{$k$-nearest neighbor classifier}, en adelante $k$-NN. Este clasificador consiste en, para cada etiqueta, determinar las $k$ imágenes cuya distancia, siendo Manhattan y Euclídea las más comunes, entre los valores de los píxeles de nuestra imagen sea menor. La etiqueta idónea será aquella cuya dicha distancia sea menor considerando las $k$ imágenes.\\
 
 %Este clasificador consiste en que, para cada etiqueta, se correspondan $k$ imágenes y consideraremos como etiqueta idónea para nuestra clasificación aquella cuya distancia, siendo Manhattan y Euclídea las más comunes, entre los píxeles con nuestra imagen sea menor. Nos encontramos con que el tiempo de entrenamiento de nuestro clasificador sería ínfimo en comparación con el tiempo de clasificación, si bien se pueden hacer diversas mejoras que cambien estos hechos. \newline
 
@@ -28,7 +28,7 @@ Una primera idea sería utilizar utilizar \emph{$k$-nearest neighbor classifier}
   \label{fig:knn}
 \end{figure}
 
-De esta sencilla propuesta surgen diversos problemas. Las métricas más comunes de este clasificador suelen darle mayor importancia al valor concreto de los píxeles, en lugar de a las formas que de las que está compuesta la figura, provocando que valores como los colores de fondo pueden influir más en la clasificación que los propios píxeles de la figura que queremos clasificar. En el ejemplo de la imagen del chiguagua, si considerásemos las etiquetas verde y perro, tendríamos que por lo general como respuesta el color verde, pese a que estamos más interesados por la mascota en sí. Otro gran problema sería la baja escalabilidad que nos proporciona esta solución, al incrementarse enormemente el costo computacional de clasificación conforme aumenta el número de imágenes a comparar, ya sea por aumentar el número de etiquetas o nutrir de más datos las ya existentes.\newline
+De esta sencilla propuesta surgen diversos problemas. Se suele dar mayor importancia al valor concreto de los píxeles, en lugar de a las formas que de las que está compuesta la figura, provocando que valores como los colores de fondo puedan influir más en la clasificación que los propios píxeles de la figura que queremos clasificar. En el ejemplo de la imagen del chiguagua, si considerásemos las etiquetas verde y perro, tendríamos que por lo general como respuesta el color verde, pese a que estamos más interesados por la mascota en sí. Otro gran problema sería la baja escalabilidad que nos proporciona esta solución, al incrementarse enormemente el costo computacional de clasificación conforme aumenta el número de imágenes a comparar, ya sea por aumentar el número de etiquetas o nutrir de más datos las ya existentes.\newline
 
 %El siguiente paso, es buscar una forma de ``memorizar'' los datos de entrenamiento de forma que no tengamos que estar comparándolos con todos ellos cuando queramos clasificar una imagen. Lo que buscamos es poder valorar de alguna forma la imagen completa y a partir de esta ``puntuación'' conocer qué etiqueta le corresponde mejor a nuestra imagen. De esta forma, veríamos drásticamente reducido el tiempo de clasificación, sacrificando para ello el tiempo de entrenamiento, y podríamos ampliar en varias unidades la cantidad de datos de entrenamiento utilizados, aumentando así la precisión de nuestro clasificador.
 
@@ -123,12 +123,12 @@ Una \emph{función de activación} es una función $f: \R^n \to \R^n$ siendo $n\
 
 A continuación, mencionaremos los ejemplos más representativos utilizados como funciones de activación:
 
-FIXME: Sugerencia: Añadir una gráfica para cada función de activación
+%FIXME: Sugerencia: Añadir una gráfica para cada función de activación
 \begin{itemize}
 \item \emph{Función sigmoide} o \emph{logística} $\sigma: \R^n \to [0,1]^n$ definida como $\sigma_i(x_i)=\frac{1}{1+e^{-x_i}} $. Se suele utilizar en la última capa de nuestra red, cuando nuestras imágenes pueden pertenecer a varias clases o etiquetas al mismo tiempo al ser el resultado para cada componente independiente del resto.
-\item \emph{Función softmax} utilizada normalmente en la última capa donde hay tantas neuronas como etiquetas y en el problema de clasificación donde una imagen puede pertenecer únicamente a una sola etiqueta o caso. Se trata de una modificación de función logística que normaliza la salida para obtener la probabilidad de pertenecer a cada clase obteniendo así que la suma de todas las salidas de esta capa sería $1$. Aquí, la $i$-ésima neurona tendría función de activación $\sigma_i(x)=\frac{e^{x_i}}{\sum_{j=1}^K e^{x_j}}$ y utilizaría $L(x)=\frac{1}{N}\sum_{i=1}^N -\ln \frac{e^{\sigma_{y_i}(x)}}{\sum_{j=1}^D e^{\sigma_j}(x)}=\frac{1}{N}\sum_{i=1}^N (-{\sigma_{y_i}(x)}+\ln \sum_{j=1}^D e^{\sigma_j(x)})$ como función de pérdida para el entrenamiento.
+\item \emph{Función softmax} utilizada normalmente en la última capa donde hay tantas neuronas como etiquetas y en el problema de clasificación donde una imagen puede pertenecer únicamente a una sola etiqueta o caso. Se trata de una modificación de función logística que normaliza la salida para obtener la probabilidad de pertenecer a cada clase obteniendo así que la suma de todas las salidas de esta capa sería $1$. Aquí, la $i$-ésima neurona tendría función de activación $\sigma_i(x)=\frac{e^{x_i}}{\sum_{j=1}^K e^{x_j}}$. % y utilizaría $L(x)=\frac{1}{N}\sum_{i=1}^N -\ln \frac{e^{\sigma_{y_i}(x)}}{\sum_{j=1}^D e^{\sigma_j}(x)}=\frac{1}{N}\sum_{i=1}^N (-{\sigma_{y_i}(x)}+\ln \sum_{j=1}^D e^{\sigma_j(x)})$ como función de pérdida para el entrenamiento.
 \item \emph{Función ReLU}, cuyo nombre completo sería \emph{Rectified Linear Unit}. Se suele utilizar en las capas intermedias de nuestra red y es de la forma $f(x)=\max(0,x)$.
-\item \emph{Función tanh} se trata de de una centralización de la función sigmoide. $Tanh(x)=2\sigma(x)-1$.
+\item \emph{Función tanh} se trata de una centralización de la función sigmoide. $Tanh(x)=2\sigma(x)-1$.
 \end{itemize}
 
 \section{La red completa}
@@ -140,11 +140,11 @@ Una red red neuronal es un conjunto de neuronas dividas en varias \emph{capas} d
   \includegraphics[width=0.4\textwidth]{neural_net}
   \vrule
   \includegraphics[width=0.5\textwidth]{neural_net2}
-  \caption{Ejemplos de redes totalmente conectadas (\emph{fully-connected}) \stanford }
+  \caption{Ejemplos de redes totalmente conectadas (\emph{fully-connected}) \cite{stanford} }
   \label{fig:fully-connected}
 \end{figure}
 
-La primera capa recibe el nombre de \emph{capa de entrada} que posee $D$ neuronas, es decir, tantas como la dimensión de nuestros datos. Por otro lado tenemos la \emph{capa de salida} con $K$ neuronas, tantas como etiquetas o clases de clasificación tengamos. El resto de neuronas se distribuyen dentro de las \emph{capas ocultas} cuya distribución y conexiones dependen del modelo en concreto que queramos desarrollar, quedando a nuestro criterio.\newline
+La primera capa recibe el nombre de \emph{capa de entrada} que posee $D$ neuronas, es decir, tantas como la dimensión de nuestros datos, y puede haber varias de ellas. Por otro lado tenemos la \emph{capa de salida} con un número de neuronas dependiente de la cantidad de etiquetas que tengamos. El resto de neuronas se distribuyen dentro de las \emph{capas ocultas} cuya distribución y conexiones dependen del modelo en concreto que queramos desarrollar, quedando a nuestro criterio.\newline
 
 
 Así, podemos afirmar que una red neuronal es la aplicación sucesiva de funciones de la forma
@@ -157,13 +157,13 @@ donde $w_j\in\R^n,\;\; \alpha_j,b_j\in\R$ serán fijas una vez entrenada la red 
 La función de pérdida, o \emph{loss function}, se trata de la función objetivo que querremos minimizar en el problema de optimización planteado durante el entrenamiento de una red neuronal. Existen muchas funciones de pérdida, que se pueden englobar en tres grandes categorías:
 \begin{itemize}
 \item Funciones de pérdida probabilísticas. Son aquellas cuyo resultado es interpretable como una medida de probabilidad. Un ejemplo de esto es la entropía cruzada, o \emph{cross entropy}, que mide la media de bits necesarios para identificar un evento.
-\item Funciones de pérdida de regresión. Son aquellas cuyos valores son reales o continuos. Como ejemplos se tiene el error cuadrático medio o la similitud del coseno.
+\item Funciones de pérdida de regresión. Son aquellas cuyos valores son reales y continuos. Como ejemplos se tiene el error cuadrático medio o la similitud del coseno.
 \item Funciones de pérdida para clasificaciones "máximo-margen". Un ejemplo de este tipo es la función de pérdida de bisagra, o \emph{hinge loss function}.
 \end{enumerate}
 
 Existen varias formas de medir el funcionamiento de una red neuronal sin que estas medidas lleguen a afectar al entrenamiento. Hay múltiples métricas de evaluación que se pueden utilizar en diferentes contextos, siendo la más común la precisión, exactitud o \emph{accuracy}.\\
 
-La métrica de \emph{accuracy} corresponde al número de datos correctamente predichos con respecto a todos los puntos. Formalmente está definida como el número de verdaderos positivos y negativos divido entre los falsos positivos, verdaderos positivos, falsos negativos y verdaderos negativos.\\
+La métrica de \emph{accuracy} corresponde al número de datos correctamente predichos con respecto a todos los puntos. Formalmente, en el caso binario, está definida como el número de verdaderos positivos y negativos divido entre los falsos positivos, verdaderos positivos, falsos negativos y verdaderos negativos.\\
 \begin{figure}[htpb]
   \centering
   \includegraphics[width=0.6\textwidth]{accuracy}
@@ -179,14 +179,14 @@ Por otro lado, se mencionará también la intersección sobre la unión, mayorme
   \label{fig:iou}
 \end{figure}
 
-\subsection{Propagación y Optimización}
+\subsection{Propagación y optimización}
 Con el fin de simplificar la explicación de los algoritmos que se verán en esta subsección, nos centraremos en el caso de las redes neuronales prealimentadas, o \emph{feed forward neural networks}, que son aquellas donde las conexiones entre las distintas neuronas no forman un ciclo. También son conocidas como redes neuronales hacia adelante puesto que la información únicamente se mueve hacia adelante, diferenciándose de las redes neuronales recurrentes.\\
 
 El algoritmo que computa el avance de la información a través de estas redes recibe el nombre de propagación hacia adelante, o \emph{forward propagation}, \cite{Goodfellow-et-al-2016}. Durante el entrenamiento, la información de entrada continua hasta producir un coste escalar $J(\theta)$ y el algoritmo de propagación hacia atrás, o \emph{back propagation}, permite que ese coste fluya hacia atrás en la red para calcular el gradiente. \\
 
-\begin{algorithm}\label{alg:forward}
+\begin{algorithm}
 \caption{Propagación hacia adelante mediante una red neuronal típica, totalmente conectada, y el cálculo de la función de coste. La función de pérdida $L(\hat{y},y)$ depende de la salida de la red $\hat{y}$ y del objetivo $y$. Para obtener el coste total $J$, a la pérdida se le debería de añadir un regularizador $\Omega(\theta)$, donde $\theta$ contiene todos los parámetros (pesos y sesgos). \cite{Goodfellow-et-al-2016}}
-\begin{algorithmic}
+\begin{algorithmic}\label{alg:forward}
 \REQUIRE Profundidad de la red $l$
 \REQUIRE $W^{(i)}, i\in\{1,...,l\}$, las matrices de pesos del modelo
 \REQUIRE $b^{(i)}, i\in\{1,...,l\}$, los parámetros de sesgos del modelo
@@ -202,9 +202,9 @@ El algoritmo que computa el avance de la información a través de estas redes r
 \end{algorithmic}
 \end{algorithm}
 
-A menudo, se piensa que con la propagación hacia atrás se está realizado todo el proceso de aprendizaje de la red, cuando este algoritmo únicamente calcula el valor del gradiente y serás otro algoritmo, como, por ejemplo, el descenso del gradiente estocástico (\emph{stochastic gradient descent}), es el utilizado para realizar el aprendizaje por la red. Los algoritmos utilizados para calcular este aprendizaje reciben el nombre de optimizadores.\\
+A menudo, se piensa que con la propagación hacia atrás se está realizado todo el proceso de aprendizaje de la red, cuando este algoritmo únicamente calcula el valor del gradiente y será otro algoritmo, como, por ejemplo, el descenso del gradiente estocástico (\emph{stochastic gradient descent}), es el utilizado para realizar el aprendizaje por la red. Los algoritmos utilizados para calcular este aprendizaje reciben el nombre de optimizadores.\\
 
-La regla de la cadena del cálculo es utilizada para calcular las derivas de funciones compuestas por otras funciones cuyas derivadas son conocidas. De esta forma, el algoritmo de propagación hacia atrás realiza el cálculo de esta regla de la cadena, en un orden específico de operaciones que es muy eficiente. \\
+El algoritmo de propagación hacia atrás realiza el cálculo de la regla de la cadena del cálculo, en un orden específico de operaciones que es muy eficiente, para calcular las derivadas de funciones compuestas por otras funciones cuyas derivadas son conocidas. \\
 \begin{algorithm}
 \caption{Computación hacia atrás para la red neuronal profunda del algoritmo \autoref{alg:forward}, que usa, en adición a la entrada $x$, un objetivo $y$. \cite{Goodfellow-et-al-2016}}
 \begin{algorithmic}
@@ -222,7 +222,7 @@ La regla de la cadena del cálculo es utilizada para calcular las derivas de fun
 \end{algorithmic}
 \end{algorithm}
 
-Todo esto es para poder plantear el objetivo más importante del entrenamiento de una red neuronal, el resolver un problema de optimización planteado al querer minimizar el valor de la función de pérdida. \\
+Todo esto es para poder plantear el objetivo más importante del entrenamiento de una red neuronal, el resolver un problema de optimización al querer minimizar el valor de la función de pérdida. \\
 
 Para ello, se describirá el algoritmo del descenso del gradiente estocástico, o \emph{stochastic gradient descent (SGD)}, que, junto a sus variantes, son los algoritmos de optimización más utilizados en el aprendizaje profundo. \\
 
@@ -294,12 +294,63 @@ Una función $\sigma : \R \to \R$ es \emph{discriminatoria} si, para una medida 
 Cualquier función sigmoidal medible y acotada es discriminatoria. En particular, las funciones sigmoidales continuas son discriminatorias.
 \end{lema}
 \begin{proof}
+Para cuales quiera $x,y\in\R^n$ y $\theta,\phi\R$, tendremos:
+
+$$\sigma(\lambda(y^Tx+\theta)+\phi) \left \{ \begin{matrix}
+\to 1 & \mbox{si } y^Tx+\theta>0 \mbox{ cuando } \lambda \to \infty, \\
+\to 0 & \mbox{si } y^Tx+\theta<0 \mbox{ cuando } \lambda \to \infty, \\
+= \sigma(\phi) & \mbox{si } y^Tx +\theta = 0 \; \forall \lambda
+\end{matrix}\right.$$
+
+Así, la sucesión de funciones $\sigma_\lambda(x)=\sigma(\lambda(y^Tx+\theta)+\phi)$ convergen puntualmente a la función
+
+$$\gamma=\left\{ \begin{matrix}
+=1 & \mbox{si } y^Tx+\theta>0 \\
+=0 & \mbox{si } y^Tx+\thetaz0 \\
+=\sigma(\phi) & \mbox{si } y^Tx+\theta>0
+\end{matrix}\right.$$
+cuando $\lambda\to+\infty$.\\
+
+Sea $\Pi_{y,\theta}$ el hiperplano definido por $\{x | y^Tx+\theta =0\}$ y $H_{y,\theta}=\{x | y^Tx+\theta>0\}.$ Entonces por el teorema de convergencia dominada de lebesgue, tendremos que:
+
+$$0\int_{I_n}\sigma_\lambda d\mu(x)=\int_{I_n}\gamma(x)d\mu(x)=\sigma(\phi)\mu(\Pi_{y,\theta})+\mu(H_{y,\theta})$$
+para todo $\phi,\theta\in\R$ e $y\inR^n$.\\
+
+A continuación, mostraremos que si $\mu(\Pi_{y,\theta})+\mu(H_{y,\theta})=0 \forall y \in \R^n, \; \forall \theta \in \R$ entonces $\mu=0$. Esto podría llegar a ser trivial si $\mu$ fuera una medida positiva pero en este caso no lo es.\\
+
+Fijemos $y\in\R^n$. Para una función medible y acotada $h$, se define el funcional lineal $F$ como
+
+$$F(h)=\int_{I_n}h(y^Tx)d\mu(x)$$
+que será un funcional acotado sobre $L^\infty(\R)$ por ser $\mu$ una medida con signo finita. Sea $h$ la función indicadora en el intervalo $[0,+\infty)$ (es decir, $h(u)=1$ si $u\ge 0$ y $h(u)=0$ si $u<0$) por lo que
+
+$$F(h)=\int_{I_n}h(y^Tx)d\mu(x)=\mu(\Pi_{y,-\theta})+\mu(H_{y,-\theta})=0.$$
+
+De forma similar, $F(h)=0$ si $h$ es la función indicadora del intervalo abierto $(\theta,+\infty)$. Por la linealidad del operador, $F(h)=0$ para la función indicadora de cualquier intervalo y, por tanto, para cualquier función simple (esto es, sumas de funciones indicadoras de intervalos). Como las funciones simples son densas en $L^\infty(\R)$, $F=0$.\\
+
+En particular, para las funciones medibles y acotadas $s(u)=sin(m\cdot u)$ y $c(u)=cos(m\cdot u)$ se tiene que
+
+$$F(s+ic)=\int_{I_n} cos(m^Tx)+isin(m^Tx)d\mu(x)=\int_{I_n}exp(im^Tx)d\mu(x)=0$$
+
+para todo $m$. Entonces, la transformada de Fourier $\mu$ es nula e igualmente debe de serlo $\mu$. Por tanto, $\sigma$ es discriminatoria.
 \end{proof}
 
 \begin{teorema}\label{thm:discriminatoria}
 Sea $\sigma$ una función discriminatoria continua. Entonces, las sumas finitas de la forma $$G(x)=\sum_{i=1}^n \alpha_i \sigma(w_i^Tx+b)$$ son densas en $C(I_n)$. En otra palabras, dados $f\in C(I_n)$ y $\varepsilon>0$, existe una suma, $G(x)$, de la forma anterior, para la cual $$|G(x)-f(x)|<\varepsilon \;\;\;\;\; \forall x \in I_n.$$
 \end{teorema}
 \begin{proof}
+Sea $S\subset C(I_n)$ un subespacio lineal de $C(I_n)$. Afirmaremos que la clausura de $S$ es el conjunto total $C(I_n)$.\\
+
+Para ello, asumamos que la clasura de $S$, $\bar S$, no es todo el espacio $C(I_n)$. Entonces, $\bar S$ es un subespacio propio cerrado de $C(I_n)$ y, por el teorema de Hahn-Banach \cite{rudin1991functional}, existe un funcional lineal $L$ en $C(I_n)$ tal que $L \ne 0$ y $L(\bar S)=L(S)=0$.\\
+
+Por el teorema de representación de Riesz \cite{rudin1987real}, este funcional lineal es de la forma
+
+$$L(h)=\int_{I_n}h(x)d\mu(x)$$
+
+para alguna medida $\mu\in M(I_n)$, para todo $h\in C(I_n)$. En particular, como $\sigma (y^T x +\theta)\in \bar S$ para todo $y\in\R^n$ y para todo $\theta \in \R$ tendremos que
+
+$$\int_{I_n}\sigma(y^Tx+\theta)d\mu(x)=0$$
+
+para todo $y\in I_n$ y para todo $\theta \in \R$. Como $\sigma$ era una función discriminatoria, se tendrá que $\mu=0$, que contradice que $F\ne 0$. Por tanto, concluimos que el subespacio $S$ es denso en $C(I_n)$.
 \end{proof}
 \begin{teorema}\label{thm:sigmoidal}
 Sea $\sigma$ una función sigmoidal continua. Entonces, las sumas finitas de la forma $$G(x)=\sum_{i=1}^n \alpha_i \sigma(w_i^Tx+b)$$ son densas en $C(I_n)$. En otra palabras, dados $f\in C(I_n)$ y $\varepsilon>0$, existe una suma, $G(x)$, de la forma anterior, para la cual $$|G(x)-f(x)|<\varepsilon \;\;\;\;\; \forall x \in I_n.$$
@@ -346,25 +397,46 @@ Sea $\sigma : \R \to \R$ una función polinómica y no afín. Sea $K \subset \R^
 
 Hasta ahora, todo lo que hemos hablado es válido para casi cualquier contexto puesto que no hemos hecho ninguna presunción en cuanto a la estructura de los datos o sobre las peculiaridades que estos presentan. Para nosotros todos los datos eran un vector con $D$ componentes a los que les correspondía una etiqueta y no le dábamos importancia a la estructura interna que estos pudieran llegar a presentar.\\
 
-Para la edición y manipulación de imágenes, es común utilizar la operación de convolución como filtro. Las redes neuronales son aquellas que utilizan estos filtros, de ahí su nombre, para analizar las distintas características de las imágenes. Si bien, podemos fijar los pesos manualmente para utilizar algunos de los filtros más comunes en la edición de imágenes, se ha comprobado experimentalmente que por lo general se obtienen mejores resultados si es la propia red quien fija estos pesos a través de un proceso de aprendizaje.\\
+Para la edición y manipulación de imágenes, es común utilizar la operación de convolución como filtro. Las redes neuronales convolucionadas son aquellas que utilizan estos filtros, de ahí su nombre, para analizar las distintas características de las imágenes. Si bien, podemos fijar los pesos manualmente para utilizar algunos de los filtros más comunes en la edición de imágenes, se ha comprobado experimentalmente que por lo general se obtienen mejores resultados si es la propia red quien fija estos pesos a través de un proceso de aprendizaje.\\
 
 %Anteriormente, comentábamos el ejemplo del conjunto de datos CIFAR-10 donde teníamos que $D=3072$ y mostrábamos cómo obteníamos ese valor. Para ello, utilizábamos la dimensión de la imagen de $ancho \times alto $ y la dimensión del \emph{espacio de color} que estábamos utilizando. De esta forma, si en lugar de trasladar estos valores a $\R^D$ como vectores nos quedamos en $M_{ancho,alto, \dim color}(\R)$ estaremos trabajando en un espacio de matrices tridimensionales. De esta forma, siendo $a$ el ancho, $h$ la altura y $c$ la dimensión del espacio de color, para cada matriz $m \in M_{a, h,c}(\R)$ tendremos que dado un píxel conocemos de forma inmediata sus píxeles más próximos sin necesidad de hacer ningún cálculo complejo. Nos aprovecharemos de esto para definir las \emph{capas convolucionadas} o \emph{convolutionals} y las \emph{capas de agrupación} o \emph{pooling}.\newline
 
 En adelante, dejaremos de considerar que nuestros datos de entrada tienen una estructura de vector y consideraremos que estamos trabajando con matrices tridimensionales, es decir, nuestros datos estarán organizados como si fueran ortoedros. Esto lo representaremos como $M_{a,h,c}(\R)$ con $a,h,c\in \N$ donde $a$ representará la anchura, $h$ la altura y $c$ el número de canales. Para simplificarlo, cada entrada $X\in M_{a,h,c}(\R)$ representará $c$ imágenes en escala de grises de dimensiones $a\times h$. Como detalle, una imagen RGB está representada como tres imágenes en escala de grises($c=3$) donde cada canal representa un color primario y con la combinación de los tres obtenemos una imagen a color.
 
-\section{Capas Convolucionadas o Convolutionals}
+\section{Capas convolucionadas o \emph{convolutionals}}
 
 Internamente, cada neurona de una capa convolucional posee un \emph{kernel} o \emph{filtro} $W\in M_{r,s,c}(\R)$ donde $r$, $s$ y $c$ son parámetros prefijados y una variable $b\in\R$ bias. Para cada entrada $X \in M_{a,h,c}(\R)$ tomamos una sección $x^{RS} \subset X$ donde $x^{RS}=(x_{ijk}^{RS})_{ijk}\; i=R,...,R+r, \;\; j=S,...,S+s\;$ y $\;k=1,...,c$ con $R=1,...,a-r$ y $S=1,...,h-s$. Así, cada neurona realiza una \emph{convolución matricial} y suma la variable $b$ bias: \newline
 
 $$f(x^{RS})=\sum_{k=1}^{c}\sum_{i=1}^{r} \sum_{j=1}^{s} w_{i,j,k} \cdot x_{i+R,j+S,k}^{RS}+b$$
 
 Siendo esta su función de puntuación de las neuronas correspondientes a dicho kernel. A este filtro le corresponderán tantas neuronas como sean necesarias para cubrir todos los datos de entrada. Una capa de convolución, podrá tener tantos filtros como se quieran y cada uno de ellos tendrá tantas neuronas como sean necesarias para cubrir toda la imagen. Visualmente, se transforma un ortoedro en otro.\newline
-
 \begin{figure}
 \centering
 
 \begin{tikzpicture}
-\cubo
+\coordinate (P1) at (0,0,0);
+\coordinate (P2) at (0,0,1);
+\coordinate (P3) at (0,1,0);
+\coordinate (P4) at (0,1,1);
+\coordinate (P5) at (1,0,0);
+\coordinate (P6) at (1,0,1);
+\coordinate (P7) at (1,1,0);
+\coordinate (P8) at (1,1,1);
+
+
+\draw[dashed,fill=gray!20] (P7) -- (P3) -- (P4) -- (P8);
+\draw[dashed,fill=gray!20] (P1) -- (P2) -- (P4) -- (P3) -- (P1);
+\draw[dashed,fill=gray!20] (P1) -- (P5) -- (P7) -- (P3) -- (P1);
+\draw[dashed,fill=gray!20] (P2) -- (P6) -- (P5) -- (P0);
+\draw (P2) -- (P4);
+\draw (P2) -- (P6);
+\draw (P3) -- (P4);
+\draw (P3) -- (P7);
+\draw (P4) -- (P8);
+\draw (P5) -- (P7);
+\draw (P5) -- (P6);
+\draw (P6) -- (P8);
+\draw (P7) -- (P8);
 
 \begin{scope}[shift={(5,0,0)}]
 \cubo
@@ -379,34 +451,54 @@ Siendo esta su función de puntuación de las neuronas correspondientes a dicho 
 
 \end{tikzpicture}
 
-\caption{Capa de Convolución. La zona grisácea corresponde al resultado de un filtro. }
+\caption{Capa de convolución. La zona grisácea corresponde a la entrada de datos y al resultado de un filtro. }
 \label{fig:convolution}
 \end{figure}
 
-En esta \href{https://cs231n.github.io/assets/conv-demo/index.html}{demo} del \href{http://cs231n.stanford.edu/}{Curso de Stanford sobre Convolutional Neural Networks for Visual Recognition} podemos ver el funcionamiento de dos filtros $3\times 3$ ($r=3,s=3$) a una entrada $x\in M_{7,7,3}$. Nótese, que el filtro no es aplicado en todas las submatrices sino que avanza dos posiciones tanto vertical como horizontalmente, es decir, la capa posee un \emph{paso} o \emph{stride} de $2$. En la formulación anterior, se ha supuesto que el paso es de tamaño $1$. Además, en la demo se ha completado la matriz $x$ con $0$ hasta tener una dimensión de $9\times 9\times 3$ para asegurarnos de que recorremos todas las posiciones de $x$ con el filtro. Tanto el paso como si la matriz es completada con algún otro número o no son parámetros que se prefijan al crear la capa, comunes a todos los filtros y controlan la dimensión de salida de la capa.
+Los píxeles pertenecientes a la sección de la capa anterior que utiliza cada neurona reciben el nombre de campo local receptivo y a la capa posterior generada por la aplicación de los filtros de la capa convolucionada recibe el nombre de capa de características.\\
 
+\begin{figure}[htpb]
+  \centering
+  \includegraphics[width=0.45\textwidth]{cnn}
+  \vrule
+  \includegraphics[width=0.45\textwidth]{convolucion}
+  \caption{Ejemplos de convoluciones \cite{stanford}(izq.) \cite{whatConvolucion}(der.). }
+  \label{fig:convolucion}
+\end{figure}
+La cantidad de píxeles de desplazamiento que hay entre las distintas secciones se conoce paso, o \emph{stride}. Por otro lado, el relleno, o \emph{padding}, se trata de la opción de añadir, o no, valores temporales a la entrada original de datos con el fin de mantener la dimensión de los datos o evitar perder los valores asociados a las esquinas de las matrices de datos. En Keras \cite{chollet2015keras} se ofrecen las opciones de \emph{same} (\emph{zero-padding}), sin relleno y \emph{casual}.Tanto el paso como si la matriz es completada con algún otro número o no son parámetros que se prefijan al crear la capa, comunes a todos los filtros y controlan la dimensión de salida de la capa.\\
+
+En esta \href{https://cs231n.github.io/assets/conv-demo/index.html}{demo} de \cite{stanford} podemos ver el funcionamiento de dos filtros $3\times 3$ ($r=3,s=3$) a una entrada $x\in M_{7,7,3}$. Nótese, que el filtro no es aplicado en todas las submatrices sino que avanza dos posiciones tanto vertical como horizontalmente, es decir, la capa posee un paso, o \emph{stride}, de $2$. En la formulación anterior, se ha supuesto que el paso es de tamaño $1$. Además, en la demo se ha completado la matriz $x$ con $0$ hasta tener una dimensión de $9\times 9\times 3$ para asegurarnos de que recorremos todas las posiciones de $x$ con el filtro. \\
+
+Se debe hacer mención de la operación de deconvolución o convolución traspuesta que funciona de forma similar a la convolución clásica. Esta operación pretende ir de forma inversa a una convolución, tratando de recuperar los valores originales antes de una convolución. Uno de sus usos más importantes es el muestreo ascendente, o \emph{up sampling}.
 
 \section{Capas de Agrupación o Pooling}
+Debido a la gran cantidad de información generada a través de las convoluciones en los mapas de características, es necesario condensar esta información para obtener sólo aquella que sea realmente relevante siendo conocido este procedimiento como submuestreo, o \emph{downsampling}. Para ello se suele utilizar las capas de agrupación, o \emph{pooling layers}, que resume la información utilizando diversos algoritmos. Como ejemplos de algoritmos de \emph{pooling} tenemos la agrupación a través del valor máximo y la agrupación a través del valor medio que calculan, respectivamente, el valor máximo y el valor medio del campo local receptivo. Para estas capas también existen los conceptos de filtros y de paso.\\
+\begin{figure}[htpb]
+  \centering
+  \includegraphics[width=0.35\textwidth]{pool}
+  \vrule
+  \includegraphics[width=0.55\textwidth]{maxpool}
+  \caption{Ejemplos de agrupaciones, o \emph{pooling} \cite{stanford}. }
+  \label{fig:pooling}
+\end{figure}
 
-FIXME: Same convoluciones
+%\section{Ejemplos}
 
-\section{Ejemplos}
+%FIXME: ¿Apéndices o distribuido en el pdf? Cosas a mencionar:
 
-FIXME: ¿Apéndices o distribuido en el pdf? Cosas a mencionar:
-
-\begin{itemize}
-\item Cómo se ven tras cada neurona y/o capa (cómo pooling y convolution modifican la imagen)
-\item Cómo los filtros modifican una imagen visualmente
-\end{itemize}
+%\begin{itemize}
+%\item Cómo se ven tras cada neurona y/o capa (cómo pooling y convolution modifican la imagen)
+%\item Cómo los filtros modifican una imagen visualmente
+%\end{itemize}
 
 \chapter{Operador no local}\label{def:non-local}
-En la sección anterior se ha visto que una operación de convolución posee un kernel que limita la cantidad de posiciones que son observadas de forma que la cantidad de parámetros de la capa de convolución es dependiente al tamaño de este núcleo. Esto tiene como desventaja que, para cada posición de nuestra entrada de datos, las posiciones que influyen al resultado de la convolución están restringidas a un subconjunto de tamaño fijo de los datos de entrada por lo que se suele decir que es una operación \emph{local}. Si quisiéramos utilizar todos los datos de entrada para cada posición de la imagen, tendríamos un aumento considerable de parámetros a utilizar, con los consecuentes problemas de memoria y entrenamiento.\\
+En la sección anterior se ha visto que una operación de convolución posee un kernel que limita la cantidad de posiciones que son observadas, de forma que la cantidad de parámetros de la capa de convolución es dependiente al tamaño de este núcleo. Esto tiene como desventaja que, para cada posición de nuestra entrada de datos, las posiciones que influyen al resultado de la convolución están restringidas a un subconjunto de tamaño fijo de los datos de entrada por lo que se suele decir que es una operación \emph{local}. Si quisiéramos utilizar todos los datos de entrada para cada posición de la imagen, tendríamos un aumento considerable de parámetros a utilizar, con los consecuentes problemas de memoria y entrenamiento.\\
 
 El objetivo de esta sección es definir un tipo de operación que sea capaz de extraer características de nuestros datos de entrada utilizando toda su dimensión y sin tener un aumento drástico del número de parámetros a entrenar, será a lo que llamaremos un operador no local. La necesidad de este tipo de operación nace del hecho de que, por lo general, las imágenes a estudiar no suelen ser un conjunto de \emph{collage} sin relación entre sí, sino que el entorno de nuestra imagen puede llegar a ser de utilidad a la hora de distinguir qué objetos estamos clasificando.\\
 
 Para simplificar la definición, nos restringiremos al contexto de espacios vectoriales de dimensión finita sobre el cuerpo de los números reales.
 \begin{definicion}
- Sea $x=(x_1,...,x_D)\in \R^D$ una señal de entrada, $u:\R \times \R \to \R$ un producto escalar, $v:\R \to \R$ función real evaluada y $C:\R^D \to \R$.  Se define una operación no local genérica o \emph{generic non-local operation} $f:\R^D \to \R^D$ con $f(x)=(f_1(x_1),...,f_D(x_D))$ aquella donde:
+ Sea $x=(x_1,...,x_D)\in \R^D$ una señal de entrada, $u:\R \times \R \to \R$ un producto escalar, $v:\R \to \R$ función real evaluada y $C:\R^D \to \R$.  Se define una operación no local genérica o \emph{generic non-local operation} $f:\R^D \to \R^D$ con $f(x)=(f_1(x_1),...,f_D(x_D))$ aquella donde \cite{DBLP:journals/corr/abs-1711-07971}:
 
  $$f_i(x_i)=\frac{1}{C(x)}\sum_{j=1}^{D} u(x_i,x_j)v(x_j) \; \;  \forall i=1,...,D$$
 \end{definicion}
@@ -414,7 +506,7 @@ Para simplificar la definición, nos restringiremos al contexto de espacios vect
  En este contexto, $v(x_j)$ será una representación de la señal de $x$ entrada en la posición $j$, $u$ representará una relación, por ejemplo la afinidad, entre las posiciones $i$ y $j$. %La operación recibe este nombre debido a que considera todas las posiciones de la imagen para calcular el valor del filtro en la posición $i$ distinguiéndose así de una operación convolucional que se centraría en un rango \emph{local} de posiciones.% ($i-1\leq j \leq i+1$ en el caso de tener una convolución de núcleo de tamaño $3$).
 \newline
 
- Proseguiremos enunciando varios ejemplos de funciones que pertenezcan a dicha definición para mostrar la diversidad que podemos elegir a la hora de implementar un modelo que siga esta estructura. Por simplicidad, consideraremos que $v(x_j)=W_v x_j$ donde $W_v$ es una matriz de pesos que tiene que ser aprendida, siendo esta fácilmente implementable como una convolución de núcleo de tamaño $1$.
+ Proseguiremos enunciando varios ejemplos de funciones que pertenezcan a dicha definición para mostrar la diversidad que podemos elegir a la hora de implementar un modelo que siga esta estructura. Por simplicidad, consideraremos que $v(x_j)=W_v x_j$ donde $W_v$ es una matriz de pesos que tiene que ser aprendida, siendo esta fácilmente implementable como una convolución de núcleo de tamaño $1$ \cite{Buades:2005:NAI:1068508.1069066} \cite{DBLP:journals/corr/abs-1711-07971}.
 
  \begin{enumerate}
  \item \emph{Gaussiana} $u(x_i,x_j)=e^{x_i^T x_j}$ y $C(x)= \sum_{j=1}^D u(x_i,x_j)$.
@@ -451,12 +543,12 @@ A partir de ahora, siempre que nos refiramos a un proceso nos estaremos refirien
   Un proceso estocástico es \emph{estrictamente estacionario} si $\forall n, \forall t_1 < \ldots < t_n \in T, \forall h \in T$ $$(X_{t_1}, \ldots, X_{t_n}) \sim (X_{t_1 + h}, \ldots, X_{t_n + h}).$$
 \end{definicion}
 
-A continuación, definiremos el concepto proceso mezclado. En la literatura, los cuatro tipos de mezcla normalmente son referidos como $\psi$-mezclado, $\Phi$-mezclado (o uniformemente mezclado), $\rho$-mezclado (o mezcla basada en la correlación maximal) y $\alpha$-mezclado (o fuertemente mezclado). Cambiaremos la notación a $\Phi_i$-mezcla $i=1,...,4$ respectivamente, de forma que una $\Phi_i$-mezcla implique una $\Phi_{i+1}$-mezcla con $i=1,...,3$.\\
+A continuación, definiremos el concepto proceso mezclado. En la literatura, los cuatro tipos de mezcla normalmente son referidos como $\psi$-mezclado, $\Phi$-mezclado (o uniformemente mezclado), $\rho$-mezclado (o mezcla basada en la correlación maximal) y $\alpha$-mezclado (o fuertemente mezclado). Cambiaremos la notación a $\Phi_i$-mezcla $i=1,...,4$ respectivamente, de forma que una $\Phi_i$-mezcla implique una $\Phi_{i+1}$-mezcla con $i=1,...,3$. \cite{RePEc:eee:spapps:v:36:y:1990:i:1:p:107-116}\\
 
 Por notación, diremos también que $\mathscr{A}_m^n$ será la $\sigma$-álgebra inducida por las variables aleatorias $Z_j$ con $m\le j \le n$ en el espacio muestral $\Omega$. Entonces:\\
 
 \begin{definicion}[Proceso mezclado]\label{def:mezcla}
-La secuencia $\{Z_j\}_{j\ge 1}$ es conocida $\Phi_i$-mezclada con $i=1,...,4$ si, para cada $A \in \mathscr{A}_1^k$ y para cada $B\in \mathscr{A}_{k+n}^{\infty}$, las siguientes desigualdades son satisfechas:
+La secuencia $\{Z_j\}_{j\ge 1}$ es conocida $\Phi_i$-mezclada con $i=1,...,4$ si, para cada $A \in \mathscr{A}_1^k$ y para cada $B\in \mathscr{A}_{k+n}^{\infty}$, las siguientes desigualdades son satisfechas \cite{RePEc:eee:spapps:v:36:y:1990:i:1:p:107-116}:
 \begin{itemize}
 \item Para $\Phi_1$-mezclada: $$|P(A\cap B) - P(A)P(B)| \le \Phi_1 (n)P(A)P(B)\text{ con } \Phi_1(n)\downarrow 0 \text{ cuando } n\to \infty$$
 \item Para $\Phi_2$-mezclada: $$|P(A\cap B) - P(A)P(B)| \le \Phi_2 (n)P(A)\text{ con } \Phi_2(n)\downarrow 0 \text{ cuando } n\to \infty$$
@@ -468,10 +560,10 @@ La secuencia $\{Z_j\}_{j\ge 1}$ es conocida $\Phi_i$-mezclada con $i=1,...,4$ si
 \section{Consistencia de un operador no local}
 La idea es que, bajo supuestos estacionarios, para cada píxel $i$ una operación no local converge a la expectativa condicional de un píxel $i$ observado en un vecindario del píxel. En este caso las condiciones de estacionariedad equivalen a decir que, a medida que crece el tamaño de la imagen, podemos encontrar muchas regiones similares para todos los detalles de la imagen. Es decir, conforme aumenta el tamaño de la imagen es más probable que, si encontramos un objeto perteneciente a determinada categoría, encontremos más objetos pertenecientes a dicha categoría.\\
 
-Sea $V$ un campo aleatorio (random field) y los datos de entrada $v$ una realización de $V$. Sea $Z$ una secuencia de variables aleatorias con $Z_i=\{X_i,Y_i\}$ con $Y_i=V(i)$ es real valuada y $X_i=V(I\backslash \{i\}) \R^p$ valuada donde $I$ representa el conjunto de posiciones. Una operación no local genérica será un estimador de la esperanza condicionada $E[Y_i|X_i=v(I\backslash{i})]$.
+Sea $V$ un campo aleatorio (\emph{random field}) y los datos de entrada $v$ una realización de $V$. Sea $Z$ una secuencia de variables aleatorias con $Z_i=\{X_i,Y_i\}$ con $Y_i=V(i)$ es real valuada y $X_i=V(I\backslash \{i\}) \R^p$ valuada donde $I$ representa el conjunto de posiciones. Una operación no local genérica será un estimador de la esperanza condicionada $E[Y_i|X_i=v(I\backslash{i})]$. \cite{Buades:2005:NAI:1068508.1069066}
 
-\begin{teorema}
+\begin{teorema}\cite{Buades:2005:NAI:1068508.1069066}
 Sea $Z=\{V(N_i\backslash{i}),V(i)\}_{i\ge 1}$ un proceso estocástico estrictamente estacionario y mezclado. Sea $f^n$ una operación no local genérica aplicada a la secuencia $Z_n=\{V(N_i\backslash\{i\}),V(i)\}_{i\ge 1}^n$. Entonces, $$ |f^n(j)-[Y_j|X_j=v(I\backslash \{j\})]| \to 0 \; a.s \;  \forall j \in{1,...,n}$$.
 \end{teorema}
 
-En un contexto más general, la demostración se puede encontrar en \cite{Buades:2005:NAI:1068508.1069066} bajo la suposición de cualquiera de cuatro tipos de procesos mezclados enunciados en \autoref{def:mezcla}
+En un contexto más general, la demostración se puede encontrar en \cite{RePEc:eee:spapps:v:36:y:1990:i:1:p:107-116} bajo la suposición de cualquiera de cuatro tipos de procesos mezclados enunciados en \autoref{def:mezcla}

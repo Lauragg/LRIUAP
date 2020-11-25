@@ -1,4 +1,4 @@
-\chapter{Recuperación de imágenes basadas en su contenido (CBIR)}
+\chapter{Recuperación de imágenes basadas en su contenido (CBIR)}\label{ch:CBIR}
 
 En el contexto de las ciencias de información, en el Capítulo 1 de \cite{10.5555/1394399} podemos encontrar una definición genérica para el contexto de las ciencias de computación del término "recuperación de información" que dice que:
 
@@ -35,7 +35,7 @@ El objetivo de este proyecto es desarrollar una aplicación en java que represen
 
 Se podrán realizar consultas de nivel 1 a través de características de color y de nivel 2 utilizando segmentación semántica para la distinción de categorías con una red neuronal implementada en Python.
 
-\chapter{Planificación y presupuesto.}
+%\chapter{Planificación y presupuesto.}
 \chapter{Requisitos}
 Antes de desarrollar la aplicación se debe comenzar con la exposición de los requisitos de datos, funcionales y no funcionales que esta requerirá para así poder tener en mente qué es lo que necesitamos, de qué es lo disponemos y cómo podremos trabajar de forma óptima para llegar al resultado deseado.\\
 
@@ -69,7 +69,7 @@ Seguidamente, respecto a los requisitos funcionales debemos de considerar:\\
 \item Capacidad de crear nuevas bases de datos utilizando múltiples descriptores.
 \item Importar un clasificador a través de un fichero.
 \end{enumerate}
-Respecto a los requisitos no funcionales nos referimos a las características de funcionamiento que nos servirán para mantener la calidad de nuestro programa. Estos serán, principalmente: rendimiento, durabilidad, estabilidad, seguridad, eficiencia, compatibilidad, garantía e integración de datos.\\
+Respecto a los requisitos no funcionales nos referimos a las características de funcionamiento que nos servirán para mantener la calidad de nuestro programa. Estos serán, principalmente: rendimiento, durabilidad, estabilidad, seguridad, eficiencia, compatibilidad, garantía e integración de datos. No debemos de olvidarnos tampoco de la necesidad de obtener una gran cantidad de datos para poder entrenar la red neuronal, siendo que en este caso se utiliza el conjunto de datos COCO \cite{COCO}.\\
 
 Finalmente, se debe comentar que todo el proyecto deberá de poder ejecutarse en ordenadores que no dispongan de muchos recursos en unos tiempos razonables, al ser el material del que se dispone y siendo esta la prueba del funcionamiento en uno de los peores casos posibles.
 
@@ -78,7 +78,7 @@ Comenzaremos analizando los requisitos mencionados en el capítulo anterior para
 
 Para los requisitos de datos se considera el encapsular apropiadamente cada uno de estos en una clase propia que sirva como una correcta representación de cada uno de los conceptos. En particular, si consideramos las especificaciones planteadas en los requisitos funcionales, se hace evidente la necesidad de la utilización de herencia para un correcto diseño del software al haber conceptos genéricos que más adelante se dividen teniendo diferentes especificaciones.\\
 
-Además, es necesario desarrollar una aplicación de escritorio que haga mucho más intuitivo la utilización de cada uno de los elementos a implementar. Así, alguien sin conocimientos de programación, pero con interés o una cantidad relativa de estudios en la materia, podría utilizarla cómodamente.\\
+Además, es necesario desarrollar una aplicación de escritorio que haga mucho más intuitiva la utilización de cada uno de los elementos a implementar. Así, alguien sin conocimientos de programación, pero con interés o una cantidad relativa de estudios en la materia, podría utilizarla cómodamente.\\
 
 Teniendo también en cuenta que sería ideal que la aplicación fuese multiplataforma y la existencia de la \emph{Java Multimedia Retrieval (JMR)} \cite{JMR}, librería desarrollada por Jesús Chamorro Martínez que resuelve de forma genérica gran parte de las funcionalidades solicitadas, se ha decidido utilizar Java como lenguaje de programación.\\
 
@@ -86,7 +86,7 @@ Sin embargo, se debe de tener en cuenta que este proyecto ha sido planteado bajo
 
 Si bien existen bibliotecas para el aprendizaje profundo en Java, estas no están tan desarrolladas como podrían estarlo en otros lenguajes de programación como Python. Por ello, se utilizará Python 3 para la creación, el entrenamiento y la carga de los modelos que se lleguen a probar a lo largo del proyecto.\\
 
-Esto plantea la cuestión de cómo resolver la comunicación entre los distintos lenguajes, que será resulta mediante la utilización de una conexión TCP.\\
+Esto plantea la cuestión de cómo resolver la comunicación entre los distintos lenguajes, que será resuelta mediante la utilización de una conexión TCP.\\
 \chapter{Diseño}
 
 Como se mencionó en el capítulo anterior, la aplicación será diseñada en dos partes conectadas por una conexión TCP. Comenzaremos mencionando las librerías utilizadas para cada una de las partes, prosiguiendo con mostrar una serie de diagramas que mostrarán la estructura interna utilizará nuestra aplicación haciendo uso del material disponible.
@@ -124,7 +124,7 @@ De los paquetes mostrados, concretamente se utilizarán:
 \item \emph{db} : Paquete que simula una base de datos. Posee su propio elemento creado a partir de los datos de entrada y de los descriptores, compatibles con la comparación con las consultas y con una cómoda recuperación de los datos originales.
 \item \emph{descriptor} : Paquete que engloba los elementos necesarios para una correcta representación de un descriptor o vector de características, como es el caso de la interfaz \emph{Comparator} o la interfaz \emph{MediaDescriptor}. Posee dos subpaquetes:
 \begin{itemize}
-\item \emph{descriptor.color} : Paquete que implementa descriptores de colores de acuerdo al estándar MPEG7 \cite{MPPEG7}.
+\item \emph{descriptor.color} : Paquete que implementa descriptores de colores de acuerdo al estándar MPEG7 \cite{MPEG7}.
 \item \emph{descriptor.label} : Paquete que implementa un descriptor por etiquetas genérico así como definir las interfaces necesarias para la clasificación de las etiquetas.
 \end{itemize}
 \item \emph{region} : Paquete diseñado para la representación de una región contenida en una imagen. Si bien este paquete no se ha utilizado directamente, servirá como inspiración para la definición de la clase \emph{MultiRegion} que se verá más adelante.
@@ -174,9 +174,9 @@ Sabiendo que un descriptor de tipo \emph{LabelDescriptor} posee un vector de eti
 
 Dicho esto, podemos explicar el comportamiento de los descriptores sin pesos de \emph{LabelDescriptor}. Sean $t$ y $u$ dos \emph{LabelDescriptor}, el comparador
 \begin{itemize}
-\item \emph{InclusionComparator} devolverá la igualdad, es decir, el valor $0$ si $t\subset u$. Se retornará $+\infty$ si no se cumple la relación.
-\item \emph{SoftEqualComparator} devolverá la igualdad, es decir, el valor $0$ si $t\subset u$ o $u\subset t$. Se retornará $+\infty$ si no se cumple ninguna relación.
-\item \emph{EqualComparator} devolverá la igualdad, es decir, el valor $0$ si $t \subset u $, $u \subset t$ y tanto $t$ como $u$ poseen la misma cantidad de etiquetas. Se retornará $+\infty$ si no se cumplen ambas relaciones.
+\item \emph{InclusionComparator}\label{def:InclusionComparator} devolverá la igualdad, es decir, el valor $0$ si $t\subset u$. Se retornará $+\infty$ si no se cumple la relación.
+\item \emph{SoftEqualComparator}\label{def:SoftEqualComparator} devolverá la igualdad, es decir, el valor $0$ si $t\subset u$ o $u\subset t$. Se retornará $+\infty$ si no se cumple ninguna relación.
+\item \emph{EqualComparator}\label{def:EqualComparator} devolverá la igualdad, es decir, el valor $0$ si $t \subset u $, $u \subset t$ y tanto $t$ como $u$ poseen la misma cantidad de etiquetas. Se retornará $+\infty$ si no se cumplen ambas relaciones.
 \end{itemize}
 
 Por otro lado, si se le añade un valor de pesos no nulo a cada una de las etiquetas de un \emph{LabelDescriptor}, por defecto, se utiliza el \emph{WeightBasedComparator} que permite elegir entre la utilización de comparación con igualdad o inclusión de etiquetas, además de calcular el valor absoluto de la diferencia de pesos de las etiquetas. Se permite elegir entre devolver el máximo, mínimo, media aritmética o media euclídea de los resultados de cada valor absoluto de la diferencia de las etiquetas como valor real, teniendo en cuenta que se devolverá, además, $+\infty$ en caso de que este sea el valor devuelto por la operación de igualdad o inclusión seleccionada.\\
@@ -195,4 +195,324 @@ que devolverá $0$ si ambas comparten los mismos píxeles en la categoría y ten
 
 Finalmente, de forma similar a como sucedía en \emph{WeightBasedComparator}, se permite elegir entre el máximo, mínimo, media aritmética o media euclídea para obtener el resultado final a partir de los resultados parciales correspondientes a cada categoría, siendo este el valor devuelto para la comparación de los dos descriptores.\\
 
-FIXME: Añadir un diagramaita que simplifique la explicación
+Además, cabe destacar la diferencia fundamental entre el \emph{WeightBasedComparator} y el \emph{IoUComparator}. Mientras que el \emph{WeightBasedComparator} utiliza los pesos aportados por el clasificador, en nuestro caso siendo el peso la confianza que tenemos de estar en la categoría correcta a través de una función \emph{softmax}, el \emph{IoUComparator} utiliza los pesos calculados por el propio descriptor a partir de la función mencionada más arriba.\\
+
+%FIXME: Añadir un diagramita que simplifique la explicación
+
+\section{Clases de utilidades}
+Para facilitar la comunicación entre la interfaz de usuario y el propio sistema CBIR se ha desarrollado una serie de clases que servirán para almacenar una serie de valores o para crear el propio contenido.\\
+
+En particular, se debe de hacer especial mención a la clase \emph{MultiRegion} basada en la clase de la JMR \cite{JMR} de nombre \emph{Region}. Esta clase representará una imagen que poseerá múltiples regiones pertenecientes a diferentes categorías y se crearán objetos pertenecientes a esta clase cuando se soliciten predicciones, para mostrar en pantalla, de una imagen concreta. Un objeto de esta clase permitirá la creación de imágenes, a partir de la original, con una serie de parámetros que marcarán la adición o no de los píxeles predichos, las \emph{bounding box}, etiquetas y/o confianza en la predicción.\\
+
+Por otro lado, también se han creado una serie de clases de tipo \emph{render} para controlar la visualización de los valores a elegir en los cuadros combinados de selección. Es decir, se han creado clases cuyos objetos representaran una imagen digital de diferentes modelos, en nuestro caso los comparadores y algunos de sus parámetros.\\
+
+Concretamente, se han desarrollado las clases \emph{ComparatorRender} (\autoref{fig:comparator}, \autoref{fig:equalcomparator}) y \emph{TypeComparatorRender} (\autoref{fig:agregation}).\\
+
+También, se debe de hacer mención a la implementación de la diferentes redes neuronales utilizando python3, concretamente la implementación de la capa \emph{fast attention} y del módulo extractor de características que la utiliza.
+
+
+\chapter{Manual de usuario}
+
+La pantalla principal de la aplicación desarrollada es la mostrada en \autoref{fig:ventanaprincipal}. Para comprender correctamente el funcionamiento del prototipo, se realizará una explicación de las funcionalidades de cada uno de los botones existentes en la barra principal \autoref{fig:barraherramientas}.\\
+
+\begin{figure}[htpb]
+  \centering
+  \includegraphics[width=1.0\textwidth]{ventanaprincipal}
+  \caption{Ventana principal del prototipo.}
+  \label{fig:ventanaprincipal}
+\end{figure}
+
+\begin{figure}[htpb]
+  \centering
+  \includegraphics[width=1.0\textwidth]{barraherramientas}
+  \caption{Barra de herramientas del prototipo.}
+  \label{fig:barraherramientas}
+\end{figure}
+
+Para simplificar la explicación, se agruparán los botones de acuerdo a funcionalidades.\\
+
+\newpage
+
+En la primera zona, marcada en verde y bajo la etiqueta A, se encuentran los botones relacionados con la entrada y salida de imágenes así como la funcionalidad de abrir el fichero de pesos de la red neuronal que queramos cargar.
+
+\begin{enumerate}
+\item El primer botón sirve para abrir imágenes, permitiendo la selección múltiple.
+\item El segundo botón permite guardar la imagen seleccionada en el escritorio, siendo que si esta es la generada con la salida de la red neuronal también se almacenarán los puntos como si fueran parte de la propia imagen.
+\item El tercer botón sirve para para abrir el fichero de pesos, con la extensión \emph{h5}, de la red neuronal que deseemos utilizar para generar las predicciones. Al cargar correctamente un fichero, habilitarán los botones de la zona D y E. Si realizamos click derecho, aparecerá las opciones de descriptores posibles a utilizar para la utilidad de la zona D, permitiendo la opción múltiple entre descriptores de color o la opción singular del descriptor por etiqueta. \autoref{fig:descriptorred}
+\end{enumerate}
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.4\textwidth]{descriptorred}
+  \caption{Cargar pesos. Descriptores disponibles para la consulta de imágenes en el escritorio.}
+  \label{fig:descriptorred}
+\end{figure}
+
+En la segunda zona, marcada en naranja y bajo la etiqueta B, se encuentran las opciones relacionadas con el sistema de bases de datos de la aplicación.
+
+\begin{enumerate}
+\item El primer botón corresponde a la opción de creación de una nueva base de datos, habilita el resto de botones relacionados con una base de datos. Al realizar click derecho, muestra las opciones de descriptores a utilizar con la nueva base de datos a crear o abrir, permitiendo la opción múltiple entre descriptores de color o la opción singular del descriptor por etiqueta.
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.4\textwidth]{descriptorbase}
+  \caption{Abrir base de datos. Descriptores disponibles para la consulta de imágenes en la base de datos.}
+  \label{fig:descriptorbase}
+\end{figure}
+\item El segundo botón sirve para abrir una de las bases de datos guardadas con anterioridad en el sistema, habilita el resto de botones relacionados con una base de datos.
+\item El tercer botón corresponde a la opción de guardar la base de datos actual, permitiendo seleccionar el directorio de guardado y el nombre de la base de datos.
+\item El cuarto botón sirve para cerrar sin guardar la base de datos actual.
+\item El quinto botón sirve para añadir, bajo los descriptores seleccionados en la opción secundaria del primer botón, todas las imágenes del escritorio abiertas actualmente en la base de datos abierta.
+\item El sexto botón sirve para comparar la imagen seleccionada con todas las imágenes almacenadas en la base de datos, bajo los descriptores seleccionados en las opciones disponibles en la opción secundaria del primer botón.
+\end{enumerate}
+
+En la tercera zona, marcada en rojo y bajo la etiqueta C, corresponde al botón de consulta entre las imágenes abiertas en el escritorio. Realiza una comparación, utilizando los descriptores marcados en el tercer botón de la zona A, de la imagen seleccionada con el resto de imágenes disponibles en el escritorio.\\
+
+La tercera zona, con el color rosa y con la etiqueta D, corresponde a la realización de una predicción de la imagen seleccionada bajo la red neuronal cargada. \\
+
+La cuarta zona corresponde a los parámetros de comparación a utilizar para los descriptores de etiquetas.
+\begin{itemize}
+\item El primer listado permite la selección de una etiqueta para la búsqueda por etiquetas en el caso de que esta opción este seleccionada. \autoref{fig:categories}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.2\textwidth]{categories}
+  \caption{Lista de categorías disponibles.}
+  \label{fig:categories}
+\end{figure}
+\item El segundo botón permite la selección múltiple de etiquetas para la búsqueda por etiquetas en caso de que está opción este seleccionada.
+\item El tercer listado permite la selección del comparador a utilizar para la búsqueda por etiquetas con regiones, tanto para la consulta en base de datos como la consulta en escritorio. \autoref{fig:comparator}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.2\textwidth]{comparator}
+  \caption{Comparadores disponibles para la consulta por etiqueta.}
+  \label{fig:comparator}
+\end{figure}
+\item El cuarto listado sirve para la seleccionar el comparador de etiquetas a utilizar con el \emph{IoUComparator}.\autoref{fig:equalcomparator}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.2\textwidth]{equalcomparator}
+  \caption{Comparación de etiquetas disponibles para el \emph{IoUComparator}.}
+  \label{fig:equalcomparator}
+\end{figure}
+\item El quinto listado permite la selección de la operación de agregación a utilizar con el \emph{IoUComparator} y con \emph{WeightBasedComparator}. \autoref{fig:agregation}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.2\textwidth]{agregation}
+  \caption{Operaciones de agregación disponibles para el \emph{IouComparator} y el \emph{WeightBasedComparator}.}
+  \label{fig:agregation}
+\end{figure}
+\item El sexto check permite distinguir si utilizamos un comparador de inclusión o uno de igualdad para el \emph{WeightBasedComparator}.
+\item El séptimo, y último, check permite habilitar la búsqueda por etiquetas seleccionadas en el primer listado y en el segundo botón o deshabilitarla para realizar las consultas a través de la imagen seleccionada en el escritorio.
+\end{itemize}
+
+\chapter{Pruebas}
+El objetivo principal de este capítulo es mostrar una serie de ejemplos de resultados del prototipo desarrollado, prestándole especial atención a los comparadores de \emph{RegionLabelDescriptor} al ser la principal característica del prototipo desarrollado.\\
+
+\begin{figure}[htpb]
+  \centering
+  \includegraphics[width=0.9\textwidth]{DetectingObjects/pred1}
+  \includegraphics[width=0.9\textwidth]{DetectingObjects/pred2}
+  \caption{Ejemplos de predicciones y el grado de confianza a partir de una función \emph{softmax} para el subconjunto de transportes.}
+  \label{fig:pred}
+\end{figure}
+
+Para una de las bases de datos de tipo etiqueta, se han utilizado aquellas imágenes del conjunto de datos de validación de COCO \cite{COCO} que tienen etiquetas relacionadas con transportes y tienen un índice menor a 200162 puesto que se ha utilizado un fichero de pesos relacionado con \autoref{fig:ejec5}, en particular aquel punto donde se alcanza un menor valor de pérdida en el entrenamiento.\\
+
+En particular, en \autoref{fig:pred} se pueden apreciar un par de ejemplos de predicciones de esta red neuronal, mostrándose con colores aleatorios las distintas categorías. La confianza en la predicción será el correspondiente resultado tras aplicar la función \emph{softmax} al valor medio entre los puntos marcados contabilizando todas las categorías para una determinada etiqueta.\\
+
+Las otras bases de datos implementadas, utilizarán imágenes del conjunto de datos de validación de COCO \cite{COCO} y sin restricciones respecto a las categorías a las que tienen que pertenecer las imágenes. Estas bases de datos será las que tendrán descriptores relacionados con colores \autoref{fig:REC} y bases de datos de etiquetas que contemplen todas las categorías. En concreto se tendrá una base de datos que represente el entrenamiento \autoref{fig:ejec10}, en los cuáles algunos ejemplos de predicciones pueden ser vistos en \autoref{resultados}.\\
+
+\begin{figure}[htpb]
+  \centering
+  \includegraphics[width=0.9\textwidth]{DetectingObjects/REC}
+  \caption{Ejemplo recuperación de imágenes basada en su color estructurado.}
+  \label{fig:REC}
+\end{figure}
+
+Antes de mostrar de las distintas posibilidades de comparación existentes mediante la comparación de una imagen concreta, mostraremos los diferentes resultados obtenidos según la imagen que utilicemos para la búsqueda, manteniendo fijo el comparador. \autoref{fig:rec}\\
+
+\begin{figure}[htpb]
+  \centering
+  \includegraphics[width=0.9\textwidth]{DetectingObjects/rec}
+  \includegraphics[width=0.9\textwidth]{DetectingObjects/rec1}
+  \caption{Ejemplos recuperación de imágenes considerando todas las categorías.}
+  \label{fig:rec}
+\end{figure}
+
+\newpage
+
+A continuación, se fijará una imagen y se verá cómo varía el resultado dependiendo de qué comparador, y con qué parámetros, estemos utilizando. La idea es mostrar la recuperación de imágenes utilizando comparadores que únicamente miren la igualdad, inclusión o igualdad suave entre etiquetas o que tengan en cuenta también otros criterios como puede ser los pesos obtenidos a la hora de etiquetas las imágenes o la cantidad de píxeles coincidentes entre cada una de las etiquetas.\\
+
+Primeramente, las imágenes resultado aparecerán ordenadas de menor a mayor resultado en la comparación, puesto que a mayor resultado más diferentes serán las imágenes de acuerdo al criterio de comparación seleccionado. En caso de compartir resultado, las imágenes aparecerán de acuerdo al orden en el que estén guardadas dentro de la propia base de datos.\\
+
+Además, cabe destacar que se mostrarán todas y cada una de las imágenes almacenadas en la base de datos. Pudiéndose llegar a un punto en el que también aparezcan imágenes con distancia infinita, es decir, imágenes tan diferentes que no son comparables con el criterio utilizado.\\
+
+En \autoref{fig:igualdad} se puede comprobar el resultado utilizando únicamente el comparador de igualdad \autoref{def:EqualComparator} entre categorías. En este caso el resultado esperado será tener una distancia con valor $0$ si la imagen comparada tiene únicamente las etiquetas ``coche'' y ``camión'', obteniendo $+\infty$ en caso de faltar alguna etiqueta o tener otra extra.\\
+\begin{figure}[htpb]
+  \centering
+  \includegraphics[width=0.9\textwidth]{DetectingObjects/IgualdadComparator}
+  \caption{Comparador de igualdad entre etiquetas únicamente.}
+  \label{fig:igualdad}
+\end{figure}
+
+En concreto, en esta relación se obtiene que desde la primera a la sexta imagen resultado tendremos imágenes que poseen únicamente las etiquetas ``coche'' y ``camión'' y por ello obtienen una distancia de $0.0$ con la imagen consultada. Estas imágenes ``iguales'', al no poder ordenarse por el valor de la predicción por compartir el mismo, serán ordenadas de acuerdo al orden en el que hayan sido almacenadas en la base de datos.\\
+
+A partir de la séptima imagen, aquella que posee una ``naranja'', se tendrá distancia infinita con la imagen consultada. Es decir, de acuerdo al criterio de comparación seleccionado, son tan distintas de la imagen consultada que no pueden ser comparables.\\
+
+Seguidamente, en \autoref{fig:inclusion} obtenemos el resultado tras el uso único del comparador de inclusión \autoref{def:InclusionComparator} entre etiquetas. Como se esperaba, se obtiene el valor $0$ si las categorías ``coche'' y ``camión'' están presentes en la imagen comparada de la base de datos y $+\infty$ si existe una carencia de alguna de ellas.\\
+
+\begin{figure}[htpb]
+  \centering
+  \includegraphics[width=0.9\textwidth]{DetectingObjects/InclusionComparator}
+  \caption{Comparador de inclusión entre etiquetas únicamente.}
+  \label{fig:inclusion}
+\end{figure}
+
+Finalizaremos los comparadores que comprueban exclusivamente las etiquetas con el comparador de ``igualdad suave'' \autoref{def:SoftEqualComparator}. La distancia será $0$ si sucede lo mismo que sucedía con el comparador de inclusión, añadiendo el hecho de que será también $0$ si la imagen a comparar posee únicamente las etiquetas ``coche'' o ``camión''. En cualquier caso será $+\infty$. Esto se puede apreciar en \autoref{fig:SoftEqualComparator}.\\
+
+\begin{figure}[htpb]
+  \centering
+  \includegraphics[width=0.9\textwidth]{DetectingObjects/SoftEqualComparator}
+  \caption{Comparador de igualdad suave entre etiquetas únicamente.}
+  \label{fig:SoftEqualComparator}
+\end{figure}
+
+\newpage
+Continuaremos hablando del comparador basado en la intersección sobre la unión siendo el primer detalle fundamental que, dependiendo de si trabajamos con igualdad  o sólo inclusión, se devolverá la distancia infinita cuando la comparación por etiquetas inicial lo indique. Sin embargo, este no será el único caso en el que se devuelva dicha distancia infinita.\\
+
+En particular, dadas una imagen seleccionada y una imagen a comparar, si existe una categoría en la imagen seleccionada tal que la intersección de todos los píxeles pertenecientes a estas categoría con los píxeles de la misma categoría de la imagen a comparar es vacía. Entonces, para esa categoría la distancia será infinita y, por tanto, por la propia definición de las funciones de agregación que mencionamos, las distancias totales bajo la operación de agregación del máximo, media aritmética o media geométrica devolverán $+\infty$.\\
+
+Concretamente, si todas las intersecciones son nulas, la distancia bajo la operación del mínimo también será $+\infty$.\\
+
+\begin{figure}[htpb]
+  \centering
+  \includegraphics[width=1.0\textwidth]{DetectingObjects/IoUComparatorMaximoIgualdad}
+  \caption{Comparador basado en IoU con igualdad entre etiquetas y operación del máximo como agregación entre etiquetas.}
+  \label{fig:IoUComparatorMaximoIgualdad}
+\end{figure}
+
+\begin{figure}[htpb]
+  \centering
+  \includegraphics[width=1.0\textwidth]{DetectingObjects/IoUComparatorMinimoIgualdad}
+  \caption{Comparador basado en IoU con igualdad entre etiquetas y operación del mínimo como agregación entre etiquetas.}
+  \label{fig:IoUComparatorMinimoIgualdad}
+\end{figure}
+
+\begin{figure}[htpb]
+  \centering
+  \includegraphics[width=1.0\textwidth]{DetectingObjects/IoUComparatorMediaIgualdad}
+  \caption{Comparador basado en IoU con igualdad entre etiquetas y con la medía aritmética como agregación entre etiquetas.}
+  \label{fig:IoUComparatorMediaIgualdad}
+\end{figure}
+
+\begin{figure}[htpb]
+  \centering
+  \includegraphics[width=1.0\textwidth]{DetectingObjects/IoUComparatorEuclideaIgualdad}
+  \caption{Comparador basado en IoU con igualdad entre etiquetas y con la media euclídea como agregación entre etiquetas.}
+  \label{fig:IoUComparatorEuclideaIgualdad}
+\end{figure}
+
+\begin{figure}[htpb]
+  \centering
+  \includegraphics[width=1.0\textwidth]{DetectingObjects/IoUComparatorMaximoInclusion}
+  \caption{Comparador basado en IoU con inclusión entre etiquetas y operación del máximo como agregación entre etiquetas.}
+  \label{fig:IoUComparatorMaximoInclusion}
+\end{figure}
+
+\begin{figure}[htpb]
+  \centering
+  \includegraphics[width=1.0\textwidth]{DetectingObjects/IoUComparatorMinimoInclusion}
+  \caption{Comparador basado en IoU con inclusión entre etiquetas y operación del mínimo como agregación entre etiquetas.}
+  \label{fig:IoUComparatorMinimoInclusion}
+\end{figure}
+
+\begin{figure}[htpb]
+  \centering
+  \includegraphics[width=1.0\textwidth]{DetectingObjects/IoUComparatorMediaInclusion}
+  \caption{Comparador basado en IoU con inclusión entre etiquetas y con la medía aritmética como agregación entre etiquetas.}
+  \label{fig:IoUComparatorMediaInclusion}
+\end{figure}
+
+\begin{figure}[htpb]
+  \centering
+  \includegraphics[width=1.0\textwidth]{DetectingObjects/IoUComparatorEuclideaInclusion}
+  \caption{Comparador basado en IoU con inclusión entre etiquetas y con la media euclídea como agregación entre etiquetas.}
+  \label{fig:IoUComparatorEuclideaInclusion}
+\end{figure}
+
+\newpage
+Como último tipo de comparador con etiquetas, el comparador basado en pesos \autoref{def:WeightBasedComparator} tendrá el valor $+\infty$ únicamente cuando la comparación de igualdad(\autoref{fig:WeightBasedComparatorMaximoIgualdad}, \autoref{fig:WeightBasedComparatorMinimoIgualdad}, \autoref{fig:WeightBasedComparatorMediaIgualdad}, \autoref{fig:WeightBasedComparatorEuclideaIgualdad}) o inclusión(\autoref{fig:WeightBasedComparatorMaximoInclusion}, \autoref{fig:WeightBasedComparatorMinimoInclusion}, \autoref{fig:WeightBasedComparatorMediaInclusion}, \autoref{fig:WeightBasedComparatorEuclideaInclusion}) seleccionada marque este valor, mientras tanto retornará el valor marcado por la operación de agregación seleccionada.\\
+
+\begin{figure}[htpb]
+  \centering
+  \includegraphics[width=1.0\textwidth]{DetectingObjects/WeightBasedComparatorMaximoIgualdad}
+  \caption{Comparador basado en pesos con igualdad entre etiquetas y operación del máximo como agregación entre pesos.}
+  \label{fig:WeightBasedComparatorMaximoIgualdad}
+\end{figure}
+
+\begin{figure}[htpb]
+  \centering
+  \includegraphics[width=1.0\textwidth]{DetectingObjects/WeightBasedComparatorMinimoIgualdad}
+  \caption{Comparador basado en pesos con igualdad entre etiquetas y operación del mínimo como agregación entre pesos.}
+  \label{fig:WeightBasedComparatorMinimoIgualdad}
+\end{figure}
+
+\begin{figure}[htpb]
+  \centering
+  \includegraphics[width=1.0\textwidth]{DetectingObjects/WeightBasedComparatorMediaIgualdad}
+  \caption{Comparador basado en pesos con igualdad entre etiquetas y con la medía aritmética como agregación entre pesos.}
+  \label{fig:WeightBasedComparatorMediaIgualdad}
+\end{figure}
+
+\begin{figure}[htpb]
+  \centering
+  \includegraphics[width=1.0\textwidth]{DetectingObjects/WeightBasedComparatorEuclideaIgualdad}
+  \caption{Comparador basado en pesos con igualdad entre etiquetas y con la media euclídea como agregación entre pesos.}
+  \label{fig:WeightBasedComparatorEuclideaIgualdad}
+\end{figure}
+
+\begin{figure}[htpb]
+  \centering
+  \includegraphics[width=1.0\textwidth]{DetectingObjects/WeightBasedComparatorMaximoInclusion}
+  \caption{Comparador basado en pesos con inclusión entre etiquetas y operación del máximo como agregación entre pesos.}
+  \label{fig:WeightBasedComparatorMaximoInclusion}
+\end{figure}
+
+\begin{figure}[htpb]
+  \centering
+  \includegraphics[width=1.0\textwidth]{DetectingObjects/WeightBasedComparatorMinimoInclusion}
+  \caption{Comparador basado en pesos con inclusión entre etiquetas y operación del mínimo como agregación entre pesos.}
+  \label{fig:WeightBasedComparatorMinimoInclusion}
+\end{figure}
+
+\begin{figure}[htpb]
+  \centering
+  \includegraphics[width=1.0\textwidth]{DetectingObjects/WeightBasedComparatorMediaInclusion}
+  \caption{Comparador basado en pesos con inclusión entre etiquetas y con la medía aritmética como agregación entre pesos.}
+  \label{fig:WeightBasedComparatorMediaInclusion}
+\end{figure}
+
+\begin{figure}[htpb]
+  \centering
+  \includegraphics[width=1.0\textwidth]{DetectingObjects/WeightBasedComparatorEuclideaInclusion}
+  \caption{Comparador basado en pesos con inclusión entre etiquetas y con la media euclídea como agregación entre pesos.}
+  \label{fig:WeightBasedComparatorEuclideaInclusion}
+\end{figure}
+
+\part{Conclusiones del proyecto}
+\chapter{Conclusiones y vías futuras}
+
+En este capítulo se abordarán las conclusiones finales del proyecto, teniendo en cuenta las grandes partes en las que este ha sido dividido. Además, se hablarán de las posibles líneas de desarrollo abiertas en las que se podrá trabajar en un futuro.\\
+
+Gracias a este proyecto, no sólo se han aprendido desde los fundamentos de las redes neuronales y las redes neuronales convolucionadas hasta detalles muchos más concretos. También se ha investigado algunas justificaciones matemáticas que permiten la utilización de este tipo de redes conforme se usan hoy en día, en particular, se han tratado diferentes versiones del teorema de aproximación universal.\\
+
+No nos hemos detenido ahí sino que, en adición, también se ha definido un tipo de bloque que implementa una operación no vista en los ejemplos clásicos para la segmentación semántica. Esta operación se ha llamado operador no local y se ha comprobado, en casos concretos, su utilidad en comparación con otras operaciones con una cantidad similar de pesos entrenables.\\
+
+Conociendo esto, se ha podido desarrollar un prototipo CBIR capaz de recuperar imágenes a través de características de nivel intermedio. Así como implementar diversos tipos de comparaciones para recuperar las imágenes siguiendo diferentes criterios.\\
+
+Al realizar esto, se ha comprobado la importancia de las librerías independientes y modularizables, permitiendo la fácil inclusión de estas en cualquier momento. También destaca la importancia de una interfaz de usuario sencilla y fácil de utilizar, sin importar el nivel de complejidad del problema abordado.\\
+
+En proyectos futuros, se podrán analizar otros tipos de bloques que puedan llegar a ser de utilidad para la segmentación semántica de imágenes. Es más, se podría ampliar el límite y tratar de localizar instancias de los distintos objetos y no únicamente los píxeles pertenecientes a las distintas categorías. En particular, se podría utilizar alguna de las últimas redes neuronales para obtener un resultado aún más óptimo.\\
+
+También se podría ampliar la cantidad de descriptores disponibles y buscar el garantizar la compatibilidad entre cada uno de ellos para, así, poder utilizar aún más descriptores de forma simultánea para describir una imagen a la hora de ser comparada con otras.\\
+
+Por otro lado, se podría extender la variedad de redes admitidas a la hora de cargar pesos, llegando a permitir cualquiera que diera los resultados con el formato deseado y no sólo aquellas que han sido entrenadas por nosotros mismo.
